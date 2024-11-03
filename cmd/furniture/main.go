@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/2pizzzza/furniture/internal/config"
+	"github.com/2pizzzza/furniture/internal/lib/logger/sl"
 	"log/slog"
 	"os"
 )
