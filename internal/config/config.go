@@ -5,12 +5,11 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-	"strconv"
 )
 
 type Config struct {
 	Host     string
-	Port     int
+	Port     string
 	Database string
 	Username string
 	Password string
@@ -26,7 +25,7 @@ func MustLoad() (db *Config, err error) {
 	}
 
 	host := os.Getenv("HOST")
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	port := os.Getenv("PORT")
 	dbname := os.Getenv("DB_NAME")
 	pass := os.Getenv("PASSWORD")
 	env := os.Getenv("ENV")

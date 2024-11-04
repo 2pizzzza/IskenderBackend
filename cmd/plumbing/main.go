@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/2pizzzza/furniture/internal/config"
-	"github.com/2pizzzza/furniture/internal/lib/logger/sl"
+	"github.com/2pizzzza/plumbing/internal/config"
+	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	"github.com/2pizzzza/plumbing/internal/storage/postgres"
 	"log/slog"
 	"os"
 )
@@ -23,6 +24,14 @@ func main() {
 	log := setupLogger(cfg.Env)
 
 	log.Info("Starting Apllication")
+
+	db, err := postgres.New(cfg)
+
+	if err != nil {
+		log.Error("Failed load database", sl.Err(err))
+	}
+
+	_ = db
 }
 
 func setupLogger(env string) *slog.Logger {
