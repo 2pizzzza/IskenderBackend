@@ -20,7 +20,7 @@ type DB struct {
 }
 
 func New(cfg *config.Config) (DB, error) {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUsername, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.Database)
 	dbConn, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
 		return DB{}, fmt.Errorf("unable to create connection pool: %v", err)
@@ -34,7 +34,8 @@ func New(cfg *config.Config) (DB, error) {
 
 	m, err := migrate.New(
 		"file://database/migration",
-		connStr)
+		fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUsername, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.Database),
+	)
 	if err != nil {
 		log.Printf("migration setup error: %s", err)
 		return DB{}, err
@@ -42,7 +43,6 @@ func New(cfg *config.Config) (DB, error) {
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Printf("migration error: %s", err)
-		return DB{}, err
 	}
 
 	slog.Info("Success connection to database")

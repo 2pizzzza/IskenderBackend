@@ -1,11 +1,13 @@
 package main
 
 import (
+	"github.com/2pizzzza/plumbing/internal/app"
 	"github.com/2pizzzza/plumbing/internal/config"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
-	"github.com/2pizzzza/plumbing/internal/storage/postgres"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 const (
@@ -25,13 +27,21 @@ func main() {
 
 	log.Info("Starting Apllication")
 
-	db, err := postgres.New(cfg)
+	application := app.New(log, cfg)
 
-	if err != nil {
-		log.Error("Failed load database", sl.Err(err))
-	}
+	go application.HTTPserv.MustRun()
 
-	_ = db
+	stop := make(chan os.Signal)
+
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	sign := <-stop
+
+	log.Info("stopping application", slog.String("signal:", sign.String()))
+
+	application.HTTPserv.Stop()
+
+	log.Info("Server is dead")
 }
 
 func setupLogger(env string) *slog.Logger {

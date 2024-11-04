@@ -5,15 +5,17 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"strconv"
 )
 
 type Config struct {
-	Host     string
-	Port     string
-	Database string
-	Username string
-	Password string
-	Env      string
+	DBHost     string
+	DBPort     string
+	Database   string
+	DBUsername string
+	DBPassword string
+	Env        string
+	HttpPort   int
 }
 
 func MustLoad() (db *Config, err error) {
@@ -29,14 +31,16 @@ func MustLoad() (db *Config, err error) {
 	dbname := os.Getenv("DB_NAME")
 	pass := os.Getenv("PASSWORD")
 	env := os.Getenv("ENV")
+	httpPort, _ := strconv.Atoi(os.Getenv("HTTP_PORT"))
 	log.Printf("Succses load env %s", pass)
 
 	return &Config{
-		Host:     host,
-		Port:     port,
-		Database: dbname,
-		Username: pass,
-		Password: pass,
-		Env:      env,
+		DBHost:     host,
+		DBPort:     port,
+		Database:   dbname,
+		DBUsername: pass,
+		DBPassword: pass,
+		Env:        env,
+		HttpPort:   httpPort,
 	}, nil
 }
