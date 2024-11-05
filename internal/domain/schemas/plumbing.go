@@ -18,3 +18,13 @@ type CreateItemResponse struct {
 	Colors      []string `json:"colors"`
 	Photos      []string `json:"photos"`
 }
+
+type CreateCategoryRequest struct {
+	CategoryID int    `json:"id"`
+	Name       string `json:"name"`
+}
+
+type CreateCategoryResponse struct {
+	CategoryID int    `json:"id"`
+	Name       string `json:"name"`
+}

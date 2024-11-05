@@ -19,6 +19,8 @@ type PlumpingRepository interface {
 	RemoveItem(ctx context.Context, itemID int) error
 	GetAllItemsByCategory(ctx context.Context, categoryID int) ([]models.Item, error)
 	GetAllItems(ctx context.Context) ([]models.Item, error)
+	// Category
+	SaveCategory(ctx context.Context, name string) (models.Category, error)
 }
 
 func New(log *slog.Logger, repository PlumpingRepository) *Plumping {

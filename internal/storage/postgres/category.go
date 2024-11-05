@@ -49,8 +49,8 @@ func (db *DB) GetCategoryByID(ctx context.Context, categoryID int) (models.Categ
 	return category, nil
 }
 
-func (db *DB) CreateCategory(ctx context.Context, name string) (models.Category, error) {
-	const op = "postgres.CreateCategory"
+func (db *DB) SaveCategory(ctx context.Context, name string) (models.Category, error) {
+	const op = "postgres.SaveCategory"
 
 	categoryQuery := `INSERT INTO Category (name) VALUES ($1) RETURNING category_id`
 	var categoryID int

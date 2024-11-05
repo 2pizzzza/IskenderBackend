@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	plumbingRouters "github.com/2pizzzza/plumbing/internal/http/plumbing"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
 	"log/slog"
 	"net/http"
@@ -13,11 +14,11 @@ type App struct {
 	port       int
 }
 
-func New(log *slog.Logger, port int) *App {
+func New(log *slog.Logger, port int, app *plumbingRouters.Server) *App {
 	mux := http.NewServeMux()
 
 	//app.RegisterRoutes(mux)
-
+	app.RegisterRoutes(mux)
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
