@@ -19,16 +19,16 @@ type DB struct {
 	Pool *pgxpool.Pool
 }
 
-func New(cfg *config.Config) (DB, error) {
+func New(cfg *config.Config) (*DB, error) {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUsername, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.Database)
 	dbConn, err := pgxpool.New(context.Background(), connStr)
 	if err != nil {
-		return DB{}, fmt.Errorf("unable to create connection pool: %v", err)
+		return &DB{}, fmt.Errorf("unable to create connection pool: %v", err)
 	}
 
 	sqlDB, err := sql.Open("pgx", connStr)
 	if err != nil {
-		return DB{}, fmt.Errorf("unable to open sql database connection: %v", err)
+		return &DB{}, fmt.Errorf("unable to open sql database connection: %v", err)
 	}
 	defer sqlDB.Close()
 
@@ -38,7 +38,7 @@ func New(cfg *config.Config) (DB, error) {
 	)
 	if err != nil {
 		log.Printf("migration setup error: %s", err)
-		return DB{}, err
+		return &DB{}, err
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
@@ -46,5 +46,5 @@ func New(cfg *config.Config) (DB, error) {
 	}
 
 	slog.Info("Success connection to database")
-	return DB{Pool: dbConn}, nil
+	return &DB{Pool: dbConn}, nil
 }

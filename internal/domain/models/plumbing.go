@@ -1,8 +1,8 @@
 package models
 
 type Category struct {
-	CategoryID int    `json:"category_id" db:"category_id"`
-	Name       string `json:"name" db:"name"`
+	CategoryID int    `json:"category_id"`
+	Name       string `json:"name"`
 }
 
 type Item struct {

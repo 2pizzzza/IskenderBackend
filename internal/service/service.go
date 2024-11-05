@@ -8,7 +8,7 @@ import (
 
 type Plumping struct {
 	log                *slog.Logger
-	plumpingRepository *PlumpingRepository
+	plumpingRepository PlumpingRepository
 }
 
 type PlumpingRepository interface {
@@ -21,9 +21,7 @@ type PlumpingRepository interface {
 	GetAllItems(ctx context.Context) ([]models.Item, error)
 }
 
-func New(
-	log *slog.Logger,
-	repository *PlumpingRepository) *Plumping {
+func New(log *slog.Logger, repository PlumpingRepository) *Plumping {
 	return &Plumping{
 		log:                log,
 		plumpingRepository: repository,

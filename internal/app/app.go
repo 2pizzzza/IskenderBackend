@@ -4,6 +4,7 @@ import (
 	httpapp "github.com/2pizzzza/plumbing/internal/app/http"
 	"github.com/2pizzzza/plumbing/internal/config"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	"github.com/2pizzzza/plumbing/internal/service"
 	"github.com/2pizzzza/plumbing/internal/storage/postgres"
 	"log/slog"
 )
@@ -18,11 +19,12 @@ func New(
 ) *App {
 	db, err := postgres.New(cfg)
 
-	_ = db
 	if err != nil {
-		log.Error("Failed to connect to database", sl.Err(err))
-		return nil
+		log.Error("Failed connect db err: %s", sl.Err(err))
 	}
+
+	plumbingService := service.New(log, db)
+	_ = plumbingService
 
 	httpApp := httpapp.New(log, cfg.HttpPort)
 
