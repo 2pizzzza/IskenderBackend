@@ -76,7 +76,7 @@ func (s *Server) GetCategoryById(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, schemas.ErrItemNotFound) {
 			s.log.Error("Category not found", sl.Err(err))
-			http.Error(w, "Item not found", http.StatusNotFound)
+			http.Error(w, "Category not found", http.StatusNotFound)
 			return
 		}
 		s.log.Error("Failed to get category by ID", sl.Err(err))
@@ -91,5 +91,72 @@ func (s *Server) GetCategoryById(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
 	}
+}
 
+func (s *Server) UpdateCategory(w http.ResponseWriter, r *http.Request) {
+	var req schemas.UpdateCategoryRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+	s.log.Info("Update category", slog.String("name", req.NewName))
+
+	err := s.service.UpdateCategory(r.Context(), &req)
+	if err != nil {
+		if errors.Is(err, schemas.ErrItemNotFound) {
+			s.log.Error("Category not found", sl.Err(err))
+			http.Error(w, "Category not found", http.StatusNotFound)
+			return
+		}
+		s.log.Error("Failed to update category by ID", sl.Err(err))
+		http.Error(w, "Failed to update category by ID", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	resp := map[string]string{"message": "Category updated successfully"}
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		s.log.Error("Failed to encode response", sl.Err(err))
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
+
+	s.log.Info("Category updated successfully", slog.Int("category_id", req.Id))
+}
+
+func (s *Server) RemoveCategory(w http.ResponseWriter, r *http.Request) {
+	var req schemas.CategoryByIdRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON request", http.StatusBadRequest)
+		return
+	}
+
+	defer r.Body.Close()
+	s.log.Info("Remove category", slog.Int("name", req.Id))
+
+	err := s.service.RemoveCategory(r.Context(), &req)
+	if err != nil {
+		if errors.Is(err, schemas.ErrItemNotFound) {
+			s.log.Error("Category not found", sl.Err(err))
+			http.Error(w, "Category not found", http.StatusNotFound)
+			return
+		}
+		s.log.Error("Failed to remove category by ID", sl.Err(err))
+		http.Error(w, "Failed to remove category by ID", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	resp := map[string]string{"message": "Category remove successfully"}
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		s.log.Error("Failed to encode response", sl.Err(err))
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
+
+	s.log.Info("Category remove successfully", slog.Int("category_id", req.Id))
 }

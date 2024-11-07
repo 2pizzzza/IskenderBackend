@@ -13,6 +13,8 @@ type PlumbingService interface {
 	CreateCategory(ctx context.Context, req *schemas.CreateCategoryRequest) (res *schemas.CreateCategoryResponse, err error)
 	GetAllCategory(ctx context.Context) (res *schemas.CategoriesResponse, err error)
 	GetCategoryById(ctx context.Context, req *schemas.CategoryByIdRequest) (res *schemas.CategoryResponse, err error)
+	UpdateCategory(ctx context.Context, req *schemas.UpdateCategoryRequest) error
+	RemoveCategory(ctx context.Context, req *schemas.CategoryByIdRequest) error
 
 	//Item
 	CreateItem(ctx context.Context, req *schemas.CreateItemRequest) (res *schemas.CreateItemResponse, err error)
@@ -37,4 +39,6 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /plumbing", s.GetItemByID)
 	mux.HandleFunc("GET /categories", s.GetAllCategories)
 	mux.HandleFunc("GET /category", s.GetCategoryById)
+	mux.HandleFunc("PUT /update-category", s.UpdateCategory)
+	mux.HandleFunc("DELETE /remove-category", s.RemoveCategory)
 }

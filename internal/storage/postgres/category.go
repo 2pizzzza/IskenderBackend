@@ -66,8 +66,19 @@ func (db *DB) SaveCategory(ctx context.Context, name string) (models.Category, e
 func (db *DB) UpdateCategory(ctx context.Context, categoryID int, name string) error {
 	const op = "postgres.UpdateCategory"
 
+	var exists bool
+	checkQuery := `SELECT EXISTS(SELECT 1 FROM Category WHERE category_id = $1)`
+	err := db.Pool.QueryRow(ctx, checkQuery, categoryID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check category existence: %w", op, err)
+	}
+
+	if !exists {
+		return schemas.ErrItemNotFound
+	}
+
 	updateQuery := `UPDATE Category SET name = $1 WHERE category_id = $2`
-	_, err := db.Pool.Exec(ctx, updateQuery, name, categoryID)
+	_, err = db.Pool.Exec(ctx, updateQuery, name, categoryID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update category: %w", op, err)
 	}
@@ -78,8 +89,19 @@ func (db *DB) UpdateCategory(ctx context.Context, categoryID int, name string) e
 func (db *DB) RemoveCategory(ctx context.Context, categoryID int) error {
 	const op = "postgres.RemoveCategory"
 
+	var exists bool
+	checkQuery := `SELECT EXISTS(SELECT 1 FROM Category WHERE category_id = $1)`
+	err := db.Pool.QueryRow(ctx, checkQuery, categoryID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check category existence: %w", op, err)
+	}
+
+	if !exists {
+		return schemas.ErrItemNotFound
+	}
+
 	deleteQuery := `DELETE FROM Category WHERE category_id = $1`
-	_, err := db.Pool.Exec(ctx, deleteQuery, categoryID)
+	_, err = db.Pool.Exec(ctx, deleteQuery, categoryID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to remove category: %w", op, err)
 	}

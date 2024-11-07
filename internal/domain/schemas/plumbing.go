@@ -52,3 +52,8 @@ type CategoryResponse struct {
 	CategoryID int    `json:"id"`
 	Name       string `json:"name"`
 }
+
+type UpdateCategoryRequest struct {
+	Id      int    `json:"id"`
+	NewName string `json:"new_name"`
+}

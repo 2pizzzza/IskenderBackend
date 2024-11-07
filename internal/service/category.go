@@ -59,20 +59,21 @@ func (rp *Plumping) GetAllCategory(ctx context.Context) (res *schemas.Categories
 	return res, nil
 }
 
-func (pr *Plumping) GetCategoryById(ctx context.Context, req *schemas.CategoryByIdRequest) (res *schemas.CategoryResponse, err error) {
+func (rp *Plumping) GetCategoryById(ctx context.Context, req *schemas.CategoryByIdRequest) (res *schemas.CategoryResponse, err error) {
 	const op = "service.GetCategoryById"
 
-	log := pr.log.With(
+	log := rp.log.With(
 		slog.String("op: ", op),
 	)
 
-	categoryRaw, err := pr.plumpingRepository.GetCategoryByID(ctx, req.Id)
+	categoryRaw, err := rp.plumpingRepository.GetCategoryByID(ctx, req.Id)
 
 	if err != nil {
 		if errors.Is(err, schemas.ErrItemNotFound) {
 			return nil, schemas.ErrItemNotFound
 		}
 		log.Error("Failed to get category by id", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
 	category := &schemas.CategoryResponse{
@@ -81,4 +82,43 @@ func (pr *Plumping) GetCategoryById(ctx context.Context, req *schemas.CategoryBy
 	}
 
 	return category, nil
+}
+
+func (rp *Plumping) UpdateCategory(ctx context.Context, req *schemas.UpdateCategoryRequest) error {
+	const op = "service.RemoveCategory"
+
+	log := rp.log.With(
+		slog.String("op: ", op),
+	)
+
+	err := rp.plumpingRepository.UpdateCategory(ctx, req.Id, req.NewName)
+
+	if err != nil {
+		if errors.Is(err, schemas.ErrItemNotFound) {
+			return schemas.ErrItemNotFound
+		}
+		log.Error("Failed to update category", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+
+	return nil
+}
+
+func (rp *Plumping) RemoveCategory(ctx context.Context, req *schemas.CategoryByIdRequest) error {
+	const op = "service.RemoveCategory"
+
+	log := rp.log.With(
+		slog.String("op: ", op),
+	)
+
+	err := rp.plumpingRepository.RemoveCategory(ctx, req.Id)
+	if err != nil {
+		if errors.Is(err, schemas.ErrItemNotFound) {
+			return schemas.ErrItemNotFound
+		}
+		log.Error("Failed to remove category", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+
+	return nil
 }
