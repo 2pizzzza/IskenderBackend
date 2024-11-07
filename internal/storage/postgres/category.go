@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	"github.com/2pizzzza/plumbing/internal/domain/schemas"
 	"github.com/jackc/pgx/v5"
 )
 
-func (db *DB) GetAllCategories(ctx context.Context) ([]models.Category, error) {
+func (db *DB) GetAllCategories(ctx context.Context) (*[]models.Category, error) {
 	const op = "postgres.GetAllCategories"
 
 	categoriesQuery := `SELECT category_id, name FROM Category`
@@ -30,7 +31,7 @@ func (db *DB) GetAllCategories(ctx context.Context) ([]models.Category, error) {
 		return nil, fmt.Errorf("%s: rows iteration error: %w", op, err)
 	}
 
-	return categories, nil
+	return &categories, nil
 }
 
 func (db *DB) GetCategoryByID(ctx context.Context, categoryID int) (models.Category, error) {
@@ -41,7 +42,7 @@ func (db *DB) GetCategoryByID(ctx context.Context, categoryID int) (models.Categ
 	err := db.Pool.QueryRow(ctx, categoryQuery, categoryID).Scan(&category.CategoryID, &category.Name)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return models.Category{}, fmt.Errorf("%s: category not found: %w", op, err)
+			return models.Category{}, schemas.ErrItemNotFound
 		}
 		return models.Category{}, fmt.Errorf("%s: failed to scan category: %w", op, err)
 	}

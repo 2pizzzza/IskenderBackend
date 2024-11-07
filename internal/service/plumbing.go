@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/domain/schemas"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
 	"log/slog"
@@ -32,4 +35,36 @@ func (rp *Plumping) CreateItem(ctx context.Context, req *schemas.CreateItemReque
 		Colors:      item.Colors,
 		Photos:      item.Photos,
 	}, nil
+}
+
+func (rp *Plumping) GetItemById(ctx context.Context, req *schemas.GetItemByIdRequest) (res *models.Item, err error) {
+	const op = "service.GetItemById"
+
+	log := rp.log.With(slog.String(
+		"op: ", op),
+	)
+
+	item, err := rp.plumpingRepository.GetItemById(ctx, req.ItemID)
+
+	if err != nil {
+		if errors.Is(err, schemas.ErrItemNotFound) {
+			return nil, schemas.ErrItemNotFound
+		}
+		log.Error("Err get item by id: ", sl.Err(err))
+
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	res = &models.Item{
+		ItemID:      item.ItemID,
+		Name:        item.Name,
+		Description: item.Description,
+		CategoryID:  item.CategoryID,
+		Price:       item.Price,
+		IsProduced:  item.IsProduced,
+		Colors:      item.Colors,
+		Photos:      item.Photos,
+	}
+
+	return res, nil
 }

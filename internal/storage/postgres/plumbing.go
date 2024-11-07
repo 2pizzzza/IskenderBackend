@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	"github.com/2pizzzza/plumbing/internal/domain/schemas"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -110,7 +111,7 @@ func (db *DB) GetItemById(ctx context.Context, id int) (models.Item, error) {
 	}
 
 	if item.ItemID == 0 {
-		return models.Item{}, fmt.Errorf("%s: item not found with id %d", op, id)
+		return models.Item{}, schemas.ErrItemNotFound
 	}
 
 	return item, nil
