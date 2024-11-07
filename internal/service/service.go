@@ -8,6 +8,7 @@ import (
 
 type Plumping struct {
 	log                *slog.Logger
+	baseDir            string
 	plumpingRepository PlumpingRepository
 }
 
@@ -27,9 +28,10 @@ type PlumpingRepository interface {
 	RemoveCategory(ctx context.Context, categoryID int) error
 }
 
-func New(log *slog.Logger, repository PlumpingRepository) *Plumping {
+func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {
 	return &Plumping{
 		log:                log,
+		baseDir:            baseDir,
 		plumpingRepository: repository,
 	}
 }

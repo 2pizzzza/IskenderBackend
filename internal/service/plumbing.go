@@ -10,6 +10,8 @@ import (
 	"log/slog"
 )
 
+const imageDir = "media/image"
+
 func (rp *Plumping) CreateItem(ctx context.Context, req *schemas.CreateItemRequest) (res *schemas.CreateItemResponse, err error) {
 	const op = "service.CreateItem"
 
@@ -67,4 +69,35 @@ func (rp *Plumping) GetItemById(ctx context.Context, req *schemas.GetItemByIdReq
 	}
 
 	return res, nil
+}
+
+func (rp *Plumping) SaveItemWithDetails(ctx context.Context, req *schemas.CreateItemWithDetailsRequest) (schemas.CreateItemResponse, error) {
+	const op = "service.SaveItemWithDetails"
+
+	log := rp.log.With(slog.String("op", op))
+
+	item, err := rp.plumpingRepository.SaveItemWithDetails(
+		ctx,
+		req.Name,
+		req.Description,
+		req.CategoryID,
+		req.Price,
+		req.Colors,
+		req.Photos,
+	)
+	if err != nil {
+		log.Error("Failed to save item with details", sl.Err(err))
+		return schemas.CreateItemResponse{}, err
+	}
+
+	return schemas.CreateItemResponse{
+		ItemID:      item.ItemID,
+		Name:        item.Name,
+		Description: item.Description,
+		CategoryID:  item.CategoryID,
+		Price:       item.Price,
+		IsProduced:  item.IsProduced,
+		Colors:      item.Colors,
+		Photos:      item.Photos,
+	}, nil
 }

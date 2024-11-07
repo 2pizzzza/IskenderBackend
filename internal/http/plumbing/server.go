@@ -19,6 +19,7 @@ type PlumbingService interface {
 	//Item
 	CreateItem(ctx context.Context, req *schemas.CreateItemRequest) (res *schemas.CreateItemResponse, err error)
 	GetItemById(ctx context.Context, id *schemas.GetItemByIdRequest) (res *models.Item, err error)
+	SaveItemWithDetails(ctx context.Context, req *schemas.CreateItemWithDetailsRequest) (schemas.CreateItemResponse, error)
 }
 
 type Server struct {
@@ -41,4 +42,5 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /category", s.GetCategoryById)
 	mux.HandleFunc("PUT /update-category", s.UpdateCategory)
 	mux.HandleFunc("DELETE /remove-category", s.RemoveCategory)
+	mux.HandleFunc("POST /create-item-with-details", s.CreateItemWithDetails)
 }

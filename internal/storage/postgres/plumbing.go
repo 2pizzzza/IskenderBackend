@@ -173,15 +173,15 @@ func (db *DB) SaveItemWithDetails(
 		newItem.Colors = append(newItem.Colors, colorName)
 	}
 
-	for _, photoURL := range photos {
+	for _, photoPath := range photos {
 		insertPhotoQuery := `
 			INSERT INTO Photo (item_id, url) VALUES ($1, $2)
 		`
-		_, err := tx.Exec(ctx, insertPhotoQuery, newItem.ItemID, photoURL)
+		_, err := tx.Exec(ctx, insertPhotoQuery, newItem.ItemID, photoPath)
 		if err != nil {
 			return models.Item{}, fmt.Errorf("%s: failed to insert photo: %w", op, err)
 		}
-		newItem.Photos = append(newItem.Photos, photoURL)
+		newItem.Photos = append(newItem.Photos, photoPath)
 	}
 
 	if err := tx.Commit(ctx); err != nil {

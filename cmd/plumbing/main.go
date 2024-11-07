@@ -27,7 +27,11 @@ func main() {
 
 	log.Info("Starting Apllication")
 
-	application := app.New(log, cfg)
+	dir, err := getBaseDir()
+	if err != nil {
+		log.Error("failed to get base dir")
+	}
+	application := app.New(log, dir, cfg)
 
 	go application.HTTPserv.MustRun()
 
@@ -63,4 +67,13 @@ func setupLogger(env string) *slog.Logger {
 	}
 
 	return log
+}
+
+func getBaseDir() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	return dir, nil
 }

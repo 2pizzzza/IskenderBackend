@@ -16,6 +16,7 @@ type App struct {
 
 func New(
 	log *slog.Logger,
+	baseDir string,
 	cfg *config.Config,
 ) *App {
 	db, err := postgres.New(cfg)
@@ -24,7 +25,7 @@ func New(
 		log.Error("Failed connect db err: %s", sl.Err(err))
 	}
 
-	plumbingRepository := service.New(log, db)
+	plumbingRepository := service.New(log, baseDir, db)
 	plumbingService := plumbing.New(log, plumbingRepository)
 
 	httpApp := httpapp.New(log, cfg.HttpPort, plumbingService)
