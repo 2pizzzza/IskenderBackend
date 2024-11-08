@@ -1,19 +1,37 @@
 package models
 
+type Catalog struct {
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Color       string `json:"color"`
+}
+
 type Category struct {
-	CategoryID int    `json:"id"`
+	Id         int    `json:"id"`
+	CategoryID int    `json:"category_id"`
 	Name       string `json:"name"`
 }
 
-type Item struct {
-	ItemID      int      `json:"id"`
+type Collection struct {
+	ID          int      `json:"id"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
-	CategoryID  int      `json:"category_id"`
-	Price       float64  `json:"price"`
-	IsProduced  bool     `json:"is_produced"`
 	Colors      []string `json:"colors"`
-	Photos      []string `json:"photos"`
+	CategoryID  int      `json:"category_id"`
+	IsProduced  bool     `json:"is_produced"`
+	IsPained    bool     `json:"is_pained"`
+}
+
+type Item struct {
+	ItemID       int     `json:"id"`
+	Name         string  `json:"name"`
+	Description  string  `json:"description"`
+	CategoryID   int     `json:"category_id"`
+	CollectionID int     `json:"collection_id"`
+	Price        float64 `json:"price"`
+	IsProduced   bool    `json:"is_produced"`
+	Photos       string  `json:"photos"`
 }
 
 type Color struct {
