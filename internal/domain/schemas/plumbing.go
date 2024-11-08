@@ -1,7 +1,6 @@
 package schemas
 
 import (
-	"errors"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 )
 
@@ -46,8 +45,6 @@ type CreateCategoryResponse struct {
 type GetItemByIdRequest struct {
 	ItemID int `json:"id"`
 }
-
-var ErrItemNotFound = errors.New("item not found")
 
 type CategoriesResponse struct {
 	Categories []models.Category `json:"categories"`
