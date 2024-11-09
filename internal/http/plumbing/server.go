@@ -26,6 +26,9 @@ type Service interface {
 	GetItemsByCategoryId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemById(ctx context.Context, id int, code string) (*models.ItemResponse, error)
 	GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
+
+	//Photo
+	GetImagePath(ctx context.Context, imageName string) (string, error)
 }
 
 type Server struct {
@@ -60,4 +63,6 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /item", s.GetItemsById)
 	mux.HandleFunc("GET /items-collection", s.GetItemsByCollectionId)
 
+	//Photo
+	mux.HandleFunc("GET /media/images/", s.GetImage)
 }

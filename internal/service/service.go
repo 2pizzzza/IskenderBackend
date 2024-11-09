@@ -33,6 +33,9 @@ type PlumpingRepository interface {
 	GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error)
 	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)
 	GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error)
+
+	//Photo
+
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {
