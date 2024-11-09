@@ -61,6 +61,49 @@ func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, language
 
 	return items, nil
 }
+func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error) {
+	const op = "postgres.GetItemByID"
+
+	var exists bool
+	existenceQuery := `SELECT EXISTS(SELECT 1 FROM Item WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, existenceQuery, itemID).Scan(&exists)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check item existence: %w", op, err)
+	}
+	if !exists {
+		return nil, storage.ErrItemNotFound
+	}
+
+	query := `
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted,
+		       COALESCE(it.name, ''), COALESCE(it.description, '')
+		FROM Item i
+		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $2
+		WHERE i.id = $1`
+
+	var item models.ItemResponse
+	err = db.Pool.QueryRow(ctx, query, itemID, languageCode).Scan(
+		&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
+		&item.IsPainted, &item.Name, &item.Description,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to retrieve item data: %w", op, err)
+	}
+
+	photos, err := db.getItemPhotos(ctx, item.ID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
+	}
+	item.Photos = photos
+
+	colors, err := db.getItemColors(ctx, item.ID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get colors for item %d: %w", op, item.ID, err)
+	}
+	item.Colors = colors
+
+	return &item, nil
+}
 
 func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosResponse, error) {
 	query := `

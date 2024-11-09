@@ -21,9 +21,11 @@ type PlumpingRepository interface {
 
 	//Collection
 	GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
+	GetCollectionByID(ctx context.Context, collectionID int, languageCode string) (*models.CollectionResponse, error)
 
 	//Item
 	GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error)
+	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {

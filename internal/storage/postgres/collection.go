@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	"github.com/2pizzzza/plumbing/internal/storage"
 )
 
 func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error) {
@@ -48,6 +49,48 @@ func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode str
 	}
 
 	return collections, nil
+}
+
+func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageCode string) (*models.CollectionResponse, error) {
+	const op = "postgres.GetCollectionByID"
+
+	var exists bool
+	existenceQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, existenceQuery, collectionID).Scan(&exists)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check collection existence: %w", op, err)
+	}
+	if !exists {
+		return nil, storage.ErrCollectionNotFound
+	}
+
+	query := `
+		SELECT c.id, c.price, c.isProducer, c.isPainted, COALESCE(ct.name, ''), COALESCE(ct.description, '')
+		FROM Collection c
+		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $2
+		WHERE c.id = $1`
+
+	var collection models.CollectionResponse
+	err = db.Pool.QueryRow(ctx, query, collectionID, languageCode).Scan(
+		&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.Name, &collection.Description,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to retrieve collection data: %w", op, err)
+	}
+
+	photos, err := db.getCollectionPhotos(ctx, collection.ID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
+	}
+	collection.Photos = photos
+
+	colors, err := db.getCollectionColors(ctx, collection.ID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
+	}
+	collection.Colors = colors
+
+	return &collection, nil
 }
 
 func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]models.PhotosResponse, error) {
