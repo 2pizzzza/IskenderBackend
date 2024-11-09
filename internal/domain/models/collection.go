@@ -42,8 +42,3 @@ type PopularResponse struct {
 	Collections []*CollectionResponse `json:"collections"`
 	Items       []*ItemResponse       `json:"items"`
 }
-
-type NewResponse struct {
-	Collections []*CollectionResponse `json:"collections"`
-	Items       []*ItemResponse       `json:"items"`
-}

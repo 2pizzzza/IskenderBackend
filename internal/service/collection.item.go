@@ -35,8 +35,8 @@ func (pr *Plumping) GetPopular(ctx context.Context, code string) (*models.Popula
 	return res, nil
 }
 
-func (pr *Plumping) GetNew(ctx context.Context, code string) (*models.NewResponse, error) {
-	const op = "service.GetPopular"
+func (pr *Plumping) GetNew(ctx context.Context, code string) (*models.PopularResponse, error) {
+	const op = "service.GetNew"
 
 	log := pr.log.With(
 		slog.String("op: ", op),
@@ -54,7 +54,34 @@ func (pr *Plumping) GetNew(ctx context.Context, code string) (*models.NewRespons
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
-	res := &models.NewResponse{
+	res := &models.PopularResponse{
+		Collections: collection,
+		Items:       items,
+	}
+
+	return res, nil
+}
+
+func (pr *Plumping) Search(ctx context.Context, code string, isProducer *bool, searchQuery string) (*models.PopularResponse, error) {
+	const op = "service.Search"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	items, err := pr.plumpingRepository.SearchItems(ctx, code, isProducer, searchQuery)
+	if err != nil {
+		log.Error("Failed to get new items", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, searchQuery)
+	if err != nil {
+		log.Error("Failed to get new collections", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	res := &models.PopularResponse{
 		Collections: collection,
 		Items:       items,
 	}

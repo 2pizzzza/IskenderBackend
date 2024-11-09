@@ -20,12 +20,15 @@ type Service interface {
 
 	//Popular and New
 	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
-	GetNew(ctx context.Context, code string) (*models.NewResponse, error)
+	GetNew(ctx context.Context, code string) (*models.PopularResponse, error)
 
 	//Items
 	GetItemsByCategoryId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemById(ctx context.Context, id int, code string) (*models.ItemResponse, error)
 	GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
+
+	//Seach
+	Search(ctx context.Context, code string, isProducer *bool, searchQuery string) (*models.PopularResponse, error)
 
 	//Photo
 	GetImagePath(ctx context.Context, imageName string) (string, error)
@@ -63,6 +66,10 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /item", s.GetItemsById)
 	mux.HandleFunc("GET /items-collection", s.GetItemsByCollectionId)
 
+	//Search
+	mux.HandleFunc("GET /search", s.Search)
+
 	//Photo
 	mux.HandleFunc("GET /media/images/", s.GetImage)
+
 }

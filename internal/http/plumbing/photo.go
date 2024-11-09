@@ -3,6 +3,8 @@ package plumbing
 import (
 	"context"
 	"fmt"
+	"github.com/2pizzzza/plumbing/internal/domain/models"
+	"github.com/2pizzzza/plumbing/internal/utils"
 	"net/http"
 	"os"
 )
@@ -12,7 +14,7 @@ func (s *Server) GetImage(w http.ResponseWriter, r *http.Request) {
 
 	imagePath, err := s.service.GetImagePath(context.Background(), imageName)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to found image"}, http.StatusNotFound)
 		return
 	}
 
@@ -32,6 +34,5 @@ func (s *Server) GetImage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", fileStat.Size()))
 
-	// Копируем файл изображения в ответ
 	http.ServeContent(w, r, imageName, fileStat.ModTime(), imgFile)
 }

@@ -29,13 +29,14 @@ type PlumpingRepository interface {
 	GetNewCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetNewItems(ctx context.Context, languageCode string) ([]*models.ItemResponse, error)
 
+	//Search and filtr
+	SearchCollections(ctx context.Context, languageCode string, isProducer *bool, searchQuery string) ([]*models.CollectionResponse, error)
+	SearchItems(ctx context.Context, languageCode string, isProducer *bool, searchQuery string) ([]*models.ItemResponse, error)
+
 	//Item
 	GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error)
 	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)
 	GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error)
-
-	//Photo
-
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {
