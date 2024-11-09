@@ -21,6 +21,7 @@ type Service interface {
 	//Items
 	GetItemsByCategoryId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemById(ctx context.Context, id int, code string) (*models.ItemResponse, error)
+	GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 }
 
 type Server struct {
@@ -49,5 +50,6 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Item
 	mux.HandleFunc("GET /items", s.GetItemsByCategoryId)
 	mux.HandleFunc("GET /item", s.GetItemsById)
+	mux.HandleFunc("GET /items-collection", s.GetItemsByCollectionId)
 
 }

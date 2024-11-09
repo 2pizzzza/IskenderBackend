@@ -49,3 +49,23 @@ func (pr *Plumping) GetItemById(ctx context.Context, id int, code string) (*mode
 
 	return items, nil
 }
+
+func (pr *Plumping) GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error) {
+	const op = "service.GetItemById"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	items, err := pr.plumpingRepository.GetItemsByCollectionID(ctx, id, code)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			log.Error("Failed to found item", sl.Err(err))
+			return nil, storage.ErrCollectionNotFound
+		}
+		log.Error("Failed to get item", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return items, nil
+}

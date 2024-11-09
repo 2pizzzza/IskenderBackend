@@ -76,3 +76,37 @@ func (s *Server) GetItemsById(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponseBody(w, res, http.StatusOK)
 
 }
+
+func (s *Server) GetItemsByCollectionId(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("collection_id")
+	lang := r.URL.Query().Get("lang")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing collection Id"}, http.StatusBadRequest)
+		return
+	}
+	if lang == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Language"}, http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+
+	s.log.Info("Get all items", slog.String("lang: ", lang), slog.Int("id: ", id))
+
+	res, err := s.service.GetItemsByCollectionId(r.Context(), id, lang)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to found collection"}, http.StatusNotFound)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get items"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+
+}

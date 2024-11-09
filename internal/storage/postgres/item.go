@@ -105,6 +105,63 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 	return &item, nil
 }
 
+func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error) {
+	const op = "postgres.GetItemsByCollectionID"
+
+	var exists bool
+	existenceQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, existenceQuery, collectionID).Scan(&exists)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check collection existence: %w", op, err)
+	}
+	if !exists {
+		return nil, storage.ErrCollectionNotFound
+	}
+
+	query := `
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted,
+		       COALESCE(it.name, ''), COALESCE(it.description, '')
+		FROM Item i
+		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $2
+		WHERE i.collection_id = $1`
+
+	rows, err := db.Pool.Query(ctx, query, collectionID, languageCode)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query items: %w", op, err)
+	}
+	defer rows.Close()
+
+	var items []*models.ItemResponse
+
+	for rows.Next() {
+		var item models.ItemResponse
+		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
+			&item.IsPainted, &item.Name, &item.Description); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
+		}
+
+		photos, err := db.getItemPhotos(ctx, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
+		}
+		item.Photos = photos
+
+		colors, err := db.getItemColors(ctx, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get colors for item %d: %w", op, item.ID, err)
+		}
+		item.Colors = colors
+
+		items = append(items, &item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return items, nil
+}
+
 func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosResponse, error) {
 	query := `
 		SELECT p.id, p.url, p.isMain

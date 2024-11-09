@@ -26,6 +26,7 @@ type PlumpingRepository interface {
 	//Item
 	GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error)
 	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)
+	GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error)
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {
