@@ -18,6 +18,10 @@ type Service interface {
 	GetCollectionByCategoryId(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 	GetCollectionByID(ctx context.Context, collectionId int, code string) (*models.CollectionResponse, error)
 
+	//Popular and New
+	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
+	GetNew(ctx context.Context, code string) (*models.NewResponse, error)
+
 	//Items
 	GetItemsByCategoryId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemById(ctx context.Context, id int, code string) (*models.ItemResponse, error)
@@ -46,6 +50,10 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Collection
 	mux.HandleFunc("GET /collections", s.GetCollectionsByCategoryId)
 	mux.HandleFunc("GET /collection", s.GetCollectionById)
+
+	//Popular and New
+	mux.HandleFunc("GET /popular", s.GetPopular)
+	mux.HandleFunc("GET /new", s.GetNew)
 
 	//Item
 	mux.HandleFunc("GET /items", s.GetItemsByCategoryId)

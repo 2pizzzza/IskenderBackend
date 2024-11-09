@@ -36,6 +36,8 @@ type ItemResponse struct {
 	Price        float64          `json:"price"`
 	IsProducer   bool             `json:"isProducer"`
 	IsPainted    bool             `json:"isPainted"`
+	IsPopular    bool             `json:"is_popular"`
+	IsNew        bool             `json:"is_new"`
 	Photos       []PhotosResponse `json:"photos"`
 	Colors       []ColorResponse  `json:"colors"`
 }

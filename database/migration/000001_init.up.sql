@@ -1,28 +1,30 @@
 CREATE TABLE IF NOT EXISTS Language (
-                                        code VARCHAR(10) PRIMARY KEY,
+    code VARCHAR(10) PRIMARY KEY,
     name VARCHAR(100)
     );
 
 CREATE TABLE IF NOT EXISTS Category (
-                                        id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS CategoryTranslation (
-                                                   category_id INT REFERENCES Category(id),
+    category_id INT REFERENCES Category(id),
     language_code VARCHAR(10) REFERENCES Language(code),
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     PRIMARY KEY (category_id, language_code)
     );
 
 CREATE TABLE IF NOT EXISTS Collection (
     id SERIAL PRIMARY KEY,
     price DECIMAL,
-    isProducer BOOLEAN,
-    isPainted BOOLEAN
+    isProducer BOOLEAN DEFAULT false,
+    isPainted BOOLEAN DEFAULT false,
+    isPopular BOOLEAN DEFAULT false,
+    isNew BOOLEAN DEFAULT false
     );
 
 CREATE TABLE IF NOT EXISTS CollectionTranslation (
-                                                     collection_id INT REFERENCES Collection(id),
+    collection_id INT REFERENCES Collection(id),
     language_code VARCHAR(10) REFERENCES Language(code),
     name VARCHAR(255),
     description TEXT,
@@ -30,17 +32,20 @@ CREATE TABLE IF NOT EXISTS CollectionTranslation (
     );
 
 CREATE TABLE IF NOT EXISTS Item (
-                                    id SERIAL PRIMARY KEY,
-                                    category_id INT REFERENCES Category(id),
+    id SERIAL PRIMARY KEY,
+    category_id INT REFERENCES Category(id),
     collection_id INT REFERENCES Collection(id),
     size VARCHAR(50),
     price DECIMAL,
-    isProducer BOOLEAN,
-    isPainted BOOLEAN
+    isProducer BOOLEAN DEFAULT false,
+    isPainted BOOLEAN DEFAULT false,
+    isPopular BOOLEAN DEFAULT false,
+    isNew BOOLEAN DEFAULT false
     );
 
+
 CREATE TABLE IF NOT EXISTS ItemTranslation (
-                                               item_id INT REFERENCES Item(id),
+    item_id INT REFERENCES Item(id),
     language_code VARCHAR(10) REFERENCES Language(code),
     name VARCHAR(255),
     description TEXT,

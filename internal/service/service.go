@@ -23,6 +23,12 @@ type PlumpingRepository interface {
 	GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionByID(ctx context.Context, collectionID int, languageCode string) (*models.CollectionResponse, error)
 
+	//Popular and new
+	GetPopularCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
+	GetPopularItems(ctx context.Context, languageCode string) ([]*models.ItemResponse, error)
+	GetNewCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
+	GetNewItems(ctx context.Context, languageCode string) ([]*models.ItemResponse, error)
+
 	//Item
 	GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error)
 	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)

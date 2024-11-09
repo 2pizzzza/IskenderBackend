@@ -27,11 +27,23 @@ type CollectionColor struct {
 
 type CollectionResponse struct {
 	ID          int              `json:"id"`
+	Name        string           `json:"name,omitempty"`
+	Description string           `json:"description,omitempty"`
 	Price       float64          `json:"price"`
 	IsProducer  bool             `json:"isProducer"`
 	IsPainted   bool             `json:"isPainted"`
-	Name        string           `json:"name,omitempty"`
-	Description string           `json:"description,omitempty"`
+	IsPopular   bool             `json:"is_popular"`
+	IsNew       bool             `json:"is_new"`
 	Photos      []PhotosResponse `json:"photos"`
 	Colors      []ColorResponse  `json:"colors"`
+}
+
+type PopularResponse struct {
+	Collections []*CollectionResponse `json:"collections"`
+	Items       []*ItemResponse       `json:"items"`
+}
+
+type NewResponse struct {
+	Collections []*CollectionResponse `json:"collections"`
+	Items       []*ItemResponse       `json:"items"`
 }
