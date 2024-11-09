@@ -3,14 +3,21 @@ CREATE TABLE IF NOT EXISTS Catalogs (
     price DECIMAL(10, 2) NOT NULL
     );
 
-CREATE TABLE IF NOT EXISTS Catalogs_Localization (
+CREATE TABLE IF NOT EXISTS Language (
     id SERIAL PRIMARY KEY,
-    catalog_id INT NOT NULL REFERENCES Catalogs(id) ON DELETE CASCADE,
-    language_code VARCHAR(10) NOT NULL,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL
+    );
+
+CREATE TABLE IF NOT EXISTS Catalogs_Localization (
+        id SERIAL PRIMARY KEY,
+        catalog_id INT NOT NULL REFERENCES Catalogs(id) ON DELETE CASCADE,
+    language_id INT NOT NULL REFERENCES Language(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    UNIQUE(catalog_id, language_code)
+    UNIQUE(catalog_id, language_id)
     );
+
 
 -- CREATE TABLE IF NOT EXISTS Category (
 --                           id SERIAL PRIMARY KEY,

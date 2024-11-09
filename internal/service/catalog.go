@@ -15,7 +15,7 @@ func (pr *Plumping) CreateCatalog(ctx context.Context, req *schemas.CreateCatalo
 
 	log := pr.log.With(slog.String("op: ", op))
 
-	catalog, err := pr.plumpingRepository.CreateCatalog(ctx, req.Name, req.Description, req.LanguageCode, req.Price, req.Color)
+	catalog, err := pr.plumpingRepository.CreateCatalog(ctx, req.Name, req.Description, req.LanguageID, req.Price, req.Color)
 
 	if err != nil {
 		if errors.Is(err, storage.ErrCatalogExists) {
@@ -37,7 +37,7 @@ func (pr *Plumping) AddNewCatalogLocalization(ctx context.Context, req *schemas.
 		slog.String("op: ", op),
 	)
 
-	catalog, err := pr.plumpingRepository.InsertCatalogLocalization(ctx, req.CatalogID, req.LanguageCode, req.Name, req.Description)
+	catalog, err := pr.plumpingRepository.InsertCatalogLocalization(ctx, req.CatalogID, req.LanguageID, req.Name, req.Description)
 	if err != nil {
 		if errors.Is(err, storage.ErrCatalogExists) {
 			log.Error("Catalog with this name already exist", sl.Err(err))
@@ -58,7 +58,7 @@ func (pr *Plumping) GetCatalogsByLangCode(ctx context.Context, req *schemas.Cata
 		slog.String("op: ", op),
 	)
 
-	catalogs, err := pr.plumpingRepository.GetCatalogsByLanguage(ctx, req.LanguageCode)
+	catalogs, err := pr.plumpingRepository.GetCatalogsByLanguageCode(ctx, req.LanguageCode)
 
 	if err != nil {
 		log.Error("Failed to get all catalogs", sl.Err(err))
@@ -95,7 +95,7 @@ func (pr *Plumping) UpdateCatalog(ctx context.Context, req *schemas.UpdateCatalo
 		slog.String("op: ", op),
 	)
 
-	err := pr.plumpingRepository.UpdateCatalog(ctx, req.ID, req.LanguageCode, req.NewName, req.NewDescription, req.NewPrice)
+	err := pr.plumpingRepository.UpdateCatalog(ctx, req.ID, req.LanguageID, req.NewName, req.NewDescription, req.NewPrice)
 	if err != nil {
 		if errors.Is(err, storage.ErrCatalogNotFound) {
 			log.Error("Failed to found catalog", sl.Err(err))

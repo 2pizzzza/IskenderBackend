@@ -15,11 +15,11 @@ type Plumping struct {
 
 type PlumpingRepository interface {
 	//Catalog
-	CreateCatalog(ctx context.Context, name, description, languageCode string, price float64, colorsReq []models.Color) (*schemas.CreateCatalogResponse, error)
-	InsertCatalogLocalization(ctx context.Context, catalogID int, languageCode, name, description string) (*schemas.CatalogLocalization, error)
-	GetCatalogsByLanguage(ctx context.Context, languageCode string) ([]*schemas.CatalogResponse, error)
+	CreateCatalog(ctx context.Context, name, description string, languageID int, price float64, colorsReq []models.Color) (*schemas.CreateCatalogResponse, error)
+	InsertCatalogLocalization(ctx context.Context, catalogID int, languageID int, name, description string) (*schemas.CatalogLocalization, error)
+	GetCatalogsByLanguageCode(ctx context.Context, languageCode string) ([]*schemas.CatalogResponse, error)
 	DeleteCatalog(ctx context.Context, catalogID int) error
-	UpdateCatalog(ctx context.Context, catalogID int, languageCode, name, description string, price float64) error
+	UpdateCatalog(ctx context.Context, catalogID int, languageID int, newName, newDescription string, newPrice float64) error
 	GetCatalogByID(ctx context.Context, catalogID int) (*schemas.CatalogDetailResponse, error)
 }
 

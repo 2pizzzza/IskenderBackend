@@ -3,15 +3,15 @@ package schemas
 import "github.com/2pizzzza/plumbing/internal/domain/models"
 
 type CreateCatalogRequest struct {
-	Name         string         `json:"name"`
-	Description  string         `json:"description"`
-	Price        float64        `json:"price"`
-	Color        []models.Color `json:"color"`
-	LanguageCode string         `json:"language_code"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Price       float64        `json:"price"`
+	Color       []models.Color `json:"color"`
+	LanguageID  int            `json:"language_id"`
 }
 
 type CreateCatalogResponse struct {
-	Id          int            `json:"id"`
+	ID          int            `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Price       float64        `json:"price"`
@@ -19,17 +19,18 @@ type CreateCatalogResponse struct {
 }
 
 type CatalogLocalizationRequest struct {
-	CatalogID    int    `json:"catalog_id"`
-	LanguageCode string `json:"language_code"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
+	CatalogID   int    `json:"catalog_id"`
+	LanguageID  int    `json:"language_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
+
 type CatalogLocalization struct {
-	ID           int    `json:"id"`
-	CatalogID    int    `json:"catalog_id"`
-	LanguageCode string `json:"language_code"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
+	ID          int    `json:"id"`
+	CatalogID   int    `json:"catalog_id"`
+	LanguageID  int    `json:"language_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type CatalogResponse struct {
@@ -52,7 +53,7 @@ type UpdateCatalogRequest struct {
 	NewName        string  `json:"new_name"`
 	NewDescription string  `json:"new_description"`
 	NewPrice       float64 `json:"new_price"`
-	LanguageCode   string  `json:"language_code"`
+	LanguageID     int     `json:"language_id"`
 }
 
 type CatalogDetailResponse struct {

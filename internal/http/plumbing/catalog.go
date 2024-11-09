@@ -106,7 +106,7 @@ func (s *Server) UpdateCatalog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.log.Info("Update catalog by id and code: ", slog.Int("id: ", req.ID), slog.String("code: ", req.LanguageCode))
+	s.log.Info("Update catalog by id and code: ", slog.Int("id: ", req.ID), slog.Int("code: ", req.LanguageID))
 
 	err := s.service.UpdateCatalog(r.Context(), &req)
 	if err != nil {

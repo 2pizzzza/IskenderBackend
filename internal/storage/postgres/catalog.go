@@ -10,15 +10,25 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (db *DB) CreateCatalog(ctx context.Context, name, description, languageCode string, price float64, colorsReq []models.Color) (*schemas.CreateCatalogResponse, error) {
+func (db *DB) CreateCatalog(ctx context.Context, name, description string, languageID int, price float64, colorsReq []models.Color) (*schemas.CreateCatalogResponse, error) {
 	const op = "postgres.CreateCatalog"
+
+	var langExists bool
+	languageCheckQuery := `SELECT EXISTS (SELECT 1 FROM Language WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, languageCheckQuery, languageID).Scan(&langExists)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check language existence: %w", op, err)
+	}
+	if !langExists {
+		return nil, fmt.Errorf("%s: language with ID %d does not exist", op, languageID)
+	}
 
 	var existingID int
 	checkQuery := `
 		SELECT c.id FROM Catalogs c
 		JOIN Catalogs_Localization cl ON c.id = cl.catalog_id
-		WHERE cl.name = $1 AND cl.language_code = $2`
-	err := db.Pool.QueryRow(ctx, checkQuery, name, languageCode).Scan(&existingID)
+		WHERE cl.name = $1 AND cl.language_id = $2`
+	err = db.Pool.QueryRow(ctx, checkQuery, name, languageID).Scan(&existingID)
 
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, fmt.Errorf("%s: failed to check existing catalog: %w", op, err)
@@ -31,12 +41,11 @@ func (db *DB) CreateCatalog(ctx context.Context, name, description, languageCode
 	createQuery := `INSERT INTO Catalogs (price) VALUES ($1) RETURNING id`
 	var catalogID int
 	err = db.Pool.QueryRow(ctx, createQuery, price).Scan(&catalogID)
-
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to create catalog: %w", op, err)
 	}
 
-	_, err = db.InsertCatalogLocalization(ctx, catalogID, languageCode, name, description)
+	_, err = db.InsertCatalogLocalization(ctx, catalogID, languageID, name, description)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to create catalog localization: %w", op, err)
 	}
@@ -44,6 +53,7 @@ func (db *DB) CreateCatalog(ctx context.Context, name, description, languageCode
 	var colors []models.Color
 	for _, colorReq := range colorsReq {
 		var color models.Color
+
 		colorCheckQuery := `SELECT id, name, hash_color FROM Color WHERE name = $1 AND hash_color = $2`
 		err := db.Pool.QueryRow(ctx, colorCheckQuery, colorReq.Name, colorReq.HashColor).Scan(
 			&color.ID, &color.Name, &color.HashColor,
@@ -57,7 +67,6 @@ func (db *DB) CreateCatalog(ctx context.Context, name, description, languageCode
 			err = db.Pool.QueryRow(ctx, colorInsertQuery, colorReq.Name, colorReq.HashColor).Scan(
 				&color.ID, &color.Name, &color.HashColor,
 			)
-
 			if err != nil {
 				return nil, fmt.Errorf("%s: failed to create color: %w", op, err)
 			}
@@ -71,14 +80,13 @@ func (db *DB) CreateCatalog(ctx context.Context, name, description, languageCode
 			INSERT INTO Catalog_Color (catalog_id, color_id)
 			VALUES ($1, $2) ON CONFLICT DO NOTHING`
 		_, err = db.Pool.Exec(ctx, catalogColorInsertQuery, catalogID, color.ID)
-
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to link color with catalog: %w", op, err)
 		}
 	}
 
 	response := &schemas.CreateCatalogResponse{
-		Id:          catalogID,
+		ID:          catalogID,
 		Name:        name,
 		Description: description,
 		Price:       price,
@@ -88,18 +96,28 @@ func (db *DB) CreateCatalog(ctx context.Context, name, description, languageCode
 	return response, nil
 }
 
-func (db *DB) InsertCatalogLocalization(ctx context.Context, catalogID int, languageCode, name, description string) (*schemas.CatalogLocalization, error) {
-	const op = "postgres.InsertLocalization"
+func (db *DB) InsertCatalogLocalization(ctx context.Context, catalogID int, languageID int, name, description string) (*schemas.CatalogLocalization, error) {
+	const op = "postgres.InsertCatalogLocalization"
+
+	var langExists bool
+	languageCheckQuery := `SELECT EXISTS (SELECT 1 FROM Language WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, languageCheckQuery, languageID).Scan(&langExists)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check language existence: %w", op, err)
+	}
+	if !langExists {
+		return nil, fmt.Errorf("%s: language with ID %d does not exist", op, languageID)
+	}
 
 	checkLocalizationQuery := `
-		SELECT id, catalog_id, language_code, name, description 
+		SELECT id, catalog_id, language_id, name, description 
 		FROM Catalogs_Localization 
-		WHERE catalog_id = $1 AND language_code = $2 AND name = $3`
+		WHERE catalog_id = $1 AND language_id = $2 AND name = $3`
 	var existingLocalization schemas.CatalogLocalization
-	err := db.Pool.QueryRow(ctx, checkLocalizationQuery, catalogID, languageCode, name).Scan(
+	err = db.Pool.QueryRow(ctx, checkLocalizationQuery, catalogID, languageID, name).Scan(
 		&existingLocalization.ID,
 		&existingLocalization.CatalogID,
-		&existingLocalization.LanguageCode,
+		&existingLocalization.LanguageID,
 		&existingLocalization.Name,
 		&existingLocalization.Description,
 	)
@@ -111,13 +129,13 @@ func (db *DB) InsertCatalogLocalization(ctx context.Context, catalogID int, lang
 	}
 
 	insertLocalizationQuery := `
-		INSERT INTO Catalogs_Localization (catalog_id, language_code, name, description)
+		INSERT INTO Catalogs_Localization (catalog_id, language_id, name, description)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id, catalog_id, language_code, name, description`
-	err = db.Pool.QueryRow(ctx, insertLocalizationQuery, catalogID, languageCode, name, description).Scan(
+		RETURNING id, catalog_id, language_id, name, description`
+	err = db.Pool.QueryRow(ctx, insertLocalizationQuery, catalogID, languageID, name, description).Scan(
 		&existingLocalization.ID,
 		&existingLocalization.CatalogID,
-		&existingLocalization.LanguageCode,
+		&existingLocalization.LanguageID,
 		&existingLocalization.Name,
 		&existingLocalization.Description,
 	)
@@ -129,16 +147,26 @@ func (db *DB) InsertCatalogLocalization(ctx context.Context, catalogID int, lang
 	return &existingLocalization, nil
 }
 
-func (db *DB) GetCatalogsByLanguage(ctx context.Context, languageCode string) ([]*schemas.CatalogResponse, error) {
+func (db *DB) GetCatalogsByLanguageCode(ctx context.Context, languageCode string) ([]*schemas.CatalogResponse, error) {
 	const op = "postgres.GetCatalogsByLanguage"
+
+	var languageID int
+	languageQuery := `SELECT id FROM Language WHERE code = $1`
+	err := db.Pool.QueryRow(ctx, languageQuery, languageCode).Scan(&languageID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("%s: language with code %s not found", op, languageCode)
+		}
+		return nil, fmt.Errorf("%s: failed to get language id: %w", op, err)
+	}
 
 	query := `
 		SELECT c.id, cl.name, cl.description, c.price
 		FROM Catalogs c
 		JOIN Catalogs_Localization cl ON c.id = cl.catalog_id
-		WHERE cl.language_code = $1`
+		WHERE cl.language_id = $1`
 
-	rows, err := db.Pool.Query(ctx, query, languageCode)
+	rows, err := db.Pool.Query(ctx, query, languageID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to get catalogs by language: %w", op, err)
 	}
@@ -198,7 +226,7 @@ func (db *DB) DeleteCatalog(ctx context.Context, catalogID int) error {
 	return nil
 }
 
-func (db *DB) UpdateCatalog(ctx context.Context, catalogID int, languageCode, newName, newDescription string, newPrice float64) error {
+func (db *DB) UpdateCatalog(ctx context.Context, catalogID int, languageID int, newName, newDescription string, newPrice float64) error {
 	const op = "postgres.UpdateCatalog"
 
 	tx, err := db.Pool.Begin(ctx)
@@ -219,16 +247,16 @@ func (db *DB) UpdateCatalog(ctx context.Context, catalogID int, languageCode, ne
 
 	updateCatalogQuery := `
 		UPDATE Catalogs
-		SET price = COALESCE($1, price)  
+		SET price = COALESCE($1, price)
 		WHERE id = $2`
 	_, err = tx.Exec(ctx, updateCatalogQuery, newPrice, catalogID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update catalog price: %w", op, err)
 	}
 
-	checkLocalizationQuery := `SELECT id FROM Catalogs_Localization WHERE catalog_id = $1 AND language_code = $2`
+	checkLocalizationQuery := `SELECT id FROM Catalogs_Localization WHERE catalog_id = $1 AND language_id = $2`
 	var localizationID int
-	err = tx.QueryRow(ctx, checkLocalizationQuery, catalogID, languageCode).Scan(&localizationID)
+	err = tx.QueryRow(ctx, checkLocalizationQuery, catalogID, languageID).Scan(&localizationID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return storage.ErrCatalogNotFound
@@ -238,14 +266,13 @@ func (db *DB) UpdateCatalog(ctx context.Context, catalogID int, languageCode, ne
 
 	updateLocalizationQuery := `
 		UPDATE Catalogs_Localization
-		SET name = COALESCE($1, name), description = COALESCE($2, description)  -- если не передано, сохраняем старое
-		WHERE catalog_id = $3 AND language_code = $4`
-	_, err = tx.Exec(ctx, updateLocalizationQuery, newName, newDescription, catalogID, languageCode)
+		SET name = COALESCE($1, name), description = COALESCE($2, description)
+		WHERE catalog_id = $3 AND language_id = $4`
+	_, err = tx.Exec(ctx, updateLocalizationQuery, newName, newDescription, catalogID, languageID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update catalog localization: %w", op, err)
 	}
 
-	// Подтверждаем транзакцию
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}
@@ -267,9 +294,10 @@ func (db *DB) GetCatalogByID(ctx context.Context, catalogID int) (*schemas.Catal
 	}
 
 	query := `
-		SELECT c.id, c.price, cl.language_code, cl.name, cl.description, col.id AS color_id, col.name AS color_name, col.hash_color
+		SELECT c.id, c.price, l.id AS language_id, l.code AS language_code, cl.name, cl.description, col.id AS color_id, col.name AS color_name, col.hash_color
 		FROM Catalogs c
 		JOIN Catalogs_Localization cl ON c.id = cl.catalog_id
+		JOIN Language l ON cl.language_id = l.id
 		LEFT JOIN Catalog_Color cc ON c.id = cc.catalog_id
 		LEFT JOIN Color col ON cc.color_id = col.id
 		WHERE c.id = $1`
@@ -283,13 +311,12 @@ func (db *DB) GetCatalogByID(ctx context.Context, catalogID int) (*schemas.Catal
 	var catalog schemas.CatalogDetailResponse
 	catalog.Languages = make([]schemas.CatalogLocalizationResponse, 0)
 
-	//colorsByLanguage := make(map[string][]schemas.ColorResponse)
-
 	for rows.Next() {
-		var langCode, name, description, colorName, hashColor string
+		var languageID, colorID int
+		var languageCode, name, description, colorName, hashColor string
 		var price float64
-		var colorID int
-		err := rows.Scan(&catalog.ID, &price, &langCode, &name, &description, &colorID, &colorName, &hashColor)
+
+		err := rows.Scan(&catalog.ID, &price, &languageID, &languageCode, &name, &description, &colorID, &colorName, &hashColor)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to scan row: %w", op, err)
 		}
@@ -297,7 +324,7 @@ func (db *DB) GetCatalogByID(ctx context.Context, catalogID int) (*schemas.Catal
 
 		var langResponse *schemas.CatalogLocalizationResponse
 		for i := range catalog.Languages {
-			if catalog.Languages[i].LanguageCode == langCode {
+			if catalog.Languages[i].LanguageCode == languageCode {
 				langResponse = &catalog.Languages[i]
 				break
 			}
@@ -305,9 +332,10 @@ func (db *DB) GetCatalogByID(ctx context.Context, catalogID int) (*schemas.Catal
 
 		if langResponse == nil {
 			langResponse = &schemas.CatalogLocalizationResponse{
-				LanguageCode: langCode,
+				LanguageCode: languageCode,
 				Name:         name,
 				Description:  description,
+				Colors:       make([]schemas.ColorResponse, 0),
 			}
 			catalog.Languages = append(catalog.Languages, *langResponse)
 		}
