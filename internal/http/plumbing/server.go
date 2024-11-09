@@ -10,6 +10,15 @@ import (
 type Service interface {
 	//Language
 	GetAllLanguages(ctx context.Context) ([]*models.Language, error)
+
+	//Category
+	GetCategoriesByCode(ctx context.Context, languageCode string) ([]*models.Category, error)
+
+	//Collection
+	GetCollectionByCategoryId(ctx context.Context, code string) ([]*models.CollectionResponse, error)
+
+	//Items
+	GetItemsByCategoryId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 }
 
 type Server struct {
@@ -27,5 +36,14 @@ func New(log *slog.Logger, service Service) *Server {
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Language
 	mux.HandleFunc("GET /language", s.GetAllLanguages)
+
+	//Category
+	mux.HandleFunc("GET /category", s.GetAllCategoriesByCode)
+
+	//Collection
+	mux.HandleFunc("GET /collections", s.GetCollectionsByCategoryId)
+
+	//Items
+	mux.HandleFunc("GET /items", s.GetItemsByCategoryId)
 
 }

@@ -24,3 +24,14 @@ type CollectionColor struct {
 	CollectionID int `json:"collection_id"`
 	ColorID      int `json:"color_id"`
 }
+
+type CollectionResponse struct {
+	ID          int              `json:"id"`
+	Price       float64          `json:"price"`
+	IsProducer  bool             `json:"isProducer"`
+	IsPainted   bool             `json:"isPainted"`
+	Name        string           `json:"name,omitempty"`
+	Description string           `json:"description,omitempty"`
+	Photos      []PhotosResponse `json:"photos"`
+	Colors      []ColorResponse  `json:"colors"`
+}

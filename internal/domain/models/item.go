@@ -26,3 +26,16 @@ type ItemColor struct {
 	ItemID  int `json:"item_id"`
 	ColorID int `json:"color_id"`
 }
+type ItemResponse struct {
+	ID           int              `json:"id"`
+	Name         string           `json:"name"`
+	Description  string           `json:"description"`
+	CategoryID   int              `json:"category_id"`
+	CollectionID int              `json:"collection_id"`
+	Size         string           `json:"size"`
+	Price        float64          `json:"price"`
+	IsProducer   bool             `json:"isProducer"`
+	IsPainted    bool             `json:"isPainted"`
+	Photos       []PhotosResponse `json:"photos"`
+	Colors       []ColorResponse  `json:"colors"`
+}
