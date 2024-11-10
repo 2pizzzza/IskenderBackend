@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	token2 "github.com/2pizzzza/plumbing/internal/lib/jwt"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"log/slog"
@@ -28,4 +29,87 @@ func (pr *Plumping) GetCategoriesByCode(ctx context.Context, languageCode string
 	}
 
 	return category, nil
+}
+
+func (pr *Plumping) CreateCategory(ctx context.Context, token string, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error) {
+	const op = "service.CreateCategory"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return nil, storage.ErrToken
+	}
+
+	category, err := pr.plumpingRepository.CreateCategory(ctx, req)
+
+	if err != nil {
+		if errors.Is(err, storage.ErrCategoryExists) {
+			log.Error("Category Exist", sl.Err(err))
+			return nil, storage.ErrCategoryExists
+		}
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			log.Error("Language 3 need", sl.Err(err))
+			return nil, storage.ErrRequiredLanguage
+		}
+
+		log.Error("Failed to create category", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", sl.Err(err))
+	}
+
+	return category, nil
+}
+
+func (pr *Plumping) UpdateCategory(ctx context.Context, token string, req *models.UpdateCategoryRequest) error {
+	const op = "service.UpdateCategory"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.UpdateCategory(ctx, req.CategoryID, req.Name, req.LanguageCode)
+	log.Info("id", req.CategoryID)
+	if err != nil {
+		if errors.Is(err, storage.ErrCategoryNotFound) {
+			log.Error("Category already exist", sl.Err(err))
+			return storage.ErrCategoryNotFound
+		}
+		log.Error("Failed to update category", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+	return nil
+}
+
+func (pr *Plumping) RemoveCategory(ctx context.Context, token string, req *models.RemoveCategoryRequest) error {
+	const op = "service.RemoveCategory"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.DeleteCategory(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, storage.ErrCategoryNotFound) {
+			log.Error("Category already exist", sl.Err(err))
+			return storage.ErrCategoryNotFound
+		}
+		log.Error("Failed to update category", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+	return nil
 }

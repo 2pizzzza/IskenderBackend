@@ -11,11 +11,15 @@ type Service interface {
 
 	//Starter
 	Starter(ctx context.Context) error
+
 	//Language
 	GetAllLanguages(ctx context.Context) ([]*models.Language, error)
 
 	//Category
 	GetCategoriesByCode(ctx context.Context, languageCode string) ([]*models.Category, error)
+	CreateCategory(ctx context.Context, token string, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error)
+	UpdateCategory(ctx context.Context, token string, req *models.UpdateCategoryRequest) error
+	RemoveCategory(ctx context.Context, token string, req *models.RemoveCategoryRequest) error
 
 	//Collection
 	GetCollectionByCategoryId(ctx context.Context, code string) ([]*models.CollectionResponse, error)
@@ -57,6 +61,9 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	//Category
 	mux.HandleFunc("GET /category", s.GetAllCategoriesByCode)
+	mux.HandleFunc("POST /category", s.CreateCategory)
+	mux.HandleFunc("PUT /category", s.UpdateCategory)
+	mux.HandleFunc("DELETE /category", s.RemoveCategory)
 
 	//Collection
 	mux.HandleFunc("GET /collections", s.GetCollectionsByCategoryId)

@@ -1,5 +1,21 @@
 basePath: /
 definitions:
+  models.CategoriesRequest:
+    properties:
+      language_code:
+        type: string
+      name:
+        type: string
+    type: object
+  models.CategoriesResponse:
+    properties:
+      id:
+        type: integer
+      language_code:
+        type: string
+      name:
+        type: string
+    type: object
   models.Category:
     properties:
       id:
@@ -40,6 +56,20 @@ definitions:
         type: string
       id:
         type: integer
+    type: object
+  models.CreateCategoryRequest:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/models.CategoriesRequest'
+        type: array
+    type: object
+  models.CreateCategoryResponse:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/models.CategoriesResponse'
+        type: array
     type: object
   models.ErrorMessage:
     properties:
@@ -86,6 +116,11 @@ definitions:
       name:
         type: string
     type: object
+  models.Message:
+    properties:
+      message:
+        type: string
+    type: object
   models.PhotosResponse:
     properties:
       id:
@@ -106,9 +141,23 @@ definitions:
           $ref: '#/definitions/models.ItemResponse'
         type: array
     type: object
+  models.RemoveCategoryRequest:
+    properties:
+      id:
+        type: integer
+    type: object
   models.Token:
     properties:
       token:
+        type: string
+    type: object
+  models.UpdateCategoryRequest:
+    properties:
+      category_id:
+        type: integer
+      language_code:
+        type: string
+      name:
         type: string
     type: object
   models.UserRequest:
@@ -131,6 +180,48 @@ info:
   version: "1.0"
 paths:
   /category:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a category. Requires a valid token.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Category removal details
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully removed category
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body or category not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to remove category
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Remove a category
+      tags:
+      - categories
     get:
       consumes:
       - application/json
@@ -163,6 +254,92 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorMessage'
       summary: Retrieve categories by language code
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Creates a new category. Requires a valid token and at least 3 language
+        entries.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Category creation details
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created category
+          schema:
+            $ref: '#/definitions/models.CreateCategoryResponse'
+        "400":
+          description: Invalid request body or category exists or less than required
+            languages
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to create category
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Create a new category
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Updates a category with new details. Requires a valid token.
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Category update details
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully updated category
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body or category not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to update category
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Update a category
       tags:
       - categories
   /collection:

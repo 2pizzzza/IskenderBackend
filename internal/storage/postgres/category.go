@@ -81,7 +81,19 @@ func (db *DB) CreateCategory(ctx context.Context, req models.CreateCategoryReque
 	const op = "postgres.CreateCategory"
 
 	if len(req.Categories) != 3 {
-		return nil, fmt.Errorf("%s: exactly 3 languages are required", op)
+		return nil, storage.ErrRequiredLanguage
+	}
+
+	for _, cat := range req.Categories {
+		var exists bool
+		checkCategoryQuery := `SELECT EXISTS(SELECT 1 FROM CategoryTranslation WHERE name = $1 AND language_code = $2)`
+		err := db.Pool.QueryRow(ctx, checkCategoryQuery, cat.Name, cat.LanguageCode).Scan(&exists)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to check category existence for language %s: %w", op, cat.LanguageCode, err)
+		}
+		if exists {
+			return nil, storage.ErrCategoryExists
+		}
 	}
 
 	tx, err := db.Pool.Begin(ctx)
@@ -144,6 +156,24 @@ func (db *DB) DeleteCategory(ctx context.Context, categoryID int) error {
 	_, err = tx.Exec(ctx, deleteTranslations, categoryID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to delete category translations: %w", op, err)
+	}
+
+	deleteItemTranslations := `DELETE FROM ItemTranslation WHERE item_id IN (SELECT id FROM Item WHERE category_id = $1)`
+	_, err = tx.Exec(ctx, deleteItemTranslations, categoryID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete item translations: %w", op, err)
+	}
+
+	deleteItemColors := `DELETE FROM ItemColor WHERE item_id IN (SELECT id FROM Item WHERE category_id = $1)`
+	_, err = tx.Exec(ctx, deleteItemColors, categoryID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete item colors: %w", op, err)
+	}
+
+	deleteItemPhotos := `DELETE FROM ItemPhoto WHERE item_id IN (SELECT id FROM Item WHERE category_id = $1)`
+	_, err = tx.Exec(ctx, deleteItemPhotos, categoryID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete item photos: %w", op, err)
 	}
 
 	deleteItems := `DELETE FROM Item WHERE category_id = $1`

@@ -11,6 +11,14 @@ type CategoryTranslation struct {
 	Name         string `json:"name"`
 }
 
+type UpdateCategoryRequest struct {
+	CategoryID   int    `json:"category_id"`
+	Name         string `json:"name"`
+	LanguageCode string `json:"language_code"`
+}
+type RemoveCategoryRequest struct {
+	ID int `json:"id"`
+}
 type CreateCategoryRequest struct {
 	Categories []CategoriesRequest `json:"categories"`
 }
@@ -28,4 +36,8 @@ type CategoriesResponse struct {
 	ID           int    `json:"id"`
 	Name         string `json:"name"`
 	LanguageCode string `json:"language_code"`
+}
+
+type Message struct {
+	Message string `json:"message"`
 }
