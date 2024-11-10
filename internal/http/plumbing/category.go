@@ -9,6 +9,18 @@ import (
 	"net/http"
 )
 
+// GetAllCategoriesByCode fetches categories based on the provided language code
+// @Summary Retrieve categories by language code
+// @Description Returns a list of categories for a specified language code
+// @Tags categories
+// @Accept  json
+// @Produce  json
+// @Param  lang  query  string  true  "Language code"
+// @Success 200 {array} models.Category "List of categories"
+// @Failure 400 {object} models.ErrorMessage "Missing language code"
+// @Failure 404 {object} models.ErrorMessage "Language code not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /category [get]
 func (s *Server) GetAllCategoriesByCode(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("lang")
 	if code == "" {

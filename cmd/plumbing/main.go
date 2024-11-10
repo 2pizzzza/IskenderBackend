@@ -16,6 +16,18 @@ const (
 	envProd  = "prod"
 )
 
+// @title Swagger Plumbing API
+// @version 1.0
+// @termsOfService http://swagger.io/terms/
+
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host 127.0.0.1:8080
+// @BasePath /
 func main() {
 	cfg, err := config.MustLoad()
 

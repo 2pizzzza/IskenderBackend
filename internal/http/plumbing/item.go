@@ -10,6 +10,19 @@ import (
 	"strconv"
 )
 
+// GetItemsByCategoryId retrieves items by category ID and language code
+// @Summary Retrieve items by category ID and language code
+// @Description Returns a list of items in the specified language for a category
+// @Tags items
+// @Accept  json
+// @Produce  json
+// @Param  category_id  query  int  true  "Category ID"
+// @Param  lang         query  string  true  "Language code"
+// @Success 200 {array} models.ItemResponse "List of items"
+// @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
+// @Failure 404 {object} models.ErrorMessage "Category not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /items [get]
 func (s *Server) GetItemsByCategoryId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("category_id")
 	lang := r.URL.Query().Get("lang")
@@ -43,6 +56,19 @@ func (s *Server) GetItemsByCategoryId(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponseBody(w, res, http.StatusOK)
 }
 
+// GetItemsById retrieves an item by its ID and language code
+// @Summary Retrieve an item by ID and language code
+// @Description Returns details of a specific item in the specified language
+// @Tags items
+// @Accept  json
+// @Produce  json
+// @Param  item_id  query  int  true  "Item ID"
+// @Param  lang     query  string  true  "Language code"
+// @Success 200 {object} models.ItemResponse "Item details"
+// @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
+// @Failure 404 {object} models.ErrorMessage "Item not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /item [get]
 func (s *Server) GetItemsById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("item_id")
 	lang := r.URL.Query().Get("lang")
@@ -77,6 +103,19 @@ func (s *Server) GetItemsById(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetItemsByCollectionId retrieves items by collection ID and language code
+// @Summary Retrieve items by collection ID and language code
+// @Description Returns a list of items in the specified language for a collection
+// @Tags items
+// @Accept  json
+// @Produce  json
+// @Param  collection_id  query  int  true  "Collection ID"
+// @Param  lang           query  string  true  "Language code"
+// @Success 200 {array} models.ItemResponse "List of items"
+// @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
+// @Failure 404 {object} models.ErrorMessage "Collection not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /items/collection [get]
 func (s *Server) GetItemsByCollectionId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("collection_id")
 	lang := r.URL.Query().Get("lang")

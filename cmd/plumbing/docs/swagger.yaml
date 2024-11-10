@@ -1,0 +1,461 @@
+basePath: /
+definitions:
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.CollectionResponse:
+    properties:
+      colors:
+        items:
+          $ref: '#/definitions/models.ColorResponse'
+        type: array
+      description:
+        type: string
+      id:
+        type: integer
+      is_new:
+        type: boolean
+      is_popular:
+        type: boolean
+      isPainted:
+        type: boolean
+      isProducer:
+        type: boolean
+      name:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+    type: object
+  models.ColorResponse:
+    properties:
+      hash_color:
+        type: string
+      id:
+        type: integer
+    type: object
+  models.ErrorMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  models.ItemResponse:
+    properties:
+      category_id:
+        type: integer
+      collection_id:
+        type: integer
+      colors:
+        items:
+          $ref: '#/definitions/models.ColorResponse'
+        type: array
+      description:
+        type: string
+      id:
+        type: integer
+      is_new:
+        type: boolean
+      is_popular:
+        type: boolean
+      isPainted:
+        type: boolean
+      isProducer:
+        type: boolean
+      name:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+      size:
+        type: string
+    type: object
+  models.Language:
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+    type: object
+  models.PhotosResponse:
+    properties:
+      id:
+        type: integer
+      isMain:
+        type: boolean
+      url:
+        type: string
+    type: object
+  models.PopularResponse:
+    properties:
+      collections:
+        items:
+          $ref: '#/definitions/models.CollectionResponse'
+        type: array
+      items:
+        items:
+          $ref: '#/definitions/models.ItemResponse'
+        type: array
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact:
+    email: support@swagger.io
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Plumbing API
+  version: "1.0"
+paths:
+  /category:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of categories for a specified language code
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of categories
+          schema:
+            items:
+              $ref: '#/definitions/models.Category'
+            type: array
+        "400":
+          description: Missing language code
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Language code not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve categories by language code
+      tags:
+      - categories
+  /collection:
+    get:
+      consumes:
+      - application/json
+      description: Returns details of a specific collection in the specified language
+      parameters:
+      - description: Collection ID
+        in: query
+        name: collection_id
+        required: true
+        type: integer
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Collection details
+          schema:
+            $ref: '#/definitions/models.CollectionResponse'
+        "400":
+          description: Missing or invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Collection not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve a collection by ID and language code
+      tags:
+      - collections
+  /collections:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of collections in the specified language for a category
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of collections
+          schema:
+            items:
+              $ref: '#/definitions/models.CollectionResponse'
+            type: array
+        "400":
+          description: Missing language code
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to get collections
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve collections by category ID and language code
+      tags:
+      - collections
+  /item:
+    get:
+      consumes:
+      - application/json
+      description: Returns details of a specific item in the specified language
+      parameters:
+      - description: Item ID
+        in: query
+        name: item_id
+        required: true
+        type: integer
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item details
+          schema:
+            $ref: '#/definitions/models.ItemResponse'
+        "400":
+          description: Missing or invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Item not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve an item by ID and language code
+      tags:
+      - items
+  /items:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of items in the specified language for a category
+      parameters:
+      - description: Category ID
+        in: query
+        name: category_id
+        required: true
+        type: integer
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of items
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemResponse'
+            type: array
+        "400":
+          description: Missing or invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve items by category ID and language code
+      tags:
+      - items
+  /items/collection:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of items in the specified language for a collection
+      parameters:
+      - description: Collection ID
+        in: query
+        name: collection_id
+        required: true
+        type: integer
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of items
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemResponse'
+            type: array
+        "400":
+          description: Missing or invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Collection not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve items by collection ID and language code
+      tags:
+      - items
+  /languages:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of all available languages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of languages
+          schema:
+            items:
+              $ref: '#/definitions/models.Language'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve all languages
+      tags:
+      - languages
+  /new:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of new collections and items for the specified language
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of new collections and items
+          schema:
+            $ref: '#/definitions/models.PopularResponse'
+        "400":
+          description: Missing or invalid language parameter
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve new collections and items by language
+      tags:
+      - new
+  /popular:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of popular collections and items for the specified
+        language
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of popular collections and items
+          schema:
+            $ref: '#/definitions/models.PopularResponse'
+        "400":
+          description: Missing or invalid language parameter
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve popular collections and items by language
+      tags:
+      - popular
+  /search:
+    get:
+      consumes:
+      - application/json
+      description: Performs a search for collections and items based on the provided
+        parameters such as language, producer status, and search query.
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        type: string
+      - description: Filter by producer status
+        in: query
+        name: is_producer
+        type: boolean
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Search results
+          schema:
+            $ref: '#/definitions/models.PopularResponse'
+        "400":
+          description: Bad request - invalid query parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Search for collections and items based on language, producer status,
+        and search query
+      tags:
+      - search
+swagger: "2.0"

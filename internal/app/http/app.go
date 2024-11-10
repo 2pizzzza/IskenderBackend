@@ -2,8 +2,10 @@ package http
 
 import (
 	"fmt"
+	_ "github.com/2pizzzza/plumbing/cmd/plumbing/docs"
 	plumbingRouters "github.com/2pizzzza/plumbing/internal/http/plumbing"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"log/slog"
 	"net/http"
 )
@@ -18,6 +20,7 @@ func New(log *slog.Logger, port int, app *plumbingRouters.Server) *App {
 	mux := http.NewServeMux()
 
 	//app.RegisterRoutes(mux)
+	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 	app.RegisterRoutes(mux)
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),

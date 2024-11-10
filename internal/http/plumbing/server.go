@@ -48,7 +48,7 @@ func New(log *slog.Logger, service Service) *Server {
 
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Language
-	mux.HandleFunc("GET /language", s.GetAllLanguages)
+	mux.HandleFunc("GET /languages", s.GetAllLanguages)
 
 	//Category
 	mux.HandleFunc("GET /category", s.GetAllCategoriesByCode)
@@ -64,7 +64,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Item
 	mux.HandleFunc("GET /items", s.GetItemsByCategoryId)
 	mux.HandleFunc("GET /item", s.GetItemsById)
-	mux.HandleFunc("GET /items-collection", s.GetItemsByCollectionId)
+	mux.HandleFunc("GET /items/collection", s.GetItemsByCollectionId)
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)
