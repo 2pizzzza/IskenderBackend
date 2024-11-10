@@ -13,6 +13,10 @@ type Plumping struct {
 }
 
 type PlumpingRepository interface {
+
+	//Starter
+	CreateStarter(ctx context.Context) error
+
 	//Language
 	GetLanguages(ctx context.Context) ([]*models.Language, error)
 

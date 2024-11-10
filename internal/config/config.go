@@ -15,6 +15,7 @@ type Config struct {
 	DBUsername string
 	DBPassword string
 	Env        string
+	HttpHost   string
 	HttpPort   int
 }
 
@@ -31,6 +32,7 @@ func MustLoad() (db *Config, err error) {
 	dbname := os.Getenv("DB_NAME")
 	pass := os.Getenv("PASSWORD")
 	env := os.Getenv("ENV")
+	httpHost := os.Getenv("HTTP_HOST")
 	httpPort, _ := strconv.Atoi(os.Getenv("HTTP_PORT"))
 	log.Printf("Succses load env %s", pass)
 
@@ -41,6 +43,7 @@ func MustLoad() (db *Config, err error) {
 		DBUsername: pass,
 		DBPassword: pass,
 		Env:        env,
+		HttpHost:   httpHost,
 		HttpPort:   httpPort,
 	}, nil
 }

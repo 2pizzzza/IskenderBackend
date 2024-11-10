@@ -28,7 +28,7 @@ func New(
 	plumbingRepository := service.New(log, baseDir, db)
 	plumbingService := plumbing.New(log, plumbingRepository)
 
-	httpApp := httpapp.New(log, cfg.HttpPort, plumbingService)
+	httpApp := httpapp.New(log, cfg.HttpHost, cfg.HttpPort, plumbingService)
 
 	return &App{
 		HTTPserv: httpApp,

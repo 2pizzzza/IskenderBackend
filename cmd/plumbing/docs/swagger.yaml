@@ -458,4 +458,28 @@ paths:
         and search query
       tags:
       - search
+  /starter:
+    post:
+      consumes:
+      - application/json
+      description: Starts the service, potentially creating necessary data or performing
+        required tasks.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "400":
+          description: already exists
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Initialize the service or perform a start-up operation
+      tags:
+      - starter
 swagger: "2.0"

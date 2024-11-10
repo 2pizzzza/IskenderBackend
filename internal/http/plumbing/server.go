@@ -8,6 +8,9 @@ import (
 )
 
 type Service interface {
+
+	//Starter
+	Starter(ctx context.Context) error
 	//Language
 	GetAllLanguages(ctx context.Context) ([]*models.Language, error)
 
@@ -47,6 +50,8 @@ func New(log *slog.Logger, service Service) *Server {
 }
 
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
+	//Starter
+	mux.HandleFunc("POST /starter", s.Starter)
 	//Language
 	mux.HandleFunc("GET /languages", s.GetAllLanguages)
 

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS CategoryTranslation (
 
 CREATE TABLE IF NOT EXISTS Collection (
     id SERIAL PRIMARY KEY,
-    price DECIMAL,
+    price DECIMAL NOT NULL,
     isProducer BOOLEAN DEFAULT false,
     isPainted BOOLEAN DEFAULT false,
     isPopular BOOLEAN DEFAULT false,
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS Collection (
 CREATE TABLE IF NOT EXISTS CollectionTranslation (
     collection_id INT REFERENCES Collection(id),
     language_code VARCHAR(10) REFERENCES Language(code),
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     description TEXT,
     PRIMARY KEY (collection_id, language_code)
     );
@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS Item (
     id SERIAL PRIMARY KEY,
     category_id INT REFERENCES Category(id),
     collection_id INT REFERENCES Collection(id),
-    size VARCHAR(50),
-    price DECIMAL,
+    size VARCHAR(50) NOT NULL,
+    price DECIMAL NOT NULL,
     isProducer BOOLEAN DEFAULT false,
     isPainted BOOLEAN DEFAULT false,
     isPopular BOOLEAN DEFAULT false,
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS Item (
 CREATE TABLE IF NOT EXISTS ItemTranslation (
     item_id INT REFERENCES Item(id),
     language_code VARCHAR(10) REFERENCES Language(code),
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     description TEXT,
     PRIMARY KEY (item_id, language_code)
     );

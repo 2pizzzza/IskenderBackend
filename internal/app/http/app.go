@@ -5,6 +5,7 @@ import (
 	_ "github.com/2pizzzza/plumbing/cmd/plumbing/docs"
 	plumbingRouters "github.com/2pizzzza/plumbing/internal/http/plumbing"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"log/slog"
 	"net/http"
@@ -13,23 +14,33 @@ import (
 type App struct {
 	log        *slog.Logger
 	httpServer *http.Server
+	host       string
 	port       int
 }
 
-func New(log *slog.Logger, port int, app *plumbingRouters.Server) *App {
+func New(log *slog.Logger, host string, port int, app *plumbingRouters.Server) *App {
 	mux := http.NewServeMux()
 
-	//app.RegisterRoutes(mux)
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"Content-Length"},
+		AllowCredentials: true,
+	})
+	handler := corsHandler.Handler(mux)
+
 	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 	app.RegisterRoutes(mux)
 	httpServer := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: mux,
+		Addr:    fmt.Sprintf("%s:%d", host, port),
+		Handler: handler,
 	}
 
 	return &App{
 		log:        log,
 		httpServer: httpServer,
+		host:       host,
 		port:       port,
 	}
 }
@@ -45,6 +56,7 @@ func (a *App) Run() error {
 
 	log := a.log.With(
 		slog.String("op", op),
+		slog.String("port", a.host),
 		slog.Int("port", a.port),
 	)
 

@@ -322,7 +322,8 @@ func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosRes
 		FROM ItemPhoto ip
 		JOIN Photo p ON ip.photo_id = p.id
 		WHERE ip.item_id = $1`
-
+	
+	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
 	rows, err := db.Pool.Query(ctx, query, itemID)
 	if err != nil {
 		return nil, fmt.Errorf("getItemPhotos: failed to query photos: %w", err)
@@ -335,6 +336,7 @@ func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosRes
 		if err := rows.Scan(&photo.ID, &photo.URL, &photo.IsMain); err != nil {
 			return nil, fmt.Errorf("getItemPhotos: failed to scan photo row: %w", err)
 		}
+		photo.URL = fmt.Sprintf("%s/%s", baseURL, photo.URL)
 		photos = append(photos, photo)
 	}
 

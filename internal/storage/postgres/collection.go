@@ -260,6 +260,7 @@ func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]mode
 		JOIN Photo p ON cp.photo_id = p.id
 		WHERE cp.collection_id = $1`
 
+	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
 	rows, err := db.Pool.Query(ctx, query, collectionID)
 	if err != nil {
 		return nil, fmt.Errorf("getCollectionPhotos: failed to query photos: %w", err)
@@ -272,6 +273,7 @@ func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]mode
 		if err := rows.Scan(&photo.ID, &photo.URL, &photo.IsMain); err != nil {
 			return nil, fmt.Errorf("getCollectionPhotos: failed to scan photo row: %w", err)
 		}
+		photo.URL = fmt.Sprintf("%s/%s", baseURL, photo.URL)
 		photos = append(photos, photo)
 	}
 

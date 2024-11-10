@@ -16,7 +16,8 @@ import (
 )
 
 type DB struct {
-	Pool *pgxpool.Pool
+	Config *config.Config
+	Pool   *pgxpool.Pool
 }
 
 func New(cfg *config.Config) (*DB, error) {
@@ -46,5 +47,5 @@ func New(cfg *config.Config) (*DB, error) {
 	}
 
 	slog.Info("Success connection to database")
-	return &DB{Pool: dbConn}, nil
+	return &DB{Pool: dbConn, Config: cfg}, nil
 }

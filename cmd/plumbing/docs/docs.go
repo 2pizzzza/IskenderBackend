@@ -531,6 +531,41 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/starter": {
+            "post": {
+                "description": "Starts the service, potentially creating necessary data or performing required tasks.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "starter"
+                ],
+                "summary": "Initialize the service or perform a start-up operation",
+                "responses": {
+                    "200": {
+                        "description": "Successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
