@@ -3,9 +3,11 @@ package app
 import (
 	httpapp "github.com/2pizzzza/plumbing/internal/app/http"
 	"github.com/2pizzzza/plumbing/internal/config"
-	"github.com/2pizzzza/plumbing/internal/http/plumbing"
+	authService "github.com/2pizzzza/plumbing/internal/http/auth"
+	handlerPlumbing "github.com/2pizzzza/plumbing/internal/http/plumbing"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
-	"github.com/2pizzzza/plumbing/internal/service"
+	"github.com/2pizzzza/plumbing/internal/service/auth"
+	service "github.com/2pizzzza/plumbing/internal/service/plumbing"
 	"github.com/2pizzzza/plumbing/internal/storage/postgres"
 	"log/slog"
 )
@@ -26,9 +28,12 @@ func New(
 	}
 
 	plumbingRepository := service.New(log, baseDir, db)
-	plumbingService := plumbing.New(log, plumbingRepository)
+	plumbingService := handlerPlumbing.New(log, plumbingRepository)
 
-	httpApp := httpapp.New(log, cfg.HttpHost, cfg.HttpPort, plumbingService)
+	authRepository := auth.New(log, cfg.DBHost, db)
+	authServ := authService.New(log, authRepository)
+
+	httpApp := httpapp.New(log, cfg.HttpHost, cfg.HttpPort, plumbingService, authServ)
 
 	return &App{
 		HTTPserv: httpApp,

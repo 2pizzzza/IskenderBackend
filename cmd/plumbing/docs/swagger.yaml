@@ -106,6 +106,18 @@ definitions:
           $ref: '#/definitions/models.ItemResponse'
         type: array
     type: object
+  models.Token:
+    properties:
+      token:
+        type: string
+    type: object
+  models.UserRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 host: 127.0.0.1:8080
 info:
   contact:
@@ -361,6 +373,37 @@ paths:
       summary: Retrieve all languages
       tags:
       - languages
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and provides a JWT token if credentials are
+        valid
+      parameters:
+      - description: User login details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login with JWT token
+          schema:
+            $ref: '#/definitions/models.Token'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Could not login
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: User login
+      tags:
+      - auth
   /new:
     get:
       consumes:
@@ -420,6 +463,34 @@ paths:
       summary: Retrieve popular collections and items by language
       tags:
       - popular
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account with a username and password
+      parameters:
+      - description: User registration details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully registered
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Could not register
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Register a new user
+      tags:
+      - auth
   /search:
     get:
       consumes:

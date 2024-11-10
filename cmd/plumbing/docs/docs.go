@@ -389,6 +389,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/login": {
+            "post": {
+                "description": "Authenticates a user and provides a JWT token if credentials are valid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "User login details",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful login with JWT token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Token"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Could not login",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/new": {
             "get": {
                 "description": "Returns a list of new collections and items for the specified language",
@@ -470,6 +516,49 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Creates a new user account with a username and password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User registration details",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User successfully registered"
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Could not register",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMessage"
                         }
@@ -729,6 +818,25 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.ItemResponse"
                     }
+                }
+            }
+        },
+        "models.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

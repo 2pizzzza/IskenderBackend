@@ -1,61 +1,36 @@
-package jwt
+package token
 
 import (
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
 
-type User interface {
-	GetID() int64
-	GetName() string
-	GetEmail() string
+var jwtSecret = []byte("your_secret_key")
+
+type Claims struct {
+	UserID int `json:"user_id"`
+	jwt.RegisteredClaims
 }
 
-func NewToken(user User, jwtSecret string, duration time.Duration) (string, error) {
-	token := jwt.New(jwt.SigningMethodES256)
-
-	claims := token.Claims.(jwt.MapClaims)
-	claims["uid"] = user.GetID()
-	claims["email"] = user.GetEmail()
-	claims["username"] = user.GetName()
-	claims["exp"] = time.Now().Add(duration).Unix()
-
-	tokenString, err := token.SignedString([]byte(jwtSecret))
-	if err != nil {
-		return "", err
+func GenerateToken(userID int) (string, error) {
+	claims := &Claims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		},
 	}
 
-	return tokenString, nil
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
 }
 
-//func ValidateToken(ctx context.Context, jwtSecret string) (jwt.MapClaims, error) {
-//	m, ok := metadata.FromIncomingContext(ctx)
-//	if !ok {
-//		return nil, fmt.Errorf("missing context")
-//	}
-//
-//	authHead := m.Get("authorization")
-//	if len(authHead) == 0 {
-//		return nil, fmt.Errorf("missing auth header")
-//	}
-//
-//	tokenStr := strings.TrimSpace(strings.TrimPrefix(authHead[0], "Bearer"))
-//
-//	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-//		return []byte(jwtSecret), nil
-//	})
-//
-//	if err != nil {
-//		return nil, fmt.Errorf("invalid token: %v", err)
-//	}
-//
-//	if !token.Valid {
-//		return nil, fmt.Errorf("invalid token")
-//	}
-//
-//	claims, ok := token.Claims.(jwt.MapClaims)
-//	if !ok {
-//		return nil, fmt.Errorf("invalid claims")
-//	}
-//	return claims, nil
-//}
+func ValidateToken(tokenStr string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, err
+}

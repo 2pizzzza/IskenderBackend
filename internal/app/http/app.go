@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	_ "github.com/2pizzzza/plumbing/cmd/plumbing/docs"
+	authService "github.com/2pizzzza/plumbing/internal/http/auth"
 	plumbingRouters "github.com/2pizzzza/plumbing/internal/http/plumbing"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
 	"github.com/rs/cors"
@@ -18,7 +19,7 @@ type App struct {
 	port       int
 }
 
-func New(log *slog.Logger, host string, port int, app *plumbingRouters.Server) *App {
+func New(log *slog.Logger, host string, port int, app *plumbingRouters.Server, auth *authService.Server) *App {
 	mux := http.NewServeMux()
 
 	corsHandler := cors.New(cors.Options{
@@ -32,6 +33,7 @@ func New(log *slog.Logger, host string, port int, app *plumbingRouters.Server) *
 
 	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 	app.RegisterRoutes(mux)
+	auth.RegisterRoutes(mux)
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", host, port),
 		Handler: handler,

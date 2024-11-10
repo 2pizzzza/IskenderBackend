@@ -1,4 +1,4 @@
-package service
+package plumbing
 
 import (
 	"context"
@@ -22,6 +22,9 @@ type PlumpingRepository interface {
 
 	//Category
 	GetCategoriesByLanguageCode(ctx context.Context, languageCode string) ([]*models.Category, error)
+	UpdateCategory(ctx context.Context, categoryID int, name string, languageCode string) error
+	CreateCategory(ctx context.Context, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error)
+	DeleteCategory(ctx context.Context, categoryID int) error
 
 	//Collection
 	GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
