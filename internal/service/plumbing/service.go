@@ -29,6 +29,9 @@ type PlumpingRepository interface {
 	//Collection
 	GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionByID(ctx context.Context, collectionID int, languageCode string) (*models.CollectionResponse, error)
+	DeleteCollection(ctx context.Context, collectionID int) error
+	UpdateCollection(ctx context.Context, req *models.UpdateCollectionRequest) error
+	GetRandomCollectionsWithPopularity(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 
 	//Popular and new
 	GetPopularCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
@@ -44,6 +47,7 @@ type PlumpingRepository interface {
 	GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error)
 	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)
 	GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error)
+	GetRandomItemsWithPopularity(ctx context.Context, languageCode string, itemID int) ([]*models.ItemResponse, error)
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {

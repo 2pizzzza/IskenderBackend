@@ -42,3 +42,24 @@ type PopularResponse struct {
 	Collections []*CollectionResponse `json:"collections"`
 	Items       []*ItemResponse       `json:"items"`
 }
+
+type UpdateCollectionRequest struct {
+	CollectionID int                `json:"collection_id"`
+	Price        float64            `json:"price,omitempty"`
+	IsProducer   bool               `json:"isProducer,omitempty"`
+	IsPainted    bool               `json:"isPainted,omitempty"`
+	IsPopular    bool               `json:"isPopular,omitempty"`
+	IsNew        bool               `json:"isNew,omitempty"`
+	Photos       []PhotosResponse   `json:"photos"`
+	Colors       []ColorResponse    `json:"colors"`
+	Collections  []UpdateCollection `json:"collections"`
+}
+type UpdateCollection struct {
+	Name         string `json:"name,omitempty"`
+	Description  string `json:"description,omitempty"`
+	LanguageCode string `json:"language_code"`
+}
+
+type RemoveCollectionRequest struct {
+	ID int `json:"id"`
+}

@@ -2,9 +2,12 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
+	"github.com/jackc/pgx/v5"
 )
 
 func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, languageCode string) ([]*models.ItemResponse, error) {
@@ -316,13 +319,104 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 	return items, nil
 }
 
+func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode string, itemID int) ([]*models.ItemResponse, error) {
+	const op = "postgres.GetRandomItemsWithPopularity"
+
+	var categoryID int
+	getCategoryQuery := `SELECT category_id FROM Item WHERE id = $1`
+	err := db.Pool.QueryRow(ctx, getCategoryQuery, itemID).Scan(&categoryID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("%s: item with id %d not found", op, itemID)
+		}
+		return nil, fmt.Errorf("%s: failed to get category id for item %d: %w", op, itemID, err)
+	}
+
+	query := `
+		SELECT i.id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, it.name, it.description
+		FROM Item i
+		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
+		WHERE i.category_id = $2
+		ORDER BY RANDOM() 
+		LIMIT 7`
+
+	rows, err := db.Pool.Query(ctx, query, languageCode, categoryID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query random items: %w", op, err)
+	}
+	defer rows.Close()
+
+	var items []*models.ItemResponse
+
+	for rows.Next() {
+		var item models.ItemResponse
+		var name sql.NullString
+		var description sql.NullString
+
+		if err := rows.Scan(
+			&item.ID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&name,
+			&description,
+		); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
+		}
+
+		if name.Valid {
+			item.Name = name.String
+		} else {
+			item.Name = ""
+		}
+
+		if description.Valid {
+			item.Description = description.String
+		} else {
+			item.Description = ""
+		}
+
+		photos, err := db.getItemPhotos(ctx, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
+		}
+		item.Photos = photos
+
+		colors, err := db.getItemColors(ctx, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get colors for item %d: %w", op, item.ID, err)
+		}
+		item.Colors = colors
+
+		items = append(items, &item)
+	}
+
+	var popularItems []*models.ItemResponse
+	var regularItems []*models.ItemResponse
+
+	for _, item := range items {
+		if item.IsPopular {
+			popularItems = append(popularItems, item)
+		} else {
+			regularItems = append(regularItems, item)
+		}
+	}
+
+	items = append(popularItems, regularItems...)
+
+	return items, nil
+}
+
 func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosResponse, error) {
 	query := `
 		SELECT p.id, p.url, p.isMain
 		FROM ItemPhoto ip
 		JOIN Photo p ON ip.photo_id = p.id
 		WHERE ip.item_id = $1`
-	
+
 	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
 	rows, err := db.Pool.Query(ctx, query, itemID)
 	if err != nil {

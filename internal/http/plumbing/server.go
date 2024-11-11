@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"log/slog"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -24,6 +25,9 @@ type Service interface {
 	//Collection
 	GetCollectionByCategoryId(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 	GetCollectionByID(ctx context.Context, collectionId int, code string) (*models.CollectionResponse, error)
+	RemoveCollection(ctx context.Context, token string, req *models.RemoveCollectionRequest) error
+	UpdateCollection(ctx context.Context, token string, req *models.UpdateCollectionRequest) error
+	GetCollectionRec(ctx context.Context, language string) ([]*models.CollectionResponse, error)
 
 	//Popular and New
 	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
@@ -33,12 +37,14 @@ type Service interface {
 	GetItemsByCategoryId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemById(ctx context.Context, id int, code string) (*models.ItemResponse, error)
 	GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
+	GetItemsRec(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, searchQuery string) (*models.PopularResponse, error)
 
 	//Photo
 	GetImagePath(ctx context.Context, imageName string) (string, error)
+	UploadPhotos(ctx context.Context, files []*multipart.FileHeader) ([]string, error)
 }
 
 type Server struct {
@@ -68,6 +74,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Collection
 	mux.HandleFunc("GET /collections", s.GetCollectionsByCategoryId)
 	mux.HandleFunc("GET /collection", s.GetCollectionById)
+	mux.HandleFunc("DELETE /collection", s.RemoveCollection)
+	mux.HandleFunc("GET /collections/rec", s.GetCollectionsRec)
 
 	//Popular and New
 	mux.HandleFunc("GET /popular", s.GetPopular)
@@ -77,6 +85,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /items", s.GetItemsByCategoryId)
 	mux.HandleFunc("GET /item", s.GetItemsById)
 	mux.HandleFunc("GET /items/collection", s.GetItemsByCollectionId)
+	mux.HandleFunc("GET /items/rec", s.GetItemsRec)
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)

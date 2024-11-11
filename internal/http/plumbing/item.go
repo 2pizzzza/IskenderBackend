@@ -149,3 +149,46 @@ func (s *Server) GetItemsByCollectionId(w http.ResponseWriter, r *http.Request) 
 	utils.WriteResponseBody(w, res, http.StatusOK)
 
 }
+
+// GetItemsRec retrieves items recommendation
+// @Summary Retrieve items recommendation language code
+// @Description Returns a list of items in the specified language for recommendation
+// @Tags items
+// @Accept  json
+// @Produce  json
+// @Param  item_id  query  int  true  "Item id"
+// @Param  lang           query  string  true  "Language code"
+// @Success 200 {array} models.ItemResponse "List of items"
+// @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
+// @Failure 404 {object} models.ErrorMessage "Collection not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /items/rec [get]
+func (s *Server) GetItemsRec(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("item_id")
+	lang := r.URL.Query().Get("lang")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing collection Id"}, http.StatusBadRequest)
+		return
+	}
+	if lang == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Language"}, http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+
+	s.log.Info("Get rec items", slog.String("lang: ", lang), slog.Int("id: ", id))
+
+	res, err := s.service.GetItemsRec(r.Context(), id, lang)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get items"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+
+}
