@@ -14,6 +14,10 @@ type Plumping struct {
 
 type PlumpingRepository interface {
 
+	//Review
+	CreateReview(ctx context.Context, username string, rating int, text string) error
+	GetAllReviews(ctx context.Context) ([]*models.ReviewResponse, error)
+
 	//Starter
 	CreateStarter(ctx context.Context) error
 

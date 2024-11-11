@@ -59,6 +59,16 @@ CREATE TABLE IF NOT EXISTS ItemTranslation (
     PRIMARY KEY (item_id, language_code)
     );
 
+CREATE TABLE IF NOT EXISTS Review (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+
+
 CREATE TABLE IF NOT EXISTS Photo (
                                      id SERIAL PRIMARY KEY,
                                      url VARCHAR(255),

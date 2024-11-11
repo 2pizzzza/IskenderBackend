@@ -13,6 +13,10 @@ type Service interface {
 	//Starter
 	Starter(ctx context.Context) error
 
+	//Review
+	CreateReview(ctx context.Context, req *models.CreateReviewRequest) error
+	GetAllReview(ctx context.Context) ([]*models.ReviewResponse, error)
+
 	//Language
 	GetAllLanguages(ctx context.Context) ([]*models.Language, error)
 
@@ -62,6 +66,11 @@ func New(log *slog.Logger, service Service) *Server {
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Starter
 	mux.HandleFunc("POST /starter", s.Starter)
+
+	//Review
+	mux.HandleFunc("GET /reviews", s.GetAllReviews)
+	mux.HandleFunc("POST /reviews", s.CreateReview)
+
 	//Language
 	mux.HandleFunc("GET /languages", s.GetAllLanguages)
 

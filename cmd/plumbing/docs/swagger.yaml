@@ -71,6 +71,15 @@ definitions:
           $ref: '#/definitions/models.CategoriesResponse'
         type: array
     type: object
+  models.CreateReviewRequest:
+    properties:
+      rating:
+        type: integer
+      text:
+        type: string
+      username:
+        type: string
+    type: object
   models.ErrorMessage:
     properties:
       message:
@@ -150,6 +159,19 @@ definitions:
     properties:
       id:
         type: integer
+    type: object
+  models.ReviewResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      rating:
+        type: integer
+      text:
+        type: string
+      username:
+        type: string
     type: object
   models.Token:
     properties:
@@ -787,6 +809,54 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /reviews:
+    get:
+      description: Fetches all reviews from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of reviews
+          schema:
+            items:
+              $ref: '#/definitions/models.ReviewResponse'
+            type: array
+        "500":
+          description: Failed to get reviews
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all reviews
+      tags:
+      - reviews
+    post:
+      consumes:
+      - application/json
+      description: Creates a review with the provided username, rating, and text
+      parameters:
+      - description: Review data
+        in: body
+        name: review
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created review
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to create review
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Create a new review
+      tags:
+      - reviews
   /search:
     get:
       consumes:
