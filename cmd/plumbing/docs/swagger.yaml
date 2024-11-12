@@ -89,6 +89,23 @@ definitions:
       username:
         type: string
     type: object
+  models.CreateVacancy:
+    properties:
+      conditions:
+        type: string
+      id:
+        type: integer
+      information:
+        type: string
+      language_code:
+        type: string
+      requirements:
+        type: string
+      responsibilities:
+        type: string
+      title:
+        type: string
+    type: object
   models.ErrorMessage:
     properties:
       message:
@@ -183,6 +200,11 @@ definitions:
       id:
         type: integer
     type: object
+  models.RemoveVacancyRequest:
+    properties:
+      id:
+        type: integer
+    type: object
   models.ReviewResponse:
     properties:
       created_at:
@@ -216,6 +238,38 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  models.VacancyResponse:
+    properties:
+      conditions:
+        type: string
+      id:
+        type: integer
+      information:
+        type: string
+      isActive:
+        type: boolean
+      language_code:
+        type: string
+      requirements:
+        type: string
+      responsibilities:
+        type: string
+      salary:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.VacancyResponses:
+    properties:
+      is_active:
+        type: string
+      salary:
+        type: integer
+      vacancy:
+        items:
+          $ref: '#/definitions/models.CreateVacancy'
+        type: array
     type: object
 host: 127.0.0.1:8080
 info:
@@ -1171,4 +1225,229 @@ paths:
       summary: Initialize the service or perform a start-up operation
       tags:
       - starter
+  /vacancies:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all  vacancies filtered by the specified language code
+      parameters:
+      - description: Language code for filtering vacancies (e.g., 'en', 'ru')
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved vacancies
+          schema:
+            items:
+              $ref: '#/definitions/models.VacancyResponse'
+            type: array
+        "400":
+          description: Missing or invalid language parameter
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all active vacancies
+      tags:
+      - vacancy
+  /vacancies/activ:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all active vacancies filtered by the specified language
+        code
+      parameters:
+      - description: Language code for filtering vacancies (e.g., 'en', 'ru')
+        in: query
+        name: lang
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved vacancies
+          schema:
+            items:
+              $ref: '#/definitions/models.VacancyResponse'
+            type: array
+        "400":
+          description: Missing or invalid language parameter
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all active vacancies
+      tags:
+      - vacancy
+  /vacancy:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a vacancy based on the provided ID in the request body
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Vacancy ID to remove
+        in: body
+        name: vacancy
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveVacancyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully removed vacancy
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body or vacancy not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Remove a vacancy
+      tags:
+      - vacancy
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a specific vacancy using the provided
+        vacancy ID parameter
+      parameters:
+      - description: The ID of the vacancy to retrieve
+        in: query
+        name: vacancy_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved vacancy
+          schema:
+            $ref: '#/definitions/models.VacancyResponses'
+        "400":
+          description: Invalid or missing vacancy ID
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Vacancy not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to get vacancy by ID
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get a vacancy by ID
+      tags:
+      - vacancy
+    post:
+      consumes:
+      - application/json
+      description: Create a new vacancy with the provided information
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Vacancy details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.VacancyResponses'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created vacancy
+          schema:
+            $ref: '#/definitions/models.VacancyResponses'
+        "400":
+          description: Invalid request body or missing required language
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to create vacancy
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Create a new vacancy
+      tags:
+      - vacancy
+    put:
+      consumes:
+      - application/json
+      description: Updates a vacancy's details based on the provided JSON body and
+        authorization token
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Updated vacancy details
+        in: body
+        name: vacancy
+        required: true
+        schema:
+          $ref: '#/definitions/models.VacancyResponse'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully updated vacancy
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body, vacancy not found, or vacancy translation
+            not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Update a vacancy
+      tags:
+      - vacancy
 swagger: "2.0"

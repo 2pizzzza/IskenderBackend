@@ -21,6 +21,14 @@ type PlumpingRepository interface {
 	UpdateBrand(ctx context.Context, id int, name, url string) (*models.BrandResponse, error)
 	GetBrandByID(ctx context.Context, id int) (*models.BrandResponse, error)
 
+	//Vacancy
+	GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error)
+	UpdateVacancy(ctx context.Context, req models.VacancyResponse) error
+	RemoveVacancy(ctx context.Context, id int) error
+	GetAllVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error)
+	GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error)
+	CreateVacancy(ctx context.Context, req *models.VacancyResponses) (*models.VacancyResponses, error)
+
 	//Review
 	CreateReview(ctx context.Context, username string, rating int, text string) error
 	GetAllReviews(ctx context.Context) ([]*models.ReviewResponse, error)

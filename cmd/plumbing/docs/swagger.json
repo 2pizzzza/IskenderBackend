@@ -1420,6 +1420,339 @@
                     }
                 }
             }
+        },
+        "/vacancies": {
+            "get": {
+                "description": "Retrieves all  vacancies filtered by the specified language code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Get all active vacancies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language code for filtering vacancies (e.g., 'en', 'ru')",
+                        "name": "lang",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved vacancies",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.VacancyResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing or invalid language parameter",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/vacancies/activ": {
+            "get": {
+                "description": "Retrieves all active vacancies filtered by the specified language code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Get all active vacancies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language code for filtering vacancies (e.g., 'en', 'ru')",
+                        "name": "lang",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved vacancies",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.VacancyResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing or invalid language parameter",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/vacancy": {
+            "get": {
+                "description": "Retrieves the details of a specific vacancy using the provided vacancy ID parameter",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Get a vacancy by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "The ID of the vacancy to retrieve",
+                        "name": "vacancy_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved vacancy",
+                        "schema": {
+                            "$ref": "#/definitions/models.VacancyResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing vacancy ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Vacancy not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get vacancy by ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Updates a vacancy's details based on the provided JSON body and authorization token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Update a vacancy",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated vacancy details",
+                        "name": "vacancy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VacancyResponse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully updated vacancy",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body, vacancy not found, or vacancy translation not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Token required or invalid token format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new vacancy with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Create a new vacancy",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Vacancy details",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.VacancyResponses"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created vacancy",
+                        "schema": {
+                            "$ref": "#/definitions/models.VacancyResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or missing required language",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create vacancy",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a vacancy based on the provided ID in the request body",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "vacancy"
+                ],
+                "summary": "Remove a vacancy",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Vacancy ID to remove",
+                        "name": "vacancy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RemoveVacancyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully removed vacancy",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or vacancy not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Token required or invalid token format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1557,6 +1890,32 @@
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateVacancy": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "information": {
+                    "type": "string"
+                },
+                "language_code": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "type": "string"
+                },
+                "responsibilities": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -1707,6 +2066,14 @@
                 }
             }
         },
+        "models.RemoveVacancyRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ReviewResponse": {
             "type": "object",
             "properties": {
@@ -1757,6 +2124,55 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "models.VacancyResponse": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "information": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "language_code": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "type": "string"
+                },
+                "responsibilities": {
+                    "type": "string"
+                },
+                "salary": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.VacancyResponses": {
+            "type": "object",
+            "properties": {
+                "is_active": {
+                    "type": "string"
+                },
+                "salary": {
+                    "type": "integer"
+                },
+                "vacancy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateVacancy"
+                    }
                 }
             }
         }

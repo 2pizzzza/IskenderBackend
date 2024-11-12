@@ -13,6 +13,14 @@ type Service interface {
 	//Starter
 	Starter(ctx context.Context) error
 
+	//Vacancy
+	GetAllActiveVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
+	UpdateVacancy(ctx context.Context, token string, req models.VacancyResponse) error
+	RemoveVacancy(ctx context.Context, token string, req *models.RemoveVacancyRequest) error
+	GetAllVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
+	GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error)
+	CreateVacancy(ctx context.Context, token string, req *models.VacancyResponses) (*models.VacancyResponses, error)
+
 	//Brand
 	CreateBrand(ctx context.Context, token string, req *models.BrandRequest) (*models.BrandResponse, error)
 	GetAllBrand(ctx context.Context) ([]*models.BrandResponse, error)
@@ -76,6 +84,14 @@ func New(log *slog.Logger, service Service) *Server {
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Starter
 	mux.HandleFunc("POST /starter", s.Starter)
+
+	//Vacancy
+	mux.HandleFunc("GET /vacancies/activ", s.GetAllVacancyActive)
+	mux.HandleFunc("DELETE /vacancy", s.RemoveVacancy)
+	mux.HandleFunc("PUT /vacancy", s.UpdateVacancy)
+	mux.HandleFunc("GET /vacancies", s.GetAllVacancy)
+	mux.HandleFunc("GET /vacancy", s.GetVacancyById)
+	mux.HandleFunc("POST /vacancy", s.CreateVacancy)
 
 	//Brand
 	mux.HandleFunc("GET /brands", s.GetAllBrands)
