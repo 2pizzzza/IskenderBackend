@@ -54,6 +54,100 @@ func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode str
 	return collections, nil
 }
 
+func (db *DB) GetCollectionsByIsProducerSLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error) {
+	const op = "postgres.GetCollectionsByLanguageCode"
+
+	query := `
+    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, 
+           COALESCE(ct.name, ''), COALESCE(ct.description, '')
+    FROM Collection c
+    LEFT JOIN CollectionTranslation ct 
+    ON c.id = ct.collection_id AND ct.language_code = $1
+    WHERE c.isProducer = true AND c.isPainted = false`
+
+	rows, err := db.Pool.Query(ctx, query, languageCode)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query collections: %w", op, err)
+	}
+	defer rows.Close()
+
+	var collections []*models.CollectionResponse
+
+	for rows.Next() {
+		var collection models.CollectionResponse
+		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.Name, &collection.Description); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
+		}
+
+		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
+		}
+		collection.Photos = photos
+
+		colors, err := db.getCollectionColors(ctx, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
+		}
+		collection.Colors = colors
+
+		collections = append(collections, &collection)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return collections, nil
+}
+
+func (db *DB) GetCollectionsByIsProducerPLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error) {
+	const op = "postgres.GetCollectionsByLanguageCode"
+
+	query := `
+    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, 
+           COALESCE(ct.name, ''), COALESCE(ct.description, '')
+    FROM Collection c
+    LEFT JOIN CollectionTranslation ct 
+    ON c.id = ct.collection_id AND ct.language_code = $1
+    WHERE c.isProducer = true AND c.isPainted = false`
+
+	rows, err := db.Pool.Query(ctx, query, languageCode)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query collections: %w", op, err)
+	}
+	defer rows.Close()
+
+	var collections []*models.CollectionResponse
+
+	for rows.Next() {
+		var collection models.CollectionResponse
+		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.Name, &collection.Description); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
+		}
+
+		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
+		}
+		collection.Photos = photos
+
+		colors, err := db.getCollectionColors(ctx, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
+		}
+		collection.Colors = colors
+
+		collections = append(collections, &collection)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return collections, nil
+}
+
 func (db *DB) GetPopularCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error) {
 	const op = "postgres.GetPopularCollections"
 
@@ -376,7 +470,6 @@ func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCo
 
 	var collections []*models.CollectionResponse
 
-	// Шаг 2: Сканируем результат
 	for rows.Next() {
 		var collection models.CollectionResponse
 		if err := rows.Scan(

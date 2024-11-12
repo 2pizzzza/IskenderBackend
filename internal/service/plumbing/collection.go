@@ -111,3 +111,35 @@ func (pr *Plumping) GetCollectionRec(ctx context.Context, language string) ([]*m
 	}
 	return collection, nil
 }
+
+func (pr *Plumping) GetCollectionByStadart(ctx context.Context, code string) ([]*models.CollectionResponse, error) {
+	const op = "service.GetCollectionByCategoryId"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collections, err := pr.plumpingRepository.GetCollectionsByIsProducerSLanguageCode(ctx, code)
+	if err != nil {
+		log.Error("Failed to get collections", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return collections, nil
+}
+
+func (pr *Plumping) GetCollectionByPainted(ctx context.Context, code string) ([]*models.CollectionResponse, error) {
+	const op = "service.GetCollectionByCategoryId"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collections, err := pr.plumpingRepository.GetCollectionsByIsProducerPLanguageCode(ctx, code)
+	if err != nil {
+		log.Error("Failed to get collections", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return collections, nil
+}

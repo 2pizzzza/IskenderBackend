@@ -167,6 +167,66 @@ func (s *Server) GetCollectionsRec(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetCollectionsStandart retrieves collections standart
+// @Summary Retrieve collections standart
+// @Description Returns a list of collections standart
+// @Tags collections
+// @Accept  json
+// @Produce  json
+// @Param  lang  query  string  true  "Language code"
+// @Success 200 {array} models.CollectionResponse "List of collections"
+// @Failure 400 {object} models.ErrorMessage "Missing language code"
+// @Failure 500 {object} models.ErrorMessage "Failed to get collections"
+// @Router /collections [get]
+func (s *Server) GetCollectionsStandart(w http.ResponseWriter, r *http.Request) {
+	lang := r.URL.Query().Get("lang")
+	if lang == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Language"}, http.StatusBadRequest)
+		return
+	}
+
+	s.log.Info("Get all collection", slog.String("lang: ", lang))
+
+	res, err := s.service.GetCollectionByStadart(r.Context(), lang)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get collections"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+
+}
+
+// GetCollectionsByPainted retrieves collections painted
+// @Summary Retrieve collections painted
+// @Description Returns a list of collections in the specified language for a category
+// @Tags collections
+// @Accept  json
+// @Produce  json
+// @Param  lang  query  string  true  "Language code"
+// @Success 200 {array} models.CollectionResponse "List of collections"
+// @Failure 400 {object} models.ErrorMessage "Missing language code"
+// @Failure 500 {object} models.ErrorMessage "Failed to get collections"
+// @Router /collections [get]
+func (s *Server) GetCollectionsByPainted(w http.ResponseWriter, r *http.Request) {
+	lang := r.URL.Query().Get("lang")
+	if lang == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Language"}, http.StatusBadRequest)
+		return
+	}
+
+	s.log.Info("Get all collection", slog.String("lang: ", lang))
+
+	res, err := s.service.GetCollectionByCategoryId(r.Context(), lang)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get collections"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+
+}
+
 //func (s *Server) UpdateCollection(w http.ResponseWriter, r *http.Request) {
 //	authHeader := r.Header.Get("Authorization")
 //	if authHeader == "" {

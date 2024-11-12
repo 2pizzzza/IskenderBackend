@@ -32,6 +32,8 @@ type Service interface {
 	RemoveCollection(ctx context.Context, token string, req *models.RemoveCollectionRequest) error
 	UpdateCollection(ctx context.Context, token string, req *models.UpdateCollectionRequest) error
 	GetCollectionRec(ctx context.Context, language string) ([]*models.CollectionResponse, error)
+	GetCollectionByStadart(ctx context.Context, code string) ([]*models.CollectionResponse, error)
+	GetCollectionByPainted(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 
 	//Popular and New
 	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
@@ -85,6 +87,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /collection", s.GetCollectionById)
 	mux.HandleFunc("DELETE /collection", s.RemoveCollection)
 	mux.HandleFunc("GET /collections/rec", s.GetCollectionsRec)
+	mux.HandleFunc("GET /collections/standart", s.GetCollectionsStandart)
+	mux.HandleFunc("GET /collections/painted", s.GetCollectionsByPainted)
 
 	//Popular and New
 	mux.HandleFunc("GET /popular", s.GetPopular)

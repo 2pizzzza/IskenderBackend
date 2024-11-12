@@ -36,6 +36,8 @@ type PlumpingRepository interface {
 	DeleteCollection(ctx context.Context, collectionID int) error
 	UpdateCollection(ctx context.Context, req *models.UpdateCollectionRequest) error
 	GetRandomCollectionsWithPopularity(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
+	GetCollectionsByIsProducerSLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
+	GetCollectionsByIsProducerPLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 
 	//Popular and new
 	GetPopularCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
