@@ -478,7 +478,7 @@ paths:
           description: Failed to get collections
           schema:
             $ref: '#/definitions/models.ErrorMessage'
-      summary: Retrieve collections by category ID and language code
+      summary: Retrieve collections painted
       tags:
       - collections
   /collections/rec:

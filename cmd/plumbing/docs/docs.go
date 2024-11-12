@@ -397,7 +397,7 @@ const docTemplate = `{
                 "tags": [
                     "collections"
                 ],
-                "summary": "Retrieve collections by category ID and language code",
+                "summary": "Retrieve collections painted",
                 "parameters": [
                     {
                         "type": "string",
