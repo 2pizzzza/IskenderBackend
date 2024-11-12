@@ -141,6 +141,11 @@ func (pr *Plumping) CreateVacancy(ctx context.Context, token string, req *models
 			return nil, storage.ErrRequiredLanguage
 
 		}
+		if errors.Is(err, storage.ErrLanguageNotFound) {
+			log.Error("Language not found", sl.Err(err))
+			return nil, storage.ErrLanguageNotFound
+
+		}
 		log.Error("Failed to create vacancy", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}

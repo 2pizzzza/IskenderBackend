@@ -251,6 +251,10 @@ func (s *Server) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 language"}, http.StatusBadRequest)
 			return
 		}
+		if errors.Is(err, storage.ErrLanguageNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "language not found"}, http.StatusBadRequest)
+			return
+		}
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to create vacancy"}, http.StatusInternalServerError)
 		return
 	}

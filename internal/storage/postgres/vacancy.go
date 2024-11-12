@@ -196,11 +196,11 @@ func (db *DB) GetVacancyById(ctx context.Context, id int) (*models.VacancyRespon
 	}
 
 	query := `
-		SELECT v.salary, v.isActive, vt.id, vt.language_code, vt.title, 
-		       vt.requirements, vt.responsibilities, vt.conditions, vt.information
-		FROM Vacancy v
-		JOIN VacancyTranslation vt ON v.id = vt.vacancy_id
-		WHERE v.id = $1`
+    SELECT v.salary, v.isActive, vt.language_code, vt.title, 
+           vt.requirements, vt.responsibilities, vt.conditions, vt.information
+    FROM Vacancy v
+    JOIN VacancyTranslation vt ON v.id = vt.vacancy_id
+    WHERE v.id = $1`
 
 	rows, err := db.Pool.Query(ctx, query, id)
 	if err != nil {
@@ -216,7 +216,6 @@ func (db *DB) GetVacancyById(ctx context.Context, id int) (*models.VacancyRespon
 		if err := rows.Scan(
 			&response.Salary,
 			&response.IsActive,
-			&translation.Id,
 			&translation.LanguageCode,
 			&translation.Title,
 			&translation.Requirements,
@@ -252,7 +251,7 @@ func (db *DB) CreateVacancy(ctx context.Context, req *models.VacancyResponses) (
 
 	var vacancyID int
 	insertVacancy := `INSERT INTO Vacancy (salary, isActive) VALUES ($1, $2) RETURNING id`
-	err = tx.QueryRow(ctx, insertVacancy, req.Salary, req.IsActive == "true").Scan(&vacancyID)
+	err = tx.QueryRow(ctx, insertVacancy, req.Salary, req.IsActive == true).Scan(&vacancyID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to insert vacancy: %w", op, err)
 	}
@@ -264,6 +263,16 @@ func (db *DB) CreateVacancy(ctx context.Context, req *models.VacancyResponses) (
 		) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	for _, translation := range req.Vacancy {
+		var exists bool
+		checkLanguageQuery := `SELECT EXISTS(SELECT 1 FROM Language WHERE code = $1)`
+		err = tx.QueryRow(ctx, checkLanguageQuery, translation.LanguageCode).Scan(&exists)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to check language existence for code %s: %w", op, translation.LanguageCode, err)
+		}
+		if !exists {
+			return nil, storage.ErrLanguageNotFound
+		}
+
 		_, err = tx.Exec(ctx, insertTranslation, vacancyID, translation.LanguageCode, translation.Title,
 			translation.Requirements, translation.Responsibilities, translation.Conditions, translation.Information)
 		if err != nil {

@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS CollectionTranslation (
 
 CREATE TABLE IF NOT EXISTS Vacancy(
     id SERIAL PRIMARY KEY,
-    isActive BOOLEAN DEFAULT true;
+    isActive BOOLEAN DEFAULT true,
     salary DECIMAL NOT NULL
 );
 

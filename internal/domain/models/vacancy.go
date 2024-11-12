@@ -14,7 +14,7 @@ type VacancyResponse struct {
 
 type VacancyResponses struct {
 	Salary   int              `json:"salary"`
-	IsActive string           `json:"is_active"`
+	IsActive bool             `json:"is_active"`
 	Vacancy  []*CreateVacancy `json:"vacancy"`
 }
 type CreateVacancy struct {
