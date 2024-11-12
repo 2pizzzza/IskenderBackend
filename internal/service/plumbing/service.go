@@ -14,6 +14,13 @@ type Plumping struct {
 
 type PlumpingRepository interface {
 
+	//Brand
+	CreateBrand(ctx context.Context, name, url string) (*models.BrandResponse, error)
+	GetAllBrand(ctx context.Context) ([]*models.BrandResponse, error)
+	RemoveBrand(ctx context.Context, id int) error
+	UpdateBrand(ctx context.Context, id int, name, url string) (*models.BrandResponse, error)
+	GetBrandByID(ctx context.Context, id int) (*models.BrandResponse, error)
+
 	//Review
 	CreateReview(ctx context.Context, username string, rating int, text string) error
 	GetAllReviews(ctx context.Context) ([]*models.ReviewResponse, error)
@@ -29,6 +36,7 @@ type PlumpingRepository interface {
 	UpdateCategory(ctx context.Context, categoryID int, name string, languageCode string) error
 	CreateCategory(ctx context.Context, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error)
 	DeleteCategory(ctx context.Context, categoryID int) error
+	GetCategoryByID(ctx context.Context, id int) (*models.GetCategoryRequest, error)
 
 	//Collection
 	GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)

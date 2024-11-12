@@ -113,3 +113,24 @@ func (pr *Plumping) RemoveCategory(ctx context.Context, token string, req *model
 	}
 	return nil
 }
+
+func (pr Plumping) GetCategoryById(ctx context.Context, id int) (*models.GetCategoryRequest, error) {
+	const op = "service.GetBrandById"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	brand, err := pr.plumpingRepository.GetCategoryByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, storage.ErrCategoryNotFound) {
+			log.Error("Brand not found", sl.Err(err))
+			return nil, storage.ErrCategoryNotFound
+
+		}
+		log.Error("Failed to get category", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return brand, nil
+}

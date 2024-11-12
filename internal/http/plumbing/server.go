@@ -13,6 +13,13 @@ type Service interface {
 	//Starter
 	Starter(ctx context.Context) error
 
+	//Brand
+	CreateBrand(ctx context.Context, token string, req *models.BrandRequest) (*models.BrandResponse, error)
+	GetAllBrand(ctx context.Context) ([]*models.BrandResponse, error)
+	RemoveBrand(ctx context.Context, token string, req *models.RemoveBrandRequest) error
+	UpdateBrand(ctx context.Context, token string, id int, name, url string) (*models.BrandResponse, error)
+	GetBrandById(ctx context.Context, id int) (*models.BrandResponse, error)
+
 	//Review
 	CreateReview(ctx context.Context, req *models.CreateReviewRequest) error
 	GetAllReview(ctx context.Context) ([]*models.ReviewResponse, error)
@@ -25,6 +32,7 @@ type Service interface {
 	CreateCategory(ctx context.Context, token string, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error)
 	UpdateCategory(ctx context.Context, token string, req *models.UpdateCategoryRequest) error
 	RemoveCategory(ctx context.Context, token string, req *models.RemoveCategoryRequest) error
+	GetCategoryById(ctx context.Context, id int) (*models.GetCategoryRequest, error)
 
 	//Collection
 	GetCollectionByCategoryId(ctx context.Context, code string) ([]*models.CollectionResponse, error)
@@ -69,6 +77,13 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Starter
 	mux.HandleFunc("POST /starter", s.Starter)
 
+	//Brand
+	mux.HandleFunc("GET /brands", s.GetAllBrands)
+	mux.HandleFunc("POST /brand", s.CreateBrand)
+	mux.HandleFunc("DELETE /brand", s.RemoveBrand)
+	mux.HandleFunc("PUT /brand", s.UpdateBrand)
+	mux.HandleFunc("GET /brand", s.GetBrandById)
+
 	//Review
 	mux.HandleFunc("GET /reviews", s.GetAllReviews)
 	mux.HandleFunc("POST /reviews", s.CreateReview)
@@ -81,6 +96,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /category", s.CreateCategory)
 	mux.HandleFunc("PUT /category", s.UpdateCategory)
 	mux.HandleFunc("DELETE /category", s.RemoveCategory)
+	mux.HandleFunc("GET /category/by/id", s.GetCategoryById)
 
 	//Collection
 	mux.HandleFunc("GET /collections", s.GetCollectionsByCategoryId)

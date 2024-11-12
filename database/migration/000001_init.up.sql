@@ -59,6 +59,12 @@ CREATE TABLE IF NOT EXISTS ItemTranslation (
     PRIMARY KEY (item_id, language_code)
     );
 
+CREATE TABLE IF NOT EXISTS Brand(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    url TEXT NOT NULL
+    );
+
 CREATE TABLE IF NOT EXISTS Review (
     id SERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL,

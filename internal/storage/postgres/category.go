@@ -194,3 +194,48 @@ func (db *DB) DeleteCategory(ctx context.Context, categoryID int) error {
 
 	return nil
 }
+
+func (db *DB) GetCategoryByID(ctx context.Context, id int) (*models.GetCategoryRequest, error) {
+	const op = "postgres.GetCategoryByID"
+
+	var exists bool
+	checkCategoryQuery := `SELECT EXISTS(SELECT 1 FROM Category WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, checkCategoryQuery, id).Scan(&exists)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check category existence: %w", op, err)
+	}
+	if !exists {
+		return nil, storage.ErrCategoryNotFound
+	}
+
+	query := `
+		SELECT c.id, ct.language_code, ct.name
+		FROM Category c
+		JOIN CategoryTranslation ct ON c.id = ct.category_id
+		WHERE c.id = $1`
+
+	rows, err := db.Pool.Query(ctx, query, id)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query category: %w", op, err)
+	}
+	defer rows.Close()
+
+	var categories []models.CategoriesRequest
+
+	var category models.CategoriesRequest
+	for rows.Next() {
+		if err := rows.Scan(&id, &category.LanguageCode, &category.Name); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan row into category struct: %w", op, err)
+		}
+		categories = append(categories, category)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return &models.GetCategoryRequest{
+		ID:         id,
+		Categories: categories,
+	}, nil
+}

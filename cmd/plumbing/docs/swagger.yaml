@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  models.BrandResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      photo:
+        type: string
+    type: object
   models.CategoriesRequest:
     properties:
       language_code:
@@ -85,6 +94,15 @@ definitions:
       message:
         type: string
     type: object
+  models.GetCategoryRequest:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/models.CategoriesRequest'
+        type: array
+      id:
+        type: integer
+    type: object
   models.ItemResponse:
     properties:
       category_id:
@@ -150,6 +168,11 @@ definitions:
           $ref: '#/definitions/models.ItemResponse'
         type: array
     type: object
+  models.RemoveBrandRequest:
+    properties:
+      id:
+        type: integer
+    type: object
   models.RemoveCategoryRequest:
     properties:
       id:
@@ -206,6 +229,185 @@ info:
   title: Swagger Plumbing API
   version: "1.0"
 paths:
+  /brand:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a brand by ID with authorization token required
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Brand ID to delete
+        in: body
+        name: RemoveBrandRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveBrandRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully removed brand
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body or brand not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Deletes a brand
+      tags:
+      - brand
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a brand using its ID from the query parameter
+      parameters:
+      - description: Brand ID to retrieve
+        in: query
+        name: brand_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved brand
+          schema:
+            $ref: '#/definitions/models.BrandResponse'
+        "400":
+          description: Invalid or missing brand ID
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Brand not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get a brand by ID
+      tags:
+      - brand
+    post:
+      consumes:
+      - multipart/form-data
+      description: Creates a new brand by accepting form data, including an image
+        file
+      parameters:
+      - description: Brand name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Brand image
+        in: formData
+        name: photo
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Validation error or bad request
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Creates a new brand
+      tags:
+      - brand
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates the details of an existing brand by ID, including the option
+        to upload a new image
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Brand ID to update
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Updated brand name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Updated brand image
+        in: formData
+        name: photo
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated brand
+          schema:
+            $ref: '#/definitions/models.BrandResponse'
+        "400":
+          description: Invalid brand ID or form data
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Brand not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Updates a brand's information
+      tags:
+      - brand
+  /brands:
+    get:
+      description: Retrieves a list of all available brands
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all brands
+          schema:
+            items:
+              $ref: '#/definitions/models.BrandResponse'
+            type: array
+        "500":
+          description: Failed to get brands
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all brands
+      tags:
+      - brand
   /category:
     delete:
       consumes:
@@ -367,6 +569,40 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorMessage'
       summary: Update a category
+      tags:
+      - categories
+  /category/by/id:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the details of a category using its ID from the query
+        parameter
+      parameters:
+      - description: Category ID to retrieve
+        in: query
+        name: category_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved category
+          schema:
+            $ref: '#/definitions/models.GetCategoryRequest'
+        "400":
+          description: Invalid or missing category ID
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get a category by ID
       tags:
       - categories
   /collection:

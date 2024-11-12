@@ -7,6 +7,7 @@ import (
 	"github.com/2pizzzza/plumbing/internal/utils"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -197,4 +198,42 @@ func (s *Server) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteResponseBody(w, models.Message{Message: "Successful update category"}, http.StatusCreated)
+}
+
+// GetCategoryById retrieves a category by its ID using query parameters
+// @Summary Get a category by ID
+// @Description Retrieves the details of a category using its ID from the query parameter
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param category_id query integer true "Category ID to retrieve"
+// @Success 200 {object} models.GetCategoryRequest "Successfully retrieved category"
+// @Failure 400 {object} models.ErrorMessage "Invalid or missing category ID"
+// @Failure 404 {object} models.ErrorMessage "Category not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /category/by/id [get]
+func (s *Server) GetCategoryById(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("category_id")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Collection Id"}, http.StatusBadRequest)
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+
+	res, err := s.service.GetCategoryById(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, storage.ErrCategoryNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Category Not found"}, http.StatusNotFound)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get category by id"}, http.StatusInternalServerError)
+		return
+
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
 }

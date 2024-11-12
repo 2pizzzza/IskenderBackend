@@ -16,10 +16,16 @@ type UpdateCategoryRequest struct {
 	Name         string `json:"name"`
 	LanguageCode string `json:"language_code"`
 }
+
 type RemoveCategoryRequest struct {
 	ID int `json:"id"`
 }
 type CreateCategoryRequest struct {
+	Categories []CategoriesRequest `json:"categories"`
+}
+
+type GetCategoryRequest struct {
+	ID         int                 `json:"id"`
 	Categories []CategoriesRequest `json:"categories"`
 }
 
