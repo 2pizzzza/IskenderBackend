@@ -307,15 +307,19 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Creates a new brand by accepting form data, including an image
-        file
+      description: Creates a new brand with a name and an optional image
       parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Brand name
         in: formData
         name: name
         required: true
         type: string
-      - description: Brand image
+      - description: Brand photo
         in: formData
         name: photo
         required: true
@@ -323,15 +327,27 @@ paths:
       produces:
       - application/json
       responses:
+        "201":
+          description: Successfully created brand
+          schema:
+            $ref: '#/definitions/models.BrandResponse'
         "400":
-          description: Validation error or bad request
+          description: Invalid request body or brand already exists
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
           schema:
             $ref: '#/definitions/models.ErrorMessage'
         "500":
           description: Internal server error
           schema:
             $ref: '#/definitions/models.ErrorMessage'
-      summary: Creates a new brand
+      summary: Create a new brand
       tags:
       - brand
     put:

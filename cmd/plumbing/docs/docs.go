@@ -153,7 +153,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Creates a new brand by accepting form data, including an image file",
+                "description": "Creates a new brand with a name and an optional image",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -163,8 +163,15 @@ const docTemplate = `{
                 "tags": [
                     "brand"
                 ],
-                "summary": "Creates a new brand",
+                "summary": "Create a new brand",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Brand name",
@@ -174,15 +181,33 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "Brand image",
+                        "description": "Brand photo",
                         "name": "photo",
                         "in": "formData",
                         "required": true
                     }
                 ],
                 "responses": {
+                    "201": {
+                        "description": "Successfully created brand",
+                        "schema": {
+                            "$ref": "#/definitions/models.BrandResponse"
+                        }
+                    },
                     "400": {
-                        "description": "Validation error or bad request",
+                        "description": "Invalid request body or brand already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Token required or invalid token format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMessage"
                         }

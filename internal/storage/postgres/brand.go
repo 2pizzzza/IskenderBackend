@@ -12,6 +12,8 @@ import (
 func (db *DB) CreateBrand(ctx context.Context, name, url string) (*models.BrandResponse, error) {
 	const op = "postgres.CreateBrand"
 
+	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+
 	var exists bool
 	checkBrandQuery := `SELECT EXISTS(SELECT 1 FROM Brand WHERE name = $1)`
 	err := db.Pool.QueryRow(ctx, checkBrandQuery, name).Scan(&exists)
@@ -32,7 +34,7 @@ func (db *DB) CreateBrand(ctx context.Context, name, url string) (*models.BrandR
 	response := &models.BrandResponse{
 		ID:   brandID,
 		Name: name,
-		Url:  url,
+		Url:  fmt.Sprintf("%s/%s", baseURL, url),
 	}
 
 	return response, nil
@@ -95,6 +97,8 @@ func (db *DB) UpdateBrand(ctx context.Context, id int, name, url string) (*model
 	var exists bool
 	checkBrandQuery := `SELECT EXISTS(SELECT 1 FROM Brand WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkBrandQuery, id).Scan(&exists)
+	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to check brand existence: %w", op, err)
 	}
@@ -105,6 +109,8 @@ func (db *DB) UpdateBrand(ctx context.Context, id int, name, url string) (*model
 	updateQuery := `UPDATE Brand SET name = $1, url = $2 WHERE id = $3 RETURNING id, name, url`
 	var response models.BrandResponse
 	err = db.Pool.QueryRow(ctx, updateQuery, name, url, id).Scan(&response.ID, &response.Name, &response.Url)
+	response.Url = fmt.Sprintf("%s/%s", baseURL, response.Url)
+
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to update brand: %w", op, err)
 	}
@@ -115,8 +121,11 @@ func (db *DB) UpdateBrand(ctx context.Context, id int, name, url string) (*model
 func (db *DB) GetBrandByID(ctx context.Context, id int) (*models.BrandResponse, error) {
 	const op = "postgres.GetBrandByID"
 
+	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+
 	var brand models.BrandResponse
 	query := `SELECT id, name, url FROM Brand WHERE id = $1`
+
 	err := db.Pool.QueryRow(ctx, query, id).Scan(&brand.ID, &brand.Name, &brand.Url)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -124,6 +133,7 @@ func (db *DB) GetBrandByID(ctx context.Context, id int) (*models.BrandResponse, 
 		}
 		return nil, fmt.Errorf("%s: failed to query brand: %w", op, err)
 	}
+	brand.Url = fmt.Sprintf("%s/%s", baseURL, brand.Url)
 
 	return &brand, nil
 }

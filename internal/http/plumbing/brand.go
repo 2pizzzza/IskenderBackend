@@ -19,14 +19,18 @@ const (
 )
 
 // CreateBrand creates a new brand
-// @Summary Creates a new brand
-// @Description Creates a new brand by accepting form data, including an image file
+// @Summary Create a new brand
+// @Description Creates a new brand with a name and an optional image
 // @Tags brand
 // @Accept multipart/form-data
 // @Produce json
+// @Param Authorization header string true "Bearer <token>"
 // @Param name formData string true "Brand name"
-// @Param photo formData file true "Brand image"
-// @Failure 400 {object} models.ErrorMessage "Validation error or bad request"
+// @Param photo formData file true "Brand photo"
+// @Success 201 {object} models.BrandResponse "Successfully created brand"
+// @Failure 400 {object} models.ErrorMessage "Invalid request body or brand already exists"
+// @Failure 401 {object} models.ErrorMessage "Token required or invalid token format"
+// @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
 // @Router /brand [post]
 func (s *Server) CreateBrand(w http.ResponseWriter, r *http.Request) {
