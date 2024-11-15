@@ -181,7 +181,7 @@ func (s *Server) GetItemsRec(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.log.Info("Get rec items", slog.String("lang: ", lang), slog.Int("id: ", id))
+	s.log.Info("Get recommendation items", slog.String("lang: ", lang), slog.Int("id: ", id))
 
 	res, err := s.service.GetItemsRec(r.Context(), id, lang)
 	if err != nil {
