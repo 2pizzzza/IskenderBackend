@@ -106,11 +106,11 @@ func (db *DB) CreateStarter(ctx context.Context) error {
 		return fmt.Errorf("%s: failed to insert item translations: %w", op, err)
 	}
 
-	_, err = tx.Exec(ctx, `INSERT INTO Photo (url, isMain) VALUES 
-		('media/images/users.png', true),
-		('media/images/users.png', false),
-		('media/images/users.png', true),
-		('media/images/users.png', false)`)
+	_, err = tx.Exec(ctx, `INSERT INTO Photo (url, isMain, hash_color) VALUES 
+		('media/images/users.png', true , '#FF5733'),
+		('media/images/users.png', false, '#33FF57'),
+		('media/images/users.png', true , '#C70039'),
+		('media/images/users.png', false, '#900C3F')`)
 	if err != nil {
 		return fmt.Errorf("%s: failed to insert photos: %w", op, err)
 	}
@@ -132,34 +132,6 @@ func (db *DB) CreateStarter(ctx context.Context) error {
 		(5, 1)`)
 	if err != nil {
 		return fmt.Errorf("%s: failed to insert item photos: %w", op, err)
-	}
-
-	_, err = tx.Exec(ctx, `INSERT INTO Color (hash_color) VALUES 
-		('#FF5733'), 
-		('#33FF57'),
-		('#C70039'), 
-		('#900C3F')`)
-	if err != nil {
-		return fmt.Errorf("%s: failed to insert colors: %w", op, err)
-	}
-
-	_, err = tx.Exec(ctx, `INSERT INTO CollectionColor (collection_id, color_id) VALUES
-		(1, 1), 
-		(2, 2),
-		(3, 3),
-		(4, 4)`)
-	if err != nil {
-		return fmt.Errorf("%s: failed to insert collection colors: %w", op, err)
-	}
-
-	_, err = tx.Exec(ctx, `INSERT INTO ItemColor (item_id, color_id) VALUES
-		(1, 1),
-		(2, 2),
-		(3, 3),
-		(4, 4),
-		(5, 1)`)
-	if err != nil {
-		return fmt.Errorf("%s: failed to insert item colors: %w", op, err)
 	}
 
 	if err := tx.Commit(ctx); err != nil {

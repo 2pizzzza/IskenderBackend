@@ -90,39 +90,23 @@ CREATE TABLE IF NOT EXISTS Review (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-
-
 CREATE TABLE IF NOT EXISTS Photo (
-                                     id SERIAL PRIMARY KEY,
-                                     url VARCHAR(255),
-    isMain BOOLEAN
-    );
-
-CREATE TABLE IF NOT EXISTS Color (
-                                     id SERIAL PRIMARY KEY,
-                                     hash_color VARCHAR(7) -- Hex цвет
+    id SERIAL PRIMARY KEY,
+    url VARCHAR(255),
+    isMain BOOLEAN,
+    hash_color VARCHAR(7)
     );
 
 CREATE TABLE IF NOT EXISTS CollectionPhoto (
-                                               collection_id INT REFERENCES Collection(id),
+    collection_id INT REFERENCES Collection(id),
     photo_id INT REFERENCES Photo(id),
     PRIMARY KEY (collection_id, photo_id)
     );
 
-CREATE TABLE IF NOT EXISTS CollectionColor (
-                                               collection_id INT REFERENCES Collection(id),
-    color_id INT REFERENCES Color(id),
-    PRIMARY KEY (collection_id, color_id)
-    );
 
 CREATE TABLE IF NOT EXISTS ItemPhoto (
-                                         item_id INT REFERENCES Item(id),
+    item_id INT REFERENCES Item(id),
     photo_id INT REFERENCES Photo(id),
     PRIMARY KEY (item_id, photo_id)
     );
 
-CREATE TABLE IF NOT EXISTS ItemColor (
-                                         item_id INT REFERENCES Item(id),
-    color_id INT REFERENCES Color(id),
-    PRIMARY KEY (item_id, color_id)
-    );

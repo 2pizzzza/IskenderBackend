@@ -12,12 +12,12 @@ type Color struct {
 }
 
 type PhotosResponse struct {
-	ID     int    `json:"id"`
-	URL    string `json:"url"`
-	IsMain bool   `json:"isMain"`
+	ID        int    `json:"id"`
+	URL       string `json:"url"`
+	IsMain    bool   `json:"isMain"`
+	HashColor string `json:"hashColor"`
 }
 
 type ColorResponse struct {
-	ID        int    `json:"id"`
 	HashColor string `json:"hash_color"`
 }

@@ -32,16 +32,11 @@ func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode str
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
 		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
@@ -79,16 +74,11 @@ func (db *DB) GetCollectionsByIsProducerSLanguageCode(ctx context.Context, langu
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
 		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
@@ -126,16 +116,11 @@ func (db *DB) GetCollectionsByIsProducerPLanguageCode(ctx context.Context, langu
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
 		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
@@ -173,16 +158,11 @@ func (db *DB) GetPopularCollections(ctx context.Context, languageCode string) ([
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
 		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
@@ -220,16 +200,11 @@ func (db *DB) GetNewCollections(ctx context.Context, languageCode string) ([]*mo
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
 		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
@@ -272,16 +247,11 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 		return nil, fmt.Errorf("%s: failed to retrieve collection data: %w", op, err)
 	}
 
-	photos, err := db.getCollectionPhotos(ctx, collection.ID)
+	photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 	}
 	collection.Photos = photos
-
-	colors, err := db.getCollectionColors(ctx, collection.ID)
-	if err != nil {
-		return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-	}
 	collection.Colors = colors
 
 	return &collection, nil
@@ -430,10 +400,6 @@ func (db *DB) UpdateCollection(ctx context.Context, req *models.UpdateCollection
 		return fmt.Errorf("%s: failed to update collection photos: %w", op, err)
 	}
 
-	if err = db.updateCollectionColors(ctx, tx, req.CollectionID, req.Colors); err != nil {
-		return fmt.Errorf("%s: failed to update collection colors: %w", op, err)
-	}
-
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}
@@ -474,16 +440,11 @@ func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCo
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
 		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
@@ -524,27 +485,9 @@ func (db *DB) updateCollectionPhotos(ctx context.Context, tx pgx.Tx, collectionI
 	return nil
 }
 
-func (db *DB) updateCollectionColors(ctx context.Context, tx pgx.Tx, collectionID int, colors []models.ColorResponse) error {
-	deleteColors := `DELETE FROM CollectionColor WHERE collection_id = $1`
-	_, err := tx.Exec(ctx, deleteColors, collectionID)
-	if err != nil {
-		return fmt.Errorf("failed to delete existing colors: %w", err)
-	}
-
-	insertColor := `INSERT INTO CollectionColor (collection_id, color_id) VALUES ($1, $2)`
-	for _, color := range colors {
-		_, err = tx.Exec(ctx, insertColor, collectionID, color.ID)
-		if err != nil {
-			return fmt.Errorf("failed to insert new color: %w", err)
-		}
-	}
-
-	return nil
-}
-
-func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]models.PhotosResponse, error) {
+func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]models.PhotosResponse, []models.ColorResponse, error) {
 	query := `
-		SELECT p.id, p.url, p.isMain
+		SELECT p.id, p.url, p.isMain, p.hash_color
 		FROM CollectionPhoto cp
 		JOIN Photo p ON cp.photo_id = p.id
 		WHERE cp.collection_id = $1`
@@ -552,52 +495,25 @@ func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]mode
 	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
 	rows, err := db.Pool.Query(ctx, query, collectionID)
 	if err != nil {
-		return nil, fmt.Errorf("getCollectionPhotos: failed to query photos: %w", err)
+		return nil, nil, fmt.Errorf("getCollectionPhotos: failed to query photos: %w", err)
 	}
 	defer rows.Close()
 
 	var photos []models.PhotosResponse
+	var colors []models.ColorResponse
 	for rows.Next() {
 		var photo models.PhotosResponse
-		if err := rows.Scan(&photo.ID, &photo.URL, &photo.IsMain); err != nil {
-			return nil, fmt.Errorf("getCollectionPhotos: failed to scan photo row: %w", err)
+		if err := rows.Scan(&photo.ID, &photo.URL, &photo.IsMain, &photo.HashColor); err != nil {
+			return nil, nil, fmt.Errorf("getCollectionPhotos: failed to scan photo row: %w", err)
 		}
+		colors = append(colors, models.ColorResponse{HashColor: photo.HashColor})
 		photo.URL = fmt.Sprintf("%s/%s", baseURL, photo.URL)
 		photos = append(photos, photo)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("getCollectionPhotos: row iteration error: %w", err)
+		return nil, nil, fmt.Errorf("getCollectionPhotos: row iteration error: %w", err)
 	}
 
-	return photos, nil
-}
-
-func (db *DB) getCollectionColors(ctx context.Context, collectionID int) ([]models.ColorResponse, error) {
-	query := `
-		SELECT c.id, c.hash_color
-		FROM CollectionColor cc
-		JOIN Color c ON cc.color_id = c.id
-		WHERE cc.collection_id = $1`
-
-	rows, err := db.Pool.Query(ctx, query, collectionID)
-	if err != nil {
-		return nil, fmt.Errorf("getCollectionColors: failed to query colors: %w", err)
-	}
-	defer rows.Close()
-
-	var colors []models.ColorResponse
-	for rows.Next() {
-		var color models.ColorResponse
-		if err := rows.Scan(&color.ID, &color.HashColor); err != nil {
-			return nil, fmt.Errorf("getCollectionColors: failed to scan color row: %w", err)
-		}
-		colors = append(colors, color)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("getCollectionColors: row iteration error: %w", err)
-	}
-
-	return colors, nil
+	return photos, colors, nil
 }
