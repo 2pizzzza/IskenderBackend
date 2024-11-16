@@ -255,7 +255,7 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 
 	return &collection, nil
 }
-func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer *bool, searchQuery string) ([]*models.CollectionResponse, error) {
+func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string) ([]*models.CollectionResponse, error) {
 	const op = "postgres.SearchCollections"
 
 	query := `
@@ -269,8 +269,13 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 	args = append(args, languageCode)
 
 	if isProducer != nil {
-		query += ` AND c.isProducer = $2`
+		query += ` AND c.isProducer = $` + fmt.Sprintf("%d", len(args)+1)
 		args = append(args, *isProducer)
+	}
+
+	if isPainted != nil {
+		query += ` AND c.isPainted = $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *isPainted)
 	}
 
 	if searchQuery != "" {

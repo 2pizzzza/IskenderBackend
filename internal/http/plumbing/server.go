@@ -65,7 +65,7 @@ type Service interface {
 	GetItemsRec(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 
 	//Seach
-	Search(ctx context.Context, code string, isProducer *bool, searchQuery string) (*models.PopularResponse, error)
+	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string) (*models.PopularResponse, error)
 
 	//Photo
 	GetImagePath(ctx context.Context, imageName string) (string, error)

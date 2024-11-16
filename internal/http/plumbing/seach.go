@@ -19,6 +19,7 @@ import (
 // @Produce  json
 // @Param  lang  query  string  false  "Language code"
 // @Param  is_producer  query  bool  false  "Filter by producer status"
+// @Param  is_painted  query  bool  false  "Filter by painted"
 // @Param  q  query  string  false  "Search query"
 // @Success 200 {object} models.PopularResponse "Search results"
 // @Failure 400 {object} models.ErrorMessage "Bad request - invalid query parameters"
@@ -31,6 +32,7 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 	)
 
 	isProducer := r.URL.Query().Get("is_producer")
+	isPainted := r.URL.Query().Get("is_painted")
 	searchQuery := r.URL.Query().Get("q")
 	code := r.URL.Query().Get("lang")
 
@@ -45,7 +47,18 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 		isProducerVal = &val
 	}
 
-	result, err := s.service.Search(r.Context(), code, isProducerVal, searchQuery)
+	var isPaintedVal *bool
+	if isPainted != "" {
+		val, err := strconv.ParseBool(isPainted)
+		if err != nil {
+			log.Error("Invalid isPainted value", slog.String("isPainted", isPainted), sl.Err(err))
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid isPainted value"}, http.StatusInternalServerError)
+			return
+		}
+		isPaintedVal = &val
+	}
+
+	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, searchQuery)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusBadRequest)

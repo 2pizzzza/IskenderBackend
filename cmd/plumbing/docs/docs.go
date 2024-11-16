@@ -819,6 +819,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/discounts": {
+            "get": {
+                "description": "Retrieve a list of all available discounts.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Discounts"
+                ],
+                "summary": "Get all discounts",
+                "responses": {
+                    "200": {
+                        "description": "List of discounts",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Discount"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get all discounts",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/item": {
             "get": {
                 "description": "Returns details of a specific item in the specified language",
@@ -1365,6 +1394,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Filter by painted",
+                        "name": "is_painted",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Search query",
                         "name": "q",
@@ -1859,9 +1894,6 @@ const docTemplate = `{
             "properties": {
                 "hash_color": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 }
             }
         },
@@ -1936,6 +1968,29 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Discount": {
+            "type": "object",
+            "properties": {
+                "discount_percentage": {
+                    "type": "number"
+                },
+                "discount_type": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "target_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -2033,6 +2088,9 @@ const docTemplate = `{
         "models.PhotosResponse": {
             "type": "object",
             "properties": {
+                "hashColor": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },

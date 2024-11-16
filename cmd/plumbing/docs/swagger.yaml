@@ -63,8 +63,6 @@ definitions:
     properties:
       hash_color:
         type: string
-      id:
-        type: integer
     type: object
   models.CreateCategoryRequest:
     properties:
@@ -113,6 +111,21 @@ definitions:
         type: array
       title:
         type: string
+    type: object
+  models.Discount:
+    properties:
+      discount_percentage:
+        type: number
+      discount_type:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      target_id:
+        type: integer
     type: object
   models.ErrorMessage:
     properties:
@@ -175,6 +188,8 @@ definitions:
     type: object
   models.PhotosResponse:
     properties:
+      hashColor:
+        type: string
       id:
         type: integer
       isMain:
@@ -834,6 +849,25 @@ paths:
       summary: Retrieve collections recommendation by language code
       tags:
       - collections
+  /discounts:
+    get:
+      description: Retrieve a list of all available discounts.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of discounts
+          schema:
+            items:
+              $ref: '#/definitions/models.Discount'
+            type: array
+        "500":
+          description: Failed to get all discounts
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all discounts
+      tags:
+      - Discounts
   /item:
     get:
       consumes:
@@ -1193,6 +1227,10 @@ paths:
       - description: Filter by producer status
         in: query
         name: is_producer
+        type: boolean
+      - description: Filter by painted
+        in: query
+        name: is_painted
         type: boolean
       - description: Search query
         in: query

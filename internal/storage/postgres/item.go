@@ -230,7 +230,7 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 	return items, nil
 }
 
-func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *bool, searchQuery string) ([]*models.ItemResponse, error) {
+func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string) ([]*models.ItemResponse, error) {
 	const op = "postgres.SearchItems"
 
 	query := `
@@ -244,8 +244,13 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 	args = append(args, languageCode)
 
 	if isProducer != nil {
-		query += ` AND i.isProducer = $2`
+		query += ` AND i.isProducer = $` + fmt.Sprintf("%d", len(args)+1)
 		args = append(args, *isProducer)
+	}
+
+	if isPainted != nil {
+		query += ` AND i.isPainted = $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *isPainted)
 	}
 
 	if searchQuery != "" {
