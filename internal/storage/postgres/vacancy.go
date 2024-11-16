@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
+	"github.com/lib/pq"
 )
 
 func (db *DB) GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error) {
@@ -89,7 +90,14 @@ func (db *DB) UpdateVacancy(ctx context.Context, req models.VacancyResponse) err
 		UPDATE VacancyTranslation 
 		SET title = $1, requirements = $2, responsibilities = $3, conditions = $4, information = $5
 		WHERE vacancy_id = $6 AND language_code = $7`
-	_, err = tx.Exec(ctx, updateTranslationQuery, req.Title, req.Requirements, req.Responsibilities, req.Conditions, req.Information, req.Id, req.LanguageCode)
+	_, err = tx.Exec(ctx, updateTranslationQuery,
+		req.Title,
+		// Передаем массивы строк
+		pq.Array(req.Requirements),
+		pq.Array(req.Responsibilities),
+		pq.Array(req.Conditions),
+		pq.Array(req.Information),
+		req.Id, req.LanguageCode)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update vacancy translation: %w", op, err)
 	}
@@ -232,6 +240,7 @@ func (db *DB) GetVacancyById(ctx context.Context, id int) (*models.VacancyRespon
 		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
 	}
 
+	// Заполнение ответа
 	response.Vacancy = translations
 	return &response, nil
 }

@@ -1905,22 +1905,34 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "id": {
                     "type": "integer"
                 },
                 "information": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "language_code": {
                     "type": "string"
                 },
                 "requirements": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "responsibilities": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "title": {
                     "type": "string"
@@ -2138,13 +2150,19 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "conditions": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "id": {
                     "type": "integer"
                 },
                 "information": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "isActive": {
                     "type": "boolean"
@@ -2153,10 +2171,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "requirements": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "responsibilities": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "salary": {
                     "type": "integer"
@@ -2170,7 +2194,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "is_active": {
-                    "type": "string"
+                    "type": "boolean"
                 },
                 "salary": {
                     "type": "integer"

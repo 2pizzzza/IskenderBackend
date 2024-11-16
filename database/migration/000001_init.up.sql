@@ -45,14 +45,15 @@ CREATE TABLE IF NOT EXISTS Vacancy(
 );
 
 CREATE TABLE IF NOT EXISTS VacancyTranslation (
-   vacancy_id INT REFERENCES Vacancy(id),
+    vacancy_id INT REFERENCES Vacancy(id),
     language_code VARCHAR(10) REFERENCES Language(code),
     title VARCHAR(255) NOT NULL,
-    requirements TEXT NOT NULL,
-    responsibilities TEXT NOT NULL,
-    conditions TEXT NOT NULL,
-    information TEXT NOT NULL
-);
+    requirements TEXT[] NOT NULL,
+    responsibilities TEXT[] NOT NULL,
+    conditions TEXT[] NOT NULL,
+    information TEXT[] NOT NULL
+    );
+
 
 CREATE TABLE IF NOT EXISTS Item (
     id SERIAL PRIMARY KEY,

@@ -92,17 +92,25 @@ definitions:
   models.CreateVacancy:
     properties:
       conditions:
-        type: string
+        items:
+          type: string
+        type: array
       id:
         type: integer
       information:
-        type: string
+        items:
+          type: string
+        type: array
       language_code:
         type: string
       requirements:
-        type: string
+        items:
+          type: string
+        type: array
       responsibilities:
-        type: string
+        items:
+          type: string
+        type: array
       title:
         type: string
     type: object
@@ -242,19 +250,27 @@ definitions:
   models.VacancyResponse:
     properties:
       conditions:
-        type: string
+        items:
+          type: string
+        type: array
       id:
         type: integer
       information:
-        type: string
+        items:
+          type: string
+        type: array
       isActive:
         type: boolean
       language_code:
         type: string
       requirements:
-        type: string
+        items:
+          type: string
+        type: array
       responsibilities:
-        type: string
+        items:
+          type: string
+        type: array
       salary:
         type: integer
       title:
@@ -263,7 +279,7 @@ definitions:
   models.VacancyResponses:
     properties:
       is_active:
-        type: string
+        type: boolean
       salary:
         type: integer
       vacancy:
