@@ -14,6 +14,9 @@ type Plumping struct {
 
 type PlumpingRepository interface {
 
+	//Discount
+	GetAllDiscount(ctx context.Context) ([]models.Discount, error)
+
 	//Brand
 	CreateBrand(ctx context.Context, name, url string) (*models.BrandResponse, error)
 	GetAllBrand(ctx context.Context) ([]*models.BrandResponse, error)

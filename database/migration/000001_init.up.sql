@@ -90,6 +90,17 @@ CREATE TABLE IF NOT EXISTS Review (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+CREATE TABLE IF NOT EXISTS Discount (
+    id SERIAL PRIMARY KEY,
+    discount_type VARCHAR(50) NOT NULL,
+    target_id INT NOT NULL,
+    discount_percentage DECIMAL(5, 2) NOT NULL,
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    CONSTRAINT fk_target_collection FOREIGN KEY (target_id) REFERENCES Collection(id) ON DELETE CASCADE,
+    CONSTRAINT fk_target_item FOREIGN KEY (target_id) REFERENCES Item(id) ON DELETE CASCADE
+    );
+
 CREATE TABLE IF NOT EXISTS Photo (
     id SERIAL PRIMARY KEY,
     url VARCHAR(255),

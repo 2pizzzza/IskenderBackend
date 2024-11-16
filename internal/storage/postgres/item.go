@@ -49,7 +49,6 @@ func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, language
 		}
 		item.Photos = photos
 		item.Colors = colors
-
 		items = append(items, &item)
 	}
 
@@ -94,7 +93,6 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 	}
 	item.Photos = photos
 	item.Colors = colors
-
 	return &item, nil
 }
 
@@ -139,7 +137,6 @@ func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, lang
 		}
 		item.Photos = photos
 		item.Colors = colors
-
 		items = append(items, &item)
 	}
 
@@ -181,7 +178,6 @@ func (db *DB) GetPopularItems(ctx context.Context, languageCode string) ([]*mode
 		}
 		item.Photos = photos
 		item.Colors = colors
-
 		items = append(items, &item)
 	}
 
@@ -238,10 +234,11 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 	const op = "postgres.SearchItems"
 
 	query := `
-		SELECT it.name
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew,
+		COALESCE(it.name, ''), COALESCE(it.description, '')
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
-		WHERE 1=1`
+		WHERE it.name IS NOT NULL`
 
 	var args []interface{}
 	args = append(args, languageCode)
@@ -266,10 +263,10 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.Name); err != nil {
+		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
+			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
-
 		items = append(items, &item)
 	}
 

@@ -38,7 +38,6 @@ func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode str
 		}
 		collection.Photos = photos
 		collection.Colors = colors
-
 		collections = append(collections, &collection)
 	}
 
@@ -256,12 +255,12 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 
 	return &collection, nil
 }
-
 func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer *bool, searchQuery string) ([]*models.CollectionResponse, error) {
 	const op = "postgres.SearchCollections"
 
 	query := `
-		SELECT ct.name
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew,
+		COALESCE(ct.name, ''), COALESCE(ct.description, '')
 		FROM Collection c
 		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $1
 		WHERE 1=1`
@@ -289,10 +288,10 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 
 	for rows.Next() {
 		var collection models.CollectionResponse
-		if err := rows.Scan(&collection.Name); err != nil {
+		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular,
+			&collection.IsNew, &collection.Name, &collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
-
 		collections = append(collections, &collection)
 	}
 

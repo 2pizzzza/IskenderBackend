@@ -13,6 +13,9 @@ type Service interface {
 	//Starter
 	Starter(ctx context.Context) error
 
+	//Discount
+	GetAllDiscounts(ctx context.Context) ([]models.Discount, error)
+
 	//Vacancy
 	GetAllActiveVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
 	UpdateVacancy(ctx context.Context, token string, req models.VacancyResponse) error
@@ -84,6 +87,9 @@ func New(log *slog.Logger, service Service) *Server {
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Starter
 	mux.HandleFunc("POST /starter", s.Starter)
+
+	//Discount
+	mux.HandleFunc("GET /discounts", s.GetAllDiscount)
 
 	//Vacancy
 	mux.HandleFunc("GET /vacancies/activ", s.GetAllVacancyActive)
