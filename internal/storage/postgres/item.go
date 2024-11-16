@@ -263,8 +263,7 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 	const op = "postgres.SearchItems"
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew,
-		       COALESCE(it.name, ''), COALESCE(it.description, '')
+		SELECT it.name
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
 		WHERE 1=1`
@@ -278,8 +277,8 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 	}
 
 	if searchQuery != "" {
-		query += ` AND (it.name ILIKE $` + fmt.Sprintf("%d", len(args)+1) + ` OR it.description ILIKE $` + fmt.Sprintf("%d", len(args)+2) + `)`
-		args = append(args, "%"+searchQuery+"%", "%"+searchQuery+"%")
+		query += ` AND it.name ILIKE $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, "%"+searchQuery+"%")
 	}
 
 	rows, err := db.Pool.Query(ctx, query, args...)
@@ -292,24 +291,15 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
+		if err := rows.Scan(&item.Name); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 
-		photos, err := db.getItemPhotos(ctx, item.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
-		}
-		item.Photos = photos
-
-		colors, err := db.getItemColors(ctx, item.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for item %d: %w", op, item.ID, err)
-		}
-		item.Colors = colors
-
 		items = append(items, &item)
+	}
+
+	if len(items) == 0 {
+		return nil, storage.ErrCollectionNotFound
 	}
 
 	if err := rows.Err(); err != nil {

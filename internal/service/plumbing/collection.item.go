@@ -2,9 +2,11 @@ package plumbing
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	"github.com/2pizzzza/plumbing/internal/storage"
 	"log/slog"
 )
 
@@ -68,15 +70,24 @@ func (pr *Plumping) Search(ctx context.Context, code string, isProducer *bool, s
 	log := pr.log.With(
 		slog.String("op: ", op),
 	)
-
+	count := 0
 	items, err := pr.plumpingRepository.SearchItems(ctx, code, isProducer, searchQuery)
 	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			count++
+		}
 		log.Error("Failed to get new items", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
 	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, searchQuery)
 	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			count++
+			if count == 2 {
+				return nil, storage.ErrCollectionNotFound
+			}
+		}
 		log.Error("Failed to get new collections", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}

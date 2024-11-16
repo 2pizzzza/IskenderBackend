@@ -1,8 +1,10 @@
 package plumbing
 
 import (
+	"errors"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/2pizzzza/plumbing/internal/utils"
 	"log/slog"
 	"net/http"
@@ -45,6 +47,10 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 
 	result, err := s.service.Search(r.Context(), code, isProducerVal, searchQuery)
 	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusBadRequest)
+			return
+		}
 		log.Error("Failed to execute search", sl.Err(err))
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to execute search"}, http.StatusInternalServerError)
 

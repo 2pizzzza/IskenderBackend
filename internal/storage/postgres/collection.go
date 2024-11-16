@@ -291,13 +291,11 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 	const op = "postgres.SearchCollections"
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew,
-		       COALESCE(ct.name, ''), COALESCE(ct.description, '')
+		SELECT ct.name
 		FROM Collection c
 		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $1
 		WHERE 1=1`
 
-	// Составляем условия фильтрации
 	var args []interface{}
 	args = append(args, languageCode)
 
@@ -307,8 +305,8 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 	}
 
 	if searchQuery != "" {
-		query += ` AND (ct.name ILIKE $` + fmt.Sprintf("%d", len(args)+1) + ` OR ct.description ILIKE $` + fmt.Sprintf("%d", len(args)+2) + `)`
-		args = append(args, "%"+searchQuery+"%", "%"+searchQuery+"%")
+		query += ` AND ct.name ILIKE $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, "%"+searchQuery+"%")
 	}
 
 	rows, err := db.Pool.Query(ctx, query, args...)
@@ -321,24 +319,15 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 
 	for rows.Next() {
 		var collection models.CollectionResponse
-		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular,
-			&collection.IsNew, &collection.Name, &collection.Description); err != nil {
+		if err := rows.Scan(&collection.Name); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
-		photos, err := db.getCollectionPhotos(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
-		}
-		collection.Photos = photos
-
-		colors, err := db.getCollectionColors(ctx, collection.ID)
-		if err != nil {
-			return nil, fmt.Errorf("%s: failed to get colors for collection %d: %w", op, collection.ID, err)
-		}
-		collection.Colors = colors
-
 		collections = append(collections, &collection)
+	}
+
+	if len(collections) == 0 {
+		return nil, storage.ErrCollectionNotFound
 	}
 
 	if err := rows.Err(); err != nil {
