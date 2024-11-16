@@ -267,6 +267,14 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
+
+		photos, colors, err := db.getItemPhotos(ctx, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
+		}
+		item.Photos = photos
+		item.Colors = colors
+
 		items = append(items, &item)
 	}
 

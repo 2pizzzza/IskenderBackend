@@ -292,7 +292,17 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 			&collection.IsNew, &collection.Name, &collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
+
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
+		}
+
+		collection.Photos = photos
+		collection.Colors = colors
+
 		collections = append(collections, &collection)
+
 	}
 
 	if len(collections) == 0 {
