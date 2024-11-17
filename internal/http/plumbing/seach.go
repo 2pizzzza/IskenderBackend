@@ -61,7 +61,7 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, searchQuery)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
-			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusBadRequest)
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusNotFound)
 			return
 		}
 		log.Error("Failed to execute search", sl.Err(err))
