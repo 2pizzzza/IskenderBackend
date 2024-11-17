@@ -829,6 +829,15 @@ const docTemplate = `{
                     "Discounts"
                 ],
                 "summary": "Get all discounts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language code",
+                        "name": "lang",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of discounts",

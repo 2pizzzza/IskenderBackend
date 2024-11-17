@@ -14,7 +14,7 @@ type Service interface {
 	Starter(ctx context.Context) error
 
 	//Discount
-	GetAllDiscounts(ctx context.Context) ([]models.Discount, error)
+	GetAllDiscounts(ctx context.Context, languageCode string) ([]models.Discount, error)
 
 	//Vacancy
 	GetAllActiveVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)

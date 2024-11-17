@@ -852,6 +852,12 @@ paths:
   /discounts:
     get:
       description: Retrieve a list of all available discounts.
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        required: true
+        type: string
       produces:
       - application/json
       responses:
