@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS VacancyTranslation (
 
 CREATE TABLE IF NOT EXISTS Item (
     id SERIAL PRIMARY KEY,
-    category_id INT REFERENCES Category(id),
+    category_id INT NOT NULL REFERENCES Category(id),
     collection_id INT REFERENCES Collection(id),
     size VARCHAR(50) NOT NULL,
     price DECIMAL NOT NULL,
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS Discount (
 CREATE TABLE IF NOT EXISTS Photo (
     id SERIAL PRIMARY KEY,
     url VARCHAR(255),
-    isMain BOOLEAN,
+    isMain BOOLEAN, 
     hash_color VARCHAR(7)
     );
 

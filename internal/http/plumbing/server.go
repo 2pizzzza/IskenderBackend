@@ -65,6 +65,7 @@ type Service interface {
 	GetItemById(ctx context.Context, id int, code string) (*models.ItemResponse, error)
 	GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemsRec(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
+	CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error)
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string) (*models.PopularResponse, error)
@@ -141,6 +142,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /item", s.GetItemsById)
 	mux.HandleFunc("GET /items/collection", s.GetItemsByCollectionId)
 	mux.HandleFunc("GET /items/rec", s.GetItemsRec)
+	mux.HandleFunc("POST /items", s.CreateItem)
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)

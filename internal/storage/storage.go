@@ -17,4 +17,6 @@ var (
 	ErrVacancyTranslationNotFound = errors.New("translation not found")
 	ErrDiscountExists             = errors.New("discount already exists")
 	ErrDiscountNotFound           = errors.New("discount already exists")
+	ErrInvalidLanguageCode        = errors.New("invalid language code ")
+	ErrItemExists                 = errors.New("item already exists")
 )

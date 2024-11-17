@@ -1088,6 +1088,72 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Create a new item with the specified details and upload photos.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Create a new item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Item data in JSON format",
+                        "name": "item",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Photos of the item",
+                        "name": "photos",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Indicates if the photo is the main one",
+                        "name": "isMain_{filename}",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Color hash for the photo",
+                        "name": "hashColor_{filename}",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created item",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateItemResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request data or item already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create item",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
             }
         },
         "/items/collection": {
@@ -2003,6 +2069,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "new_price": {
+                    "type": "number"
+                },
                 "photos": {
                     "type": "array",
                     "items": {
@@ -2041,6 +2110,64 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.CategoriesResponse"
                     }
+                }
+            }
+        },
+        "models.CreateItemResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "collection_id": {
+                    "type": "integer"
+                },
+                "isPainted": {
+                    "type": "boolean"
+                },
+                "isProducer": {
+                    "type": "boolean"
+                },
+                "is_new": {
+                    "type": "boolean"
+                },
+                "is_popular": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateItemTranslation"
+                    }
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateItemTranslation": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "language_code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -2246,6 +2373,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "new_price": {
+                    "type": "number"
                 },
                 "photos": {
                     "type": "array",

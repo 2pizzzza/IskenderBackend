@@ -1,7 +1,9 @@
 package plumbing
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/2pizzzza/plumbing/internal/utils"
@@ -191,4 +193,87 @@ func (s *Server) GetItemsRec(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponseBody(w, res, http.StatusOK)
 
+}
+
+// CreateItem godoc
+// @Summary Create a new item
+// @Description Create a new item with the specified details and upload photos.
+// @Tags items
+// @Accept multipart/form-data
+// @Produce json
+// @Param item formData string true "Item data in JSON format" example="{\"category_id\":1,\"collection_id\":2,\"size\":\"M\",\"price\":100.5,\"isProducer\":false,\"isPainted\":true,\"is_popular\":true,\"is_new\":false,\"items\":[{\"language_code\":\"en\",\"name\":\"Item Name\",\"description\":\"Item Description\"}]}"
+// @Param photos formData file false "Photos of the item"
+// @Param isMain_{filename} formData bool false "Indicates if the photo is the main one"
+// @Param hashColor_{filename} formData string false "Color hash for the photo"
+// @Success 201 {object} models.CreateItemResponse "Successfully created item"
+// @Failure 400 {object} models.ErrorMessage "Invalid request data or item already exists"
+// @Failure 403 {object} models.ErrorMessage "Permissions denied"
+// @Failure 500 {object} models.ErrorMessage "Failed to create item"
+// @Router /items [post]
+func (s *Server) CreateItem(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid form-data"}, http.StatusBadRequest)
+		return
+	}
+
+	itemData := r.FormValue("item")
+	if itemData == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing item data"}, http.StatusBadRequest)
+		return
+	}
+
+	var req models.CreateItem
+	if err := json.Unmarshal([]byte(itemData), &req); err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid item data"}, http.StatusBadRequest)
+		return
+	}
+
+	var photos []models.PhotosResponse
+	files := r.MultipartForm.File["photos"]
+
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to open uploaded file"}, http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+
+		filename, err := saveImage(file, fileHeader.Filename)
+		if err != nil {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to save image"}, http.StatusInternalServerError)
+			return
+		}
+
+		isMain := r.FormValue(fmt.Sprintf("isMain_%s", fileHeader.Filename)) == "true"
+		hashColor := r.FormValue(fmt.Sprintf("hashColor_%s", fileHeader.Filename))
+
+		photos = append(photos, models.PhotosResponse{
+			URL:       "/media/images/" + filename,
+			IsMain:    isMain,
+			HashColor: hashColor,
+		})
+	}
+
+	req.Photos = photos
+
+	res, err := s.service.CreateItem(r.Context(), req)
+	if err != nil {
+		if errors.Is(err, storage.ErrToken) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Permissions denied"}, http.StatusForbidden)
+			return
+		}
+		if errors.Is(err, storage.ErrItemExists) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Item with this name already exists"}, http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 languages"}, http.StatusBadRequest)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to create item"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusCreated)
 }

@@ -89,3 +89,31 @@ func (pr *Plumping) GetItemsRec(ctx context.Context, id int, code string) ([]*mo
 
 	return items, nil
 }
+
+func (pr *Plumping) CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error) {
+	const op = "service.CreateItem"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	item, err := pr.plumpingRepository.CreateItem(ctx, req)
+	if err != nil {
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			log.Error("Required 3 languages", sl.Err(err))
+			return nil, fmt.Errorf("%s, %w", op, err)
+		}
+		if errors.Is(err, storage.ErrInvalidLanguageCode) {
+			log.Error("Required 3 languages kgz, ru, en", sl.Err(err))
+			return nil, fmt.Errorf("%s, %w", op, err)
+		}
+		if errors.Is(err, storage.ErrItemExists) {
+			log.Error("Item already exist", sl.Err(err))
+			return nil, fmt.Errorf("%s, %w", op, err)
+		}
+		log.Error("Failed to create item", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return item, nil
+}

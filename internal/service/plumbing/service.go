@@ -75,6 +75,7 @@ type PlumpingRepository interface {
 	GetItemByID(ctx context.Context, itemID int, languageCode string) (*models.ItemResponse, error)
 	GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error)
 	GetRandomItemsWithPopularity(ctx context.Context, languageCode string, itemID int) ([]*models.ItemResponse, error)
+	CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error)
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {

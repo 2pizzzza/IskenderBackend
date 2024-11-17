@@ -42,3 +42,36 @@ type ItemResponse struct {
 	Photos       []PhotosResponse `json:"photos"`
 	Colors       []ColorResponse  `json:"colors"`
 }
+
+type CreateItem struct {
+	CategoryID   int                     `json:"category_id"`
+	CollectionID int                     `json:"collection_id"`
+	Size         string                  `json:"size"`
+	Price        float64                 `json:"price"`
+	IsProducer   bool                    `json:"isProducer"`
+	IsPainted    bool                    `json:"isPainted"`
+	IsPopular    bool                    `json:"is_popular"`
+	IsNew        bool                    `json:"is_new"`
+	Photos       []PhotosResponse        `json:"photos"`
+	Items        []CreateItemTranslation `json:"items"`
+}
+
+type CreateItemTranslation struct {
+	LanguageCode string `json:"language_code"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+}
+
+type CreateItemResponse struct {
+	ID           int                     `json:"ID"`
+	CategoryID   int                     `json:"category_id"`
+	CollectionID int                     `json:"collection_id"`
+	Size         string                  `json:"size"`
+	Price        float64                 `json:"price"`
+	IsProducer   bool                    `json:"isProducer"`
+	IsPainted    bool                    `json:"isPainted"`
+	IsPopular    bool                    `json:"is_popular"`
+	IsNew        bool                    `json:"is_new"`
+	Photos       []PhotosResponse        `json:"photos"`
+	Items        []CreateItemTranslation `json:"items"`
+}
