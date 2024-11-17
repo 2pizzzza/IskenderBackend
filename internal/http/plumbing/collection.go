@@ -1,7 +1,9 @@
 package plumbing
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/2pizzzza/plumbing/internal/utils"
@@ -227,51 +229,85 @@ func (s *Server) GetCollectionsByPainted(w http.ResponseWriter, r *http.Request)
 
 }
 
-//func (s *Server) UpdateCollection(w http.ResponseWriter, r *http.Request) {
-//	authHeader := r.Header.Get("Authorization")
-//	if authHeader == "" {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Token required"}, http.StatusUnauthorized)
-//		return
-//	}
-//
-//	parts := strings.Split(authHeader, " ")
-//	if len(parts) != 2 || parts[0] != "Bearer" {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid token format"}, http.StatusUnauthorized)
-//		return
-//	}
-//	token := parts[1]
-//
-//	err := r.ParseMultipartForm(10 << 20)
-//	if err != nil {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Unable to parse form data"}, http.StatusBadRequest)
-//		return
-//	}
-//
-//	files := r.MultipartForm.File["photos"]
-//	if len(files) == 0 {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "No photos uploaded"}, http.StatusBadRequest)
-//		return
-//	}
-//
-//	uploadedFiles, err := s.service.UploadPhotos(r.Context(), files)
-//	if err != nil {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to upload photos"}, http.StatusInternalServerError)
-//		return
-//	}
-//
-//	// Подготовка запроса
-//	var req models.UpdateCollectionRequest
-//	err = json.NewDecoder(r.Body).Decode(&req)
-//	if err != nil {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid JSON in request body"}, http.StatusBadRequest)
-//		return
-//	}
-//
-//	err = s.service.UpdateCollection(r.Context(), token, &req)
-//	if err != nil {
-//		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to update collection"}, http.StatusInternalServerError)
-//		return
-//	}
-//
-//	utils.WriteResponseBody(w, models.UploadedPhotosResponse{Files: uploadedFiles}, http.StatusOK)
-//}
+// CreateCollection godoc
+// @Summary Create a new collection
+// @Description Create a new collection with the specified details and upload photos.
+// @Tags collections
+// @Accept multipart/form-data
+// @Produce json
+// @Param collection formData string true "Collection data in JSON format" example="{\"category_id\":1,\"collection_id\":2,\"size\":\"M\",\"price\":100.5,\"isProducer\":false,\"isPainted\":true,\"is_popular\":true,\"is_new\":false,\"items\":[{\"language_code\":\"en\",\"name\":\"Item Name\",\"description\":\"Item Description\"}]}"
+// @Param photos formData file false "Photos of the item"
+// @Param isMain_{filename} formData bool false "Indicates if the photo is the main one"
+// @Param hashColor_{filename} formData string false "Color hash for the photo"
+// @Success 201 {object} models.CreateCollectionResponse"Successfully created collection"
+// @Failure 400 {object} models.ErrorMessage "Invalid request data or collection already exists"
+// @Failure 403 {object} models.ErrorMessage "Permissions denied"
+// @Failure 500 {object} models.ErrorMessage "Failed to create collection"
+// @Router /collection [post]
+func (s *Server) CreateCollection(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid form-data"}, http.StatusBadRequest)
+		return
+	}
+
+	itemData := r.FormValue("collection")
+	if itemData == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing collection data"}, http.StatusBadRequest)
+		return
+	}
+
+	var req models.CreateCollectionRequest
+	if err := json.Unmarshal([]byte(itemData), &req); err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection data"}, http.StatusBadRequest)
+		return
+	}
+
+	var photos []models.PhotosResponse
+	files := r.MultipartForm.File["photos"]
+
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to open uploaded file"}, http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+
+		filename, err := saveImage(file, fileHeader.Filename)
+		if err != nil {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to save image"}, http.StatusInternalServerError)
+			return
+		}
+
+		isMain := r.FormValue(fmt.Sprintf("isMain_%s", fileHeader.Filename)) == "false"
+		hashColor := r.FormValue(fmt.Sprintf("hashColor_%s", fileHeader.Filename))
+
+		photos = append(photos, models.PhotosResponse{
+			URL:       "/media/images/" + filename,
+			IsMain:    isMain,
+			HashColor: hashColor,
+		})
+	}
+
+	req.Photos = photos
+
+	res, err := s.service.CreateCollection(r.Context(), req)
+	if err != nil {
+		if errors.Is(err, storage.ErrToken) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Permissions denied"}, http.StatusForbidden)
+			return
+		}
+		if errors.Is(err, storage.ErrCollectionExists) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Collection with this name already exists"}, http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 languages"}, http.StatusBadRequest)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to create collection"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusCreated)
+}

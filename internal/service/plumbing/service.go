@@ -59,6 +59,7 @@ type PlumpingRepository interface {
 	GetRandomCollectionsWithPopularity(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionsByIsProducerSLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionsByIsProducerPLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
+	CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error)
 
 	//Popular and new
 	GetPopularCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)

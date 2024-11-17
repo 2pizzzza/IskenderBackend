@@ -55,6 +55,7 @@ type Service interface {
 	GetCollectionRec(ctx context.Context, language string) ([]*models.CollectionResponse, error)
 	GetCollectionByStadart(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 	GetCollectionByPainted(ctx context.Context, code string) ([]*models.CollectionResponse, error)
+	CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error)
 
 	//Popular and New
 	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
@@ -132,6 +133,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /collections/rec", s.GetCollectionsRec)
 	mux.HandleFunc("GET /collections/standart", s.GetCollectionsStandart)
 	mux.HandleFunc("GET /collections/painted", s.GetCollectionsByPainted)
+	mux.HandleFunc("POST /collection", s.CreateCollection)
 
 	//Popular and New
 	mux.HandleFunc("GET /popular", s.GetPopular)

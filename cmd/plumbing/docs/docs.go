@@ -661,6 +661,72 @@ const docTemplate = `{
                     }
                 }
             },
+            "post": {
+                "description": "Create a new collection with the specified details and upload photos.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "collections"
+                ],
+                "summary": "Create a new collection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Collection data in JSON format",
+                        "name": "collection",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Photos of the item",
+                        "name": "photos",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Indicates if the photo is the main one",
+                        "name": "isMain_{filename}",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Color hash for the photo",
+                        "name": "hashColor_{filename}",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created collection",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateCollectionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request data or collection already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create collection",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "Removes a collection from the database by ID. Requires a valid token.",
                 "consumes": [
@@ -2110,6 +2176,55 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.CategoriesResponse"
                     }
+                }
+            }
+        },
+        "models.CreateCollection": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "language_code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateCollectionResponse": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "collections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateCollection"
+                    }
+                },
+                "isNew": {
+                    "type": "boolean"
+                },
+                "isPainted": {
+                    "type": "boolean"
+                },
+                "isPopular": {
+                    "type": "boolean"
+                },
+                "isProducer": {
+                    "type": "boolean"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "price": {
+                    "type": "number"
                 }
             }
         },

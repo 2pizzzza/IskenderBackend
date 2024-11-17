@@ -17,6 +17,11 @@ type PhotosResponse struct {
 	IsMain    bool   `json:"isMain"`
 	HashColor string `json:"hashColor"`
 }
+type CreatePhotos struct {
+	URL       string `json:"url"`
+	IsMain    bool   `json:"isMain"`
+	HashColor string `json:"hashColor"`
+}
 
 type ColorResponse struct {
 	HashColor string `json:"hash_color"`

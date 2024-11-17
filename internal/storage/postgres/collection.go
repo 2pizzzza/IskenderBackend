@@ -544,3 +544,117 @@ func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]mode
 
 	return photos, colors, nil
 }
+
+func (db *DB) CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error) {
+	const op = "postgres.CreateCollection"
+
+	if len(req.Collections) != 3 {
+		return nil, storage.ErrRequiredLanguage
+	}
+
+	languageCodes := map[string]bool{"ru": false, "kgz": false, "en": false}
+	for _, translation := range req.Collections {
+		if _, ok := languageCodes[translation.LanguageCode]; !ok {
+			return nil, storage.ErrInvalidLanguageCode
+		}
+		languageCodes[translation.LanguageCode] = true
+	}
+
+	for _, translation := range req.Collections {
+		var exists bool
+		checkCollectionQuery := `SELECT EXISTS(
+			SELECT 1 FROM CollectionTranslation 
+			WHERE name = $1 AND language_code = $2
+		)`
+		err := db.Pool.QueryRow(ctx, checkCollectionQuery, translation.Name, translation.LanguageCode).Scan(&exists)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to check collection existence for language %s: %w", op, translation.LanguageCode, err)
+		}
+		if exists {
+			return nil, storage.ErrCollectionExists
+		}
+	}
+
+	tx, err := db.Pool.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+	}
+	defer tx.Rollback(ctx)
+
+	var collectionID int
+	insertCollectionQuery := `
+		INSERT INTO Collection (price, isProducer, isPainted, isPopular, isNew)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id
+	`
+	err = tx.QueryRow(ctx, insertCollectionQuery,
+		req.Price,
+		req.IsProducer,
+		req.IsPainted,
+		req.IsPopular,
+		req.IsNew,
+	).Scan(&collectionID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to insert collection: %w", op, err)
+	}
+
+	insertTranslationQuery := `
+		INSERT INTO CollectionTranslation (collection_id, language_code, name, description)
+		VALUES ($1, $2, $3, $4)
+	`
+	for _, translation := range req.Collections {
+		_, err = tx.Exec(ctx, insertTranslationQuery, collectionID, translation.LanguageCode, translation.Name, translation.Description)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to insert collection translation for language %s: %w", op, translation.LanguageCode, err)
+		}
+	}
+
+	insertPhotoQuery := `
+		INSERT INTO Photo (url, isMain, hash_color)
+		VALUES ($1, $2, $3)
+		RETURNING id
+	`
+	var photoIDs []int
+	for _, photo := range req.Photos {
+		var photoID int
+		err = tx.QueryRow(ctx, insertPhotoQuery, photo.URL, photo.IsMain, photo.HashColor).Scan(&photoID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to insert photo with url %s: %w", op, photo.URL, err)
+		}
+		photoIDs = append(photoIDs, photoID)
+	}
+
+	insertCollectionPhotoQuery := `
+		INSERT INTO CollectionPhoto (collection_id, photo_id)
+		VALUES ($1, $2)
+	`
+	for _, photoID := range photoIDs {
+		_, err = tx.Exec(ctx, insertCollectionPhotoQuery, collectionID, photoID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to insert photo association for photo id %d: %w", op, photoID, err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("%s: failed to commit transaction: %w", op, err)
+	}
+
+	var response models.CreateCollectionResponse
+	response.ID = collectionID
+	response.Price = req.Price
+	response.IsProducer = req.IsProducer
+	response.IsPainted = req.IsPainted
+	response.IsPopular = req.IsPopular
+	response.IsNew = req.IsNew
+	response.Collections = req.Collections
+
+	for _, photo := range req.Photos {
+		response.Photos = append(response.Photos, models.PhotosResponse{
+			URL:       photo.URL,
+			IsMain:    photo.IsMain,
+			HashColor: photo.HashColor,
+		})
+	}
+
+	return &response, nil
+}

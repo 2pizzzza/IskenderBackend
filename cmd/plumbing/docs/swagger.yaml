@@ -80,6 +80,38 @@ definitions:
           $ref: '#/definitions/models.CategoriesResponse'
         type: array
     type: object
+  models.CreateCollection:
+    properties:
+      description:
+        type: string
+      language_code:
+        type: string
+      name:
+        type: string
+    type: object
+  models.CreateCollectionResponse:
+    properties:
+      ID:
+        type: integer
+      collections:
+        items:
+          $ref: '#/definitions/models.CreateCollection'
+        type: array
+      isNew:
+        type: boolean
+      isPainted:
+        type: boolean
+      isPopular:
+        type: boolean
+      isProducer:
+        type: boolean
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+    type: object
   models.CreateItemResponse:
     properties:
       ID:
@@ -873,6 +905,50 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorMessage'
       summary: Retrieve a collection by ID and language code
+      tags:
+      - collections
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new collection with the specified details and upload photos.
+      parameters:
+      - description: Collection data in JSON format
+        in: formData
+        name: collection
+        required: true
+        type: string
+      - description: Photos of the item
+        in: formData
+        name: photos
+        type: file
+      - description: Indicates if the photo is the main one
+        in: formData
+        name: isMain_{filename}
+        type: boolean
+      - description: Color hash for the photo
+        in: formData
+        name: hashColor_{filename}
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created collection
+          schema:
+            $ref: '#/definitions/models.CreateCollectionResponse'
+        "400":
+          description: Invalid request data or collection already exists
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to create collection
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Create a new collection
       tags:
       - collections
   /collections:

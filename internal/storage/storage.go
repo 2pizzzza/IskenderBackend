@@ -19,4 +19,5 @@ var (
 	ErrDiscountNotFound           = errors.New("discount already exists")
 	ErrInvalidLanguageCode        = errors.New("invalid language code ")
 	ErrItemExists                 = errors.New("item already exists")
+	ErrCollectionExists           = errors.New("collection already exists")
 )

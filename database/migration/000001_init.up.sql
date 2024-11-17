@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS Discount (
 CREATE TABLE IF NOT EXISTS Photo (
     id SERIAL PRIMARY KEY,
     url VARCHAR(255),
-    isMain BOOLEAN, 
+    isMain BOOLEAN,
     hash_color VARCHAR(7)
     );
 

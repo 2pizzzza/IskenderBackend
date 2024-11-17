@@ -143,3 +143,31 @@ func (pr *Plumping) GetCollectionByPainted(ctx context.Context, code string) ([]
 
 	return collections, nil
 }
+
+func (pr *Plumping) CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error) {
+	const op = "service.CreateCollection"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collection, err := pr.plumpingRepository.CreateCollection(ctx, req)
+	if err != nil {
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			log.Error("Required 3 languages", sl.Err(err))
+			return nil, fmt.Errorf("%s, %w", op, err)
+		}
+		if errors.Is(err, storage.ErrInvalidLanguageCode) {
+			log.Error("Required 3 languages kgz, ru, en", sl.Err(err))
+			return nil, fmt.Errorf("%s, %w", op, err)
+		}
+		if errors.Is(err, storage.ErrCollectionExists) {
+			log.Error("Collection already exist", sl.Err(err))
+			return nil, fmt.Errorf("%s, %w", op, err)
+		}
+		log.Error("Failed to create collection", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return collection, nil
+}
