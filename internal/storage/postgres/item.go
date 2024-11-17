@@ -47,6 +47,8 @@ func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, language
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
+		item.NewPrice = newPrice
 		item.Photos = photos
 		item.Colors = colors
 		items = append(items, &item)
@@ -88,9 +90,11 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 	}
 
 	photos, colors, err := db.getItemPhotos(ctx, item.ID)
+	newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 	}
+	item.NewPrice = newPrice
 	item.Photos = photos
 	item.Colors = colors
 	return &item, nil
@@ -135,6 +139,8 @@ func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, lang
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
+		item.NewPrice = newPrice
 		item.Photos = photos
 		item.Colors = colors
 		items = append(items, &item)
@@ -176,6 +182,8 @@ func (db *DB) GetPopularItems(ctx context.Context, languageCode string) ([]*mode
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
+		item.NewPrice = newPrice
 		item.Photos = photos
 		item.Colors = colors
 		items = append(items, &item)
@@ -217,6 +225,8 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
+		item.NewPrice = newPrice
 		item.Photos = photos
 		item.Colors = colors
 
@@ -277,6 +287,8 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
+		item.NewPrice = newPrice
 		item.Photos = photos
 		item.Colors = colors
 
@@ -358,6 +370,8 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
+		item.NewPrice = newPrice
 		item.Photos = photos
 		item.Colors = colors
 
@@ -410,4 +424,40 @@ func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosRes
 	}
 
 	return photos, colors, nil
+}
+
+func (db *DB) GetDiscountedPrice(ctx context.Context, targetType string, targetID int, oldPrice float64) (float64, error) {
+	const op = "postgres.GetDiscountedPrice"
+
+	if targetType != "item" && targetType != "collection" {
+		return 0.0, fmt.Errorf("%s: invalid targetType %s, must be 'item' or 'collection'", op, targetType)
+	}
+
+	var discountPercentage float64
+
+	var query string
+	if targetType == "item" {
+		query = `SELECT discount_percentage FROM Discount d
+                 JOIN Item i ON d.target_id = i.id
+                 WHERE d.discount_type = 'item' AND d.target_id = $1`
+	} else if targetType == "collection" {
+		query = `SELECT discount_percentage FROM Discount d
+                 JOIN Collection c ON d.target_id = c.id
+                 WHERE d.discount_type = 'collection' AND d.target_id = $1`
+	}
+
+	err := db.Pool.QueryRow(ctx, query, targetID).Scan(&discountPercentage)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return oldPrice, nil
+		}
+		return 0.0, fmt.Errorf("%s: failed to get discount percentage for targetID %d: %w", op, targetID, err)
+	}
+	if oldPrice <= 0 {
+		return 0.0, nil
+	}
+	discountFactor := 1 - (discountPercentage / 100)
+	newPrice := oldPrice * discountFactor
+
+	return newPrice, nil
 }

@@ -36,6 +36,8 @@ func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode str
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 		collections = append(collections, &collection)
@@ -77,6 +79,8 @@ func (db *DB) GetCollectionsByIsProducerSLanguageCode(ctx context.Context, langu
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 
@@ -119,6 +123,8 @@ func (db *DB) GetCollectionsByIsProducerPLanguageCode(ctx context.Context, langu
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 
@@ -161,6 +167,8 @@ func (db *DB) GetPopularCollections(ctx context.Context, languageCode string) ([
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 
@@ -203,6 +211,8 @@ func (db *DB) GetNewCollections(ctx context.Context, languageCode string) ([]*mo
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 
@@ -245,7 +255,8 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to retrieve collection data: %w", op, err)
 	}
-
+	newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+	collection.NewPrice = newPrice
 	photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
@@ -302,7 +313,8 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
-
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 
@@ -458,6 +470,8 @@ func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCo
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
+		newPrice, err := db.GetDiscountedPrice(ctx, "collection", collection.ID, collection.Price)
+		collection.NewPrice = newPrice
 		collection.Photos = photos
 		collection.Colors = colors
 
@@ -481,7 +495,6 @@ func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCo
 }
 
 func (db *DB) updateCollectionPhotos(ctx context.Context, tx pgx.Tx, collectionID int, photos []models.PhotosResponse) error {
-	// Удаление старых фотографий
 	deletePhotos := `DELETE FROM CollectionPhoto WHERE collection_id = $1`
 	_, err := tx.Exec(ctx, deletePhotos, collectionID)
 	if err != nil {

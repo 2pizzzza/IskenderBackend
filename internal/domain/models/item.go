@@ -34,6 +34,7 @@ type ItemResponse struct {
 	CollectionID int              `json:"collection_id"`
 	Size         string           `json:"size"`
 	Price        float64          `json:"price"`
+	NewPrice     float64          `json:"new_price"`
 	IsProducer   bool             `json:"isProducer"`
 	IsPainted    bool             `json:"isPainted"`
 	IsPopular    bool             `json:"is_popular"`
