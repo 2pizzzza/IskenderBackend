@@ -15,6 +15,8 @@ type Service interface {
 
 	//Discount
 	GetAllDiscounts(ctx context.Context, languageCode string) ([]models.Discount, error)
+	CreateDiscount(ctx context.Context, token string, discount models.DiscountCreate) (*models.DiscountCreate, error)
+	DeleteDiscount(ctx context.Context, token string, discount models.DiscountRequest) error
 
 	//Vacancy
 	GetAllActiveVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
@@ -90,6 +92,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	//Discount
 	mux.HandleFunc("GET /discounts", s.GetAllDiscount)
+	mux.HandleFunc("POST /discount", s.CreateDiscount)
+	mux.HandleFunc("DELETE /discount", s.RemoveDiscount)
 
 	//Vacancy
 	mux.HandleFunc("GET /vacancies/activ", s.GetAllVacancyActive)

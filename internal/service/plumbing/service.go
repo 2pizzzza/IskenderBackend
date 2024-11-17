@@ -16,6 +16,8 @@ type PlumpingRepository interface {
 
 	//Discount
 	GetAllDiscount(ctx context.Context, languageCode string) ([]models.Discount, error)
+	CreateDiscount(ctx context.Context, discount models.DiscountCreate) (*models.DiscountCreate, error)
+	DeleteDiscount(ctx context.Context, id int) error
 
 	//Brand
 	CreateBrand(ctx context.Context, name, url string) (*models.BrandResponse, error)

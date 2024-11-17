@@ -819,6 +819,122 @@ const docTemplate = `{
                 }
             }
         },
+        "/discount": {
+            "post": {
+                "description": "Create a new discount with the specified details.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Discounts"
+                ],
+                "summary": "Create a new discount",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Discount creation details",
+                        "name": "discount",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscountCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully created discount",
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscountCreate"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or discount already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create discount",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a discount.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Discounts"
+                ],
+                "summary": "Remove a  discount",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Discount remove",
+                        "name": "discount",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DiscountRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully remove discount",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or discount already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create discount",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/discounts": {
             "get": {
                 "description": "Retrieve a list of all available discounts.",
@@ -1983,6 +2099,68 @@ const docTemplate = `{
         "models.Discount": {
             "type": "object",
             "properties": {
+                "color": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ColorResponse"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount_percentage": {
+                    "type": "number"
+                },
+                "discount_type": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_new": {
+                    "type": "boolean"
+                },
+                "is_painted": {
+                    "type": "boolean"
+                },
+                "is_popular": {
+                    "type": "boolean"
+                },
+                "is_producer": {
+                    "type": "boolean"
+                },
+                "language_code": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "new_price": {
+                    "type": "number"
+                },
+                "old_price": {
+                    "type": "number"
+                },
+                "photo": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "target_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.DiscountCreate": {
+            "type": "object",
+            "properties": {
                 "discount_percentage": {
                     "type": "number"
                 },
@@ -1999,6 +2177,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "target_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.DiscountRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "integer"
                 }
             }

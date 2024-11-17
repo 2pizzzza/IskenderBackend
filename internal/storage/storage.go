@@ -15,4 +15,6 @@ var (
 	ErrToken                      = errors.New("Token not valid")
 	ErrVacancyNotFound            = errors.New("Vacancy not found")
 	ErrVacancyTranslationNotFound = errors.New("translation not found")
+	ErrDiscountExists             = errors.New("discount already exists")
+	ErrDiscountNotFound           = errors.New("discount already exists")
 )

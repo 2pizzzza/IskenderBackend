@@ -114,6 +114,47 @@ definitions:
     type: object
   models.Discount:
     properties:
+      color:
+        items:
+          $ref: '#/definitions/models.ColorResponse'
+        type: array
+      description:
+        type: string
+      discount_percentage:
+        type: number
+      discount_type:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      is_new:
+        type: boolean
+      is_painted:
+        type: boolean
+      is_popular:
+        type: boolean
+      is_producer:
+        type: boolean
+      language_code:
+        type: string
+      name:
+        type: string
+      new_price:
+        type: number
+      old_price:
+        type: number
+      photo:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      start_date:
+        type: string
+      target_id:
+        type: integer
+    type: object
+  models.DiscountCreate:
+    properties:
       discount_percentage:
         type: number
       discount_type:
@@ -125,6 +166,11 @@ definitions:
       start_date:
         type: string
       target_id:
+        type: integer
+    type: object
+  models.DiscountRequest:
+    properties:
+      id:
         type: integer
     type: object
   models.ErrorMessage:
@@ -849,6 +895,83 @@ paths:
       summary: Retrieve collections recommendation by language code
       tags:
       - collections
+  /discount:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a discount.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Discount remove
+        in: body
+        name: discount
+        required: true
+        schema:
+          $ref: '#/definitions/models.DiscountRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully remove discount
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request or discount already exists
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Unauthorized or invalid token
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to create discount
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Remove a  discount
+      tags:
+      - Discounts
+    post:
+      consumes:
+      - application/json
+      description: Create a new discount with the specified details.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Discount creation details
+        in: body
+        name: discount
+        required: true
+        schema:
+          $ref: '#/definitions/models.DiscountCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created discount
+          schema:
+            $ref: '#/definitions/models.DiscountCreate'
+        "400":
+          description: Invalid request or discount already exists
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Unauthorized or invalid token
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to create discount
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Create a new discount
+      tags:
+      - Discounts
   /discounts:
     get:
       description: Retrieve a list of all available discounts.
