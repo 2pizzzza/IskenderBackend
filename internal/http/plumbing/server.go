@@ -51,7 +51,7 @@ type Service interface {
 	GetCollectionByCategoryId(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 	GetCollectionByID(ctx context.Context, collectionId int, code string) (*models.CollectionResponse, error)
 	RemoveCollection(ctx context.Context, token string, req *models.RemoveCollectionRequest) error
-	UpdateCollection(ctx context.Context, token string, req *models.UpdateCollectionRequest) error
+	UpdateCollection(ctx context.Context, token string, collectionId int, req models.CreateCollectionRequest) error
 	GetCollectionRec(ctx context.Context, language string) ([]*models.CollectionResponse, error)
 	GetCollectionByStadart(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 	GetCollectionByPainted(ctx context.Context, code string) ([]*models.CollectionResponse, error)
@@ -67,6 +67,8 @@ type Service interface {
 	GetItemsByCollectionId(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	GetItemsRec(ctx context.Context, id int, code string) ([]*models.ItemResponse, error)
 	CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error)
+	UpdateItem(ctx context.Context, token string, itemId int, req models.CreateItem) error
+	RemoveItem(ctx context.Context, token string, req models.ItemRequest) error
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string) (*models.PopularResponse, error)
@@ -134,6 +136,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /collections/standart", s.GetCollectionsStandart)
 	mux.HandleFunc("GET /collections/painted", s.GetCollectionsByPainted)
 	mux.HandleFunc("POST /collection", s.CreateCollection)
+	mux.HandleFunc("PUT /collection", s.UpdateCollection)
 
 	//Popular and New
 	mux.HandleFunc("GET /popular", s.GetPopular)
@@ -145,6 +148,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /items/collection", s.GetItemsByCollectionId)
 	mux.HandleFunc("GET /items/rec", s.GetItemsRec)
 	mux.HandleFunc("POST /items", s.CreateItem)
+	mux.HandleFunc("PUT /items", s.UpdateItem)
+	mux.HandleFunc("DELETE /items", s.RemoveItem)
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	token2 "github.com/2pizzzza/plumbing/internal/lib/jwt"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"log/slog"
@@ -116,4 +117,63 @@ func (pr *Plumping) CreateItem(ctx context.Context, req models.CreateItem) (*mod
 	}
 
 	return item, nil
+}
+
+func (pr *Plumping) UpdateItem(ctx context.Context, token string, itemId int, req models.CreateItem) error {
+	const op = "service.UpdateItem"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.UpdateItem(ctx, itemId, req)
+	if err != nil {
+		if errors.Is(err, storage.ErrItemNotFound) {
+			log.Error("Item not found", sl.Err(err))
+			return storage.ErrCollectionNotFound
+		}
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			log.Error("Required 3 languages", sl.Err(err))
+			return storage.ErrRequiredLanguage
+		}
+		if errors.Is(err, storage.ErrInvalidLanguageCode) {
+			log.Error("Required 3 languages kgz, ru, en", sl.Err(err))
+			return storage.ErrInvalidLanguageCode
+		}
+		log.Error("Failed to update item", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+	return nil
+}
+
+func (pr *Plumping) RemoveItem(ctx context.Context, token string, req models.ItemRequest) error {
+	const op = "service.RemoveItem"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.RemoveItem(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, storage.ErrItemNotFound) {
+			log.Error("item not found", sl.Err(err))
+			return storage.ErrItemNotFound
+		}
+
+		log.Error("Failed to remove collection", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+	return nil
 }

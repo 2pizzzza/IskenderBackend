@@ -311,3 +311,115 @@ func (s *Server) CreateCollection(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponseBody(w, res, http.StatusCreated)
 }
+
+// UpdateCollection godoc
+// @Summary Update an existing collection
+// @Description Update a collection with new details and photos.
+// @Tags collections
+// @Accept multipart/form-data
+// @Produce json
+// @Param Authorization header string true "Bearer token"
+// @Param collection_id query int true "Collection ID"
+// @Param collection formData string true "Collection data in JSON format"
+// @Param photos formData file true "Photos to upload"
+// @Param isMain_{filename} formData bool false "Is this photo the main one?"
+// @Param hashColor_{filename} formData string false "Hash color for the photo"
+// @Success 201 {object} models.Message "Successfully updated the collection"
+// @Failure 400 {object} models.ErrorMessage "Invalid request (e.g., missing or invalid data)"
+// @Failure 401 {object} models.ErrorMessage "Unauthorized or invalid token"
+// @Failure 403 {object} models.ErrorMessage "Permissions denied"
+// @Failure 404 {object} models.ErrorMessage "Collection not found"
+// @Failure 500 {object} models.ErrorMessage "Failed to update collection"
+// @Router /collections [put]
+func (s *Server) UpdateCollection(w http.ResponseWriter, r *http.Request) {
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Token required"}, http.StatusUnauthorized)
+	}
+
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid token format"}, http.StatusUnauthorized)
+		return
+	}
+	token := parts[1]
+
+	idStr := r.URL.Query().Get("collection_id")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Collection Id"}, http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid form-data"}, http.StatusBadRequest)
+		return
+	}
+
+	itemData := r.FormValue("collection")
+	if itemData == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing collection data"}, http.StatusBadRequest)
+		return
+	}
+
+	var req models.CreateCollectionRequest
+	if err := json.Unmarshal([]byte(itemData), &req); err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection data"}, http.StatusBadRequest)
+		return
+	}
+
+	var photos []models.PhotosResponse
+	files := r.MultipartForm.File["photos"]
+
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to open uploaded file"}, http.StatusInternalServerError)
+			return
+		}
+		defer file.Close()
+
+		filename, err := saveImage(file, fileHeader.Filename)
+		if err != nil {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to save image"}, http.StatusInternalServerError)
+			return
+		}
+
+		isMain := r.FormValue(fmt.Sprintf("isMain_%s", fileHeader.Filename)) == "false"
+		hashColor := r.FormValue(fmt.Sprintf("hashColor_%s", fileHeader.Filename))
+
+		photos = append(photos, models.PhotosResponse{
+			URL:       "/media/images/" + filename,
+			IsMain:    isMain,
+			HashColor: hashColor,
+		})
+	}
+
+	req.Photos = photos
+
+	err = s.service.UpdateCollection(r.Context(), token, id, req)
+	if err != nil {
+		if errors.Is(err, storage.ErrToken) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Permissions denied"}, http.StatusForbidden)
+			return
+		}
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Collection not fount"}, http.StatusNotFound)
+			return
+		}
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 languages"}, http.StatusBadRequest)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to create collection"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, models.Message{Message: "Successful update collection"}, http.StatusCreated)
+}

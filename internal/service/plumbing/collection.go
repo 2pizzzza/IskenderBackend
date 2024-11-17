@@ -72,31 +72,6 @@ func (pr *Plumping) RemoveCollection(ctx context.Context, token string, req *mod
 	return nil
 }
 
-func (pr *Plumping) UpdateCollection(ctx context.Context, token string, req *models.UpdateCollectionRequest) error {
-	const op = "service.UpdateCollection"
-
-	log := pr.log.With(
-		slog.String("op: ", op),
-	)
-
-	_, err := token2.ValidateToken(token)
-	if err != nil {
-		log.Error("Failed validate token")
-		return storage.ErrToken
-	}
-
-	err = pr.plumpingRepository.UpdateCollection(ctx, req)
-	if err != nil {
-		if errors.Is(err, storage.ErrCollectionNotFound) {
-			log.Error("Collection not found", sl.Err(err))
-			return storage.ErrCollectionNotFound
-		}
-		log.Error("Failed to update collection", sl.Err(err))
-		return fmt.Errorf("%s, %w", op, err)
-	}
-	return nil
-}
-
 func (pr *Plumping) GetCollectionRec(ctx context.Context, language string) ([]*models.CollectionResponse, error) {
 	const op = "service.GetCollectionRec"
 
@@ -170,4 +145,37 @@ func (pr *Plumping) CreateCollection(ctx context.Context, req models.CreateColle
 	}
 
 	return collection, nil
+}
+
+func (pr *Plumping) UpdateCollection(ctx context.Context, token string, collectionId int, req models.CreateCollectionRequest) error {
+	const op = "service.UpdateCollection"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.UpdateCollection(ctx, collectionId, req)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			log.Error("Collection not found", sl.Err(err))
+			return storage.ErrCollectionNotFound
+		}
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			log.Error("Required 3 languages", sl.Err(err))
+			return storage.ErrRequiredLanguage
+		}
+		if errors.Is(err, storage.ErrInvalidLanguageCode) {
+			log.Error("Required 3 languages kgz, ru, en", sl.Err(err))
+			return storage.ErrInvalidLanguageCode
+		}
+		log.Error("Failed to update collection", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+	return nil
 }

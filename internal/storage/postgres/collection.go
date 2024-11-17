@@ -377,62 +377,6 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	return nil
 }
 
-func (db *DB) UpdateCollection(ctx context.Context, req *models.UpdateCollectionRequest) error {
-	const op = "postgres.UpdateCollection"
-
-	var exists bool
-	checkQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
-	err := db.Pool.QueryRow(ctx, checkQuery, req.CollectionID).Scan(&exists)
-	if err != nil {
-		return fmt.Errorf("%s: failed to check collection existence: %w", op, err)
-	}
-	if !exists {
-		return storage.ErrCollectionNotFound
-	}
-
-	tx, err := db.Pool.Begin(ctx)
-	if err != nil {
-		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
-	}
-	defer tx.Rollback(ctx)
-
-	updateCollection := `
-		UPDATE Collection
-		SET price = COALESCE(NULLIF($1, 0), price),
-		    isProducer = COALESCE($2, isProducer),
-		    isPainted = COALESCE($3, isPainted),
-		    isPopular = COALESCE($4, isPopular),
-		    isNew = COALESCE($5, isNew)
-		WHERE id = $6`
-	_, err = tx.Exec(ctx, updateCollection, req.Price, req.IsProducer, req.IsPainted, req.IsPopular, req.IsNew, req.CollectionID)
-	if err != nil {
-		return fmt.Errorf("%s: failed to update collection: %w", op, err)
-	}
-
-	for _, translation := range req.Collections {
-		updateTranslation := `
-			INSERT INTO CollectionTranslation (collection_id, language_code, name, description)
-			VALUES ($1, $2, $3, $4)
-			ON CONFLICT (collection_id, language_code)
-			DO UPDATE SET name = COALESCE($3, CollectionTranslation.name),
-			              description = COALESCE($4, CollectionTranslation.description)`
-		_, err := tx.Exec(ctx, updateTranslation, req.CollectionID, translation.LanguageCode, translation.Name, translation.Description)
-		if err != nil {
-			return fmt.Errorf("%s: failed to update collection translation for language %s: %w", op, translation.LanguageCode, err)
-		}
-	}
-
-	if err = db.updateCollectionPhotos(ctx, tx, req.CollectionID, req.Photos); err != nil {
-		return fmt.Errorf("%s: failed to update collection photos: %w", op, err)
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
-	}
-
-	return nil
-}
-
 func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error) {
 	const op = "postgres.GetRandomCollectionsWithPopularity"
 
@@ -657,4 +601,112 @@ func (db *DB) CreateCollection(ctx context.Context, req models.CreateCollectionR
 	}
 
 	return &response, nil
+}
+
+func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models.CreateCollectionRequest) error {
+	const op = "postgres.UpdateCollection"
+
+	var exists bool
+	checkCollectionQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, checkCollectionQuery, collectionID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check collection existence: %w", op, err)
+	}
+	if !exists {
+		return storage.ErrCollectionNotFound
+	}
+
+	// Проверка обязательных языков
+	if len(req.Collections) != 3 {
+		return storage.ErrRequiredLanguage
+	}
+
+	languageCodes := map[string]bool{"ru": false, "kgz": false, "en": false}
+	for _, translation := range req.Collections {
+		if _, ok := languageCodes[translation.LanguageCode]; !ok {
+			return storage.ErrInvalidLanguageCode
+		}
+		languageCodes[translation.LanguageCode] = true
+	}
+
+	tx, err := db.Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+	}
+	defer tx.Rollback(ctx)
+
+	updateCollectionQuery := `
+		UPDATE Collection
+		SET price = $1, isProducer = $2, isPainted = $3, isPopular = $4, isNew = $5
+		WHERE id = $6
+	`
+	_, err = tx.Exec(ctx, updateCollectionQuery,
+		req.Price,
+		req.IsProducer,
+		req.IsPainted,
+		req.IsPopular,
+		req.IsNew,
+		collectionID,
+	)
+	if err != nil {
+		return fmt.Errorf("%s: failed to update collection: %w", op, err)
+	}
+
+	updateTranslationQuery := `
+		UPDATE CollectionTranslation
+		SET name = $1, description = $2
+		WHERE collection_id = $3 AND language_code = $4
+	`
+	insertTranslationQuery := `
+		INSERT INTO CollectionTranslation (collection_id, language_code, name, description)
+		VALUES ($1, $2, $3, $4)
+	`
+	for _, translation := range req.Collections {
+		result, err := tx.Exec(ctx, updateTranslationQuery, translation.Name, translation.Description, collectionID, translation.LanguageCode)
+		if err != nil {
+			return fmt.Errorf("%s: failed to update collection translation for language %s: %w", op, translation.LanguageCode, err)
+		}
+
+		rowsAffected := result.RowsAffected()
+		if rowsAffected == 0 {
+			_, err = tx.Exec(ctx, insertTranslationQuery, collectionID, translation.LanguageCode, translation.Name, translation.Description)
+			if err != nil {
+				return fmt.Errorf("%s: failed to insert collection translation for language %s: %w", op, translation.LanguageCode, err)
+			}
+		}
+	}
+
+	deleteCollectionPhotoQuery := `DELETE FROM CollectionPhoto WHERE collection_id = $1`
+	_, err = tx.Exec(ctx, deleteCollectionPhotoQuery, collectionID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete old collection photos: %w", op, err)
+	}
+
+	insertPhotoQuery := `
+		INSERT INTO Photo (url, isMain, hash_color)
+		VALUES ($1, $2, $3)
+		RETURNING id
+	`
+	insertCollectionPhotoQuery := `
+		INSERT INTO CollectionPhoto (collection_id, photo_id)
+		VALUES ($1, $2)
+	`
+	for _, photo := range req.Photos {
+		var photoID int
+		err = tx.QueryRow(ctx, insertPhotoQuery, photo.URL, photo.IsMain, photo.HashColor).Scan(&photoID)
+		if err != nil {
+			return fmt.Errorf("%s: failed to insert photo with url %s: %w", op, photo.URL, err)
+		}
+
+		_, err = tx.Exec(ctx, insertCollectionPhotoQuery, collectionID, photoID)
+		if err != nil {
+			return fmt.Errorf("%s: failed to insert photo association for photo id %d: %w", op, photoID, err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
+	}
+
+	return nil
 }

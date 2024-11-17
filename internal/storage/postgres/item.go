@@ -581,3 +581,166 @@ func (db *DB) CreateItem(ctx context.Context, req models.CreateItem) (*models.Cr
 
 	return &response, nil
 }
+
+func (db *DB) UpdateItem(ctx context.Context, itemID int, req models.CreateItem) error {
+	const op = "postgres.UpdateItem"
+
+	var exists bool
+	checkItemQuery := `SELECT EXISTS(SELECT 1 FROM Item WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, checkItemQuery, itemID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check item existence: %w", op, err)
+	}
+	if !exists {
+		return storage.ErrItemNotFound
+	}
+
+	if len(req.Items) != 3 {
+		return storage.ErrRequiredLanguage
+	}
+
+	languageCodes := map[string]bool{"ru": false, "kgz": false, "en": false}
+	for _, translation := range req.Items {
+		if _, ok := languageCodes[translation.LanguageCode]; !ok {
+			return storage.ErrInvalidLanguageCode
+		}
+		languageCodes[translation.LanguageCode] = true
+	}
+
+	tx, err := db.Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+	}
+	defer tx.Rollback(ctx)
+
+	updateItemQuery := `
+		UPDATE Item
+		SET category_id = $1, collection_id = $2, size = $3, price = $4, 
+		    isProducer = $5, isPainted = $6, isPopular = $7, isNew = $8
+		WHERE id = $9
+	`
+	_, err = tx.Exec(ctx, updateItemQuery,
+		req.CategoryID,
+		req.CollectionID,
+		req.Size,
+		req.Price,
+		req.IsProducer,
+		req.IsPainted,
+		req.IsPopular,
+		req.IsNew,
+		itemID,
+	)
+	if err != nil {
+		return fmt.Errorf("%s: failed to update item: %w", op, err)
+	}
+
+	updateTranslationQuery := `
+		UPDATE ItemTranslation
+		SET name = $1, description = $2
+		WHERE item_id = $3 AND language_code = $4
+	`
+	insertTranslationQuery := `
+		INSERT INTO ItemTranslation (item_id, language_code, name, description)
+		VALUES ($1, $2, $3, $4)
+	`
+	for _, translation := range req.Items {
+		result, err := tx.Exec(ctx, updateTranslationQuery, translation.Name, translation.Description, itemID, translation.LanguageCode)
+		if err != nil {
+			return fmt.Errorf("%s: failed to update item translation for language %s: %w", op, translation.LanguageCode, err)
+		}
+
+		rowsAffected := result.RowsAffected()
+		if rowsAffected == 0 {
+			_, err = tx.Exec(ctx, insertTranslationQuery, itemID, translation.LanguageCode, translation.Name, translation.Description)
+			if err != nil {
+				return fmt.Errorf("%s: failed to insert item translation for language %s: %w", op, translation.LanguageCode, err)
+			}
+		}
+	}
+
+	deleteItemPhotoQuery := `DELETE FROM ItemPhoto WHERE item_id = $1`
+	_, err = tx.Exec(ctx, deleteItemPhotoQuery, itemID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete old item photos: %w", op, err)
+	}
+
+	insertPhotoQuery := `
+		INSERT INTO Photo (url, isMain, hash_color)
+		VALUES ($1, $2, $3)
+		RETURNING id
+	`
+	insertItemPhotoQuery := `
+		INSERT INTO ItemPhoto (item_id, photo_id)
+		VALUES ($1, $2)
+	`
+	for _, photo := range req.Photos {
+		var photoID int
+		err = tx.QueryRow(ctx, insertPhotoQuery, photo.URL, photo.IsMain, photo.HashColor).Scan(&photoID)
+		if err != nil {
+			return fmt.Errorf("%s: failed to insert photo with url %s: %w", op, photo.URL, err)
+		}
+
+		_, err = tx.Exec(ctx, insertItemPhotoQuery, itemID, photoID)
+		if err != nil {
+			return fmt.Errorf("%s: failed to insert photo association for photo id %d: %w", op, photoID, err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
+	}
+
+	return nil
+}
+
+func (db *DB) RemoveItem(ctx context.Context, itemID int) error {
+	const op = "postgres.RemoveItem"
+
+	var exists bool
+	checkItemQuery := `SELECT EXISTS(SELECT 1 FROM Item WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, checkItemQuery, itemID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check item existence: %w", op, err)
+	}
+	if !exists {
+		return storage.ErrItemNotFound
+	}
+
+	tx, err := db.Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+	}
+	defer tx.Rollback(ctx)
+
+	deleteItemTranslationQuery := `DELETE FROM ItemTranslation WHERE item_id = $1`
+	_, err = tx.Exec(ctx, deleteItemTranslationQuery, itemID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete item translations: %w", op, err)
+	}
+
+	deleteItemPhotoQuery := `DELETE FROM ItemPhoto WHERE item_id = $1`
+	_, err = tx.Exec(ctx, deleteItemPhotoQuery, itemID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete item photos: %w", op, err)
+	}
+
+	deleteItemQuery := `DELETE FROM Item WHERE id = $1`
+	_, err = tx.Exec(ctx, deleteItemQuery, itemID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete item: %w", op, err)
+	}
+
+	deleteOrphanedPhotosQuery := `
+		DELETE FROM Photo WHERE id NOT IN (SELECT photo_id FROM ItemPhoto)
+	`
+	_, err = tx.Exec(ctx, deleteOrphanedPhotosQuery)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete orphaned photos: %w", op, err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
+	}
+
+	return nil
+}

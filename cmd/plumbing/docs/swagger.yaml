@@ -982,6 +982,69 @@ paths:
       summary: Retrieve collections painted
       tags:
       - collections
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update a collection with new details and photos.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Collection ID
+        in: query
+        name: collection_id
+        required: true
+        type: integer
+      - description: Collection data in JSON format
+        in: formData
+        name: collection
+        required: true
+        type: string
+      - description: Photos to upload
+        in: formData
+        name: photos
+        required: true
+        type: file
+      - description: Is this photo the main one?
+        in: formData
+        name: isMain_{filename}
+        type: boolean
+      - description: Hash color for the photo
+        in: formData
+        name: hashColor_{filename}
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully updated the collection
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request (e.g., missing or invalid data)
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Unauthorized or invalid token
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Collection not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to update collection
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Update an existing collection
+      tags:
+      - collections
   /collections/rec:
     get:
       consumes:
@@ -1235,6 +1298,69 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorMessage'
       summary: Create a new item
+      tags:
+      - items
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update a item with new details and photos.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Item ID
+        in: query
+        name: item_id
+        required: true
+        type: integer
+      - description: Collection data in JSON format
+        in: formData
+        name: item
+        required: true
+        type: string
+      - description: Photos to upload
+        in: formData
+        name: photos
+        required: true
+        type: file
+      - description: Is this photo the main one?
+        in: formData
+        name: isMain_{filename}
+        type: boolean
+      - description: Hash color for the photo
+        in: formData
+        name: hashColor_{filename}
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully updated the item
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request (e.g., missing or invalid data)
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Unauthorized or invalid token
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Collection not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to update collection
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Update an existing item
       tags:
       - items
   /items/collection:

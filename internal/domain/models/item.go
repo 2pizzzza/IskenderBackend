@@ -17,9 +17,8 @@ type ItemTranslation struct {
 	Description  string `json:"description"`
 }
 
-type ItemPhoto struct {
-	ItemID  int `json:"item_id"`
-	PhotoID int `json:"photo_id"`
+type ItemRequest struct {
+	ID int `json:"id"`
 }
 
 type ItemColor struct {

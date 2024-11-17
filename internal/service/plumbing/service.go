@@ -55,7 +55,7 @@ type PlumpingRepository interface {
 	GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionByID(ctx context.Context, collectionID int, languageCode string) (*models.CollectionResponse, error)
 	DeleteCollection(ctx context.Context, collectionID int) error
-	UpdateCollection(ctx context.Context, req *models.UpdateCollectionRequest) error
+	UpdateCollection(ctx context.Context, collectionID int, req models.CreateCollectionRequest) error
 	GetRandomCollectionsWithPopularity(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionsByIsProducerSLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
 	GetCollectionsByIsProducerPLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
@@ -77,6 +77,8 @@ type PlumpingRepository interface {
 	GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error)
 	GetRandomItemsWithPopularity(ctx context.Context, languageCode string, itemID int) ([]*models.ItemResponse, error)
 	CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error)
+	UpdateItem(ctx context.Context, itemID int, req models.CreateItem) error
+	RemoveItem(ctx context.Context, itemID int) error
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {
