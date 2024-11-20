@@ -179,3 +179,19 @@ func (pr *Plumping) UpdateCollection(ctx context.Context, token string, collecti
 	}
 	return nil
 }
+
+func (pr *Plumping) GetCollection(ctx context.Context) ([]*models.CollectionResponses, error) {
+	const op = "service.GetCollection"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collection, err := pr.plumpingRepository.GetAllCollections(ctx)
+	if err != nil {
+		log.Error("Failed to get all collections", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return collection, nil
+}

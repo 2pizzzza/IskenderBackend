@@ -1125,6 +1125,35 @@
                 }
             }
         },
+        "/getAllCollection": {
+            "get": {
+                "description": "Retrieves a list of all available collections",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "collections"
+                ],
+                "summary": "Get all collections",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all collections",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.CollectionResponses"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get collections",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/getAllItems": {
             "get": {
                 "description": "Retrieves a list of all available items",
@@ -2408,6 +2437,47 @@
                 },
                 "new_price": {
                     "type": "number"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.CollectionResponses": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "collections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateCollection"
+                    }
+                },
+                "color": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ColorResponse"
+                    }
+                },
+                "isNew": {
+                    "type": "boolean"
+                },
+                "isPainted": {
+                    "type": "boolean"
+                },
+                "isPopular": {
+                    "type": "boolean"
+                },
+                "isProducer": {
+                    "type": "boolean"
                 },
                 "photos": {
                     "type": "array",

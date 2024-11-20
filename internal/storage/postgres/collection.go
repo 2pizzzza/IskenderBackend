@@ -603,6 +603,63 @@ func (db *DB) CreateCollection(ctx context.Context, req models.CreateCollectionR
 	return &response, nil
 }
 
+func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionResponses, error) {
+	const op = "postgres.GetAllCollections"
+
+	query := `
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew
+		FROM Collection c`
+
+	rows, err := db.Pool.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query collections: %w", op, err)
+	}
+	defer rows.Close()
+
+	var collections []*models.CollectionResponses
+
+	for rows.Next() {
+		var collection models.CollectionResponses
+		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted,
+			&collection.IsPopular, &collection.IsNew); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
+		}
+
+		transQuery := `SELECT language_code, name, description FROM CollectionTranslation WHERE collection_id = $1`
+		transRows, err := db.Pool.Query(ctx, transQuery, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to query translations for collection %d: %w", op, collection.ID, err)
+		}
+		defer transRows.Close()
+
+		var translations []models.CreateCollection
+		for transRows.Next() {
+			var trans models.CreateCollection
+			if err := transRows.Scan(&trans.LanguageCode, &trans.Name, &trans.Description); err != nil {
+				return nil, fmt.Errorf("%s: failed to scan translation row: %w", op, err)
+			}
+			translations = append(translations, trans)
+		}
+
+		photos, colors, err := db.getCollectionPhotos(ctx, collection.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
+		}
+
+		collection.Collections = translations
+		collection.Photos = photos
+		collection.Color = colors
+
+		collections = append(collections, &collection)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return collections, nil
+}
+
 func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models.CreateCollectionRequest) error {
 	const op = "postgres.UpdateCollection"
 

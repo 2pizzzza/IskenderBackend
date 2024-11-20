@@ -61,6 +61,33 @@ definitions:
       price:
         type: number
     type: object
+  models.CollectionResponses:
+    properties:
+      ID:
+        type: integer
+      collections:
+        items:
+          $ref: '#/definitions/models.CreateCollection'
+        type: array
+      color:
+        items:
+          $ref: '#/definitions/models.ColorResponse'
+        type: array
+      isNew:
+        type: boolean
+      isPainted:
+        type: boolean
+      isPopular:
+        type: boolean
+      isProducer:
+        type: boolean
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+    type: object
   models.ColorResponse:
     properties:
       hash_color:
@@ -1216,6 +1243,25 @@ paths:
       summary: Get all discounts
       tags:
       - Discounts
+  /getAllCollection:
+    get:
+      description: Retrieves a list of all available collections
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all collections
+          schema:
+            items:
+              $ref: '#/definitions/models.CollectionResponses'
+            type: array
+        "500":
+          description: Failed to get collections
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all collections
+      tags:
+      - collections
   /getAllItems:
     get:
       description: Retrieves a list of all available items

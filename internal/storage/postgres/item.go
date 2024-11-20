@@ -146,7 +146,6 @@ func (db *DB) GetAllItems(ctx context.Context) ([]*models.ItemResponses, error) 
 		item.Photos = photos
 		item.Color = color
 
-		// Добавляем товар в список
 		items = append(items, &item)
 	}
 

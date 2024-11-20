@@ -423,3 +423,23 @@ func (s *Server) UpdateCollection(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponseBody(w, models.Message{Message: "Successful update collection"}, http.StatusCreated)
 }
+
+// GetAllCollection retrieves all collections
+// @Summary Get all collections
+// @Description Retrieves a list of all available collections
+// @Tags collections
+// @Produce json
+// @Success 200 {array} models.CollectionResponses "Successfully retrieved all collections"
+// @Failure 500 {object} models.ErrorMessage "Failed to get collections"
+// @Router /getAllCollection [get]
+func (s *Server) GetAllCollection(w http.ResponseWriter, r *http.Request) {
+	s.log.Info("Get all review")
+
+	reviews, err := s.service.GetCollection(r.Context())
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get brands"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, reviews, http.StatusOK)
+}
