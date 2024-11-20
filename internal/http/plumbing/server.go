@@ -69,6 +69,7 @@ type Service interface {
 	CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error)
 	UpdateItem(ctx context.Context, token string, itemId int, req models.CreateItem) error
 	RemoveItem(ctx context.Context, token string, req models.ItemRequest) error
+	GetItems(ctx context.Context) ([]*models.ItemResponses, error)
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string) (*models.PopularResponse, error)
@@ -150,6 +151,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /items", s.CreateItem)
 	mux.HandleFunc("PUT /items", s.UpdateItem)
 	mux.HandleFunc("DELETE /items", s.RemoveItem)
+	mux.HandleFunc("GET /getAllItems", s.GetAllItems)
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)

@@ -79,6 +79,7 @@ type PlumpingRepository interface {
 	CreateItem(ctx context.Context, req models.CreateItem) (*models.CreateItemResponse, error)
 	UpdateItem(ctx context.Context, itemID int, req models.CreateItem) error
 	RemoveItem(ctx context.Context, itemID int) error
+	GetAllItems(ctx context.Context) ([]*models.ItemResponses, error)
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {

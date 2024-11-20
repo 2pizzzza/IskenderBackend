@@ -394,7 +394,7 @@ func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 // RemoveItem godoc
 // @Summary Remove an item from the collection
 // @Description Remove a specific item from the collection based on the provided ID.
-// @Tags Items
+// @Tags items
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer token"
@@ -439,4 +439,24 @@ func (s *Server) RemoveItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteResponseBody(w, models.Message{Message: "Successful remove iten"}, http.StatusCreated)
+}
+
+// GetAllItems retrieves all items
+// @Summary Get all Items
+// @Description Retrieves a list of all available items
+// @Tags items
+// @Produce json
+// @Success 200 {array} models.ItemResponses "Successfully retrieved all items"
+// @Failure 500 {object} models.ErrorMessage "Failed to get items"
+// @Router /getAllItems [get]
+func (s *Server) GetAllItems(w http.ResponseWriter, r *http.Request) {
+	s.log.Info("Get all review")
+
+	reviews, err := s.service.GetItems(r.Context())
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get brands"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, reviews, http.StatusOK)
 }

@@ -259,6 +259,11 @@ definitions:
       id:
         type: integer
     type: object
+  models.ItemRequest:
+    properties:
+      id:
+        type: integer
+    type: object
   models.ItemResponse:
     properties:
       category_id:
@@ -285,6 +290,39 @@ definitions:
         type: string
       new_price:
         type: number
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+      size:
+        type: string
+    type: object
+  models.ItemResponses:
+    properties:
+      ID:
+        type: integer
+      category_id:
+        type: integer
+      collection_id:
+        type: integer
+      color:
+        items:
+          $ref: '#/definitions/models.ColorResponse'
+        type: array
+      is_new:
+        type: boolean
+      is_popular:
+        type: boolean
+      isPainted:
+        type: boolean
+      isProducer:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/models.CreateItemTranslation'
+        type: array
       photos:
         items:
           $ref: '#/definitions/models.PhotosResponse'
@@ -1178,6 +1216,25 @@ paths:
       summary: Get all discounts
       tags:
       - Discounts
+  /getAllItems:
+    get:
+      description: Retrieves a list of all available items
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all items
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemResponses'
+            type: array
+        "500":
+          description: Failed to get items
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all Items
+      tags:
+      - items
   /item:
     get:
       consumes:
@@ -1217,6 +1274,49 @@ paths:
       tags:
       - items
   /items:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a specific item from the collection based on the provided
+        ID.
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Item ID to remove
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully removed the item
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request or item not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Unauthorized or invalid token
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to remove item
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Remove an item from the collection
+      tags:
+      - items
     get:
       consumes:
       - application/json

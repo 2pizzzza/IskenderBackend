@@ -1132,6 +1132,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/getAllItems": {
+            "get": {
+                "description": "Retrieves a list of all available items",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Get all Items",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all items",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ItemResponses"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get items",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/item": {
             "get": {
                 "description": "Returns details of a specific item in the specified language",
@@ -1401,6 +1430,69 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to create item",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a specific item from the collection based on the provided ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Remove an item from the collection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Item ID to remove",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully removed the item",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or item not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized or invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to remove item",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMessage"
                         }
@@ -2639,6 +2731,14 @@ const docTemplate = `{
                 }
             }
         },
+        "models.ItemRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.ItemResponse": {
             "type": "object",
             "properties": {
@@ -2677,6 +2777,56 @@ const docTemplate = `{
                 },
                 "new_price": {
                     "type": "number"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemResponses": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "collection_id": {
+                    "type": "integer"
+                },
+                "color": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ColorResponse"
+                    }
+                },
+                "isPainted": {
+                    "type": "boolean"
+                },
+                "isProducer": {
+                    "type": "boolean"
+                },
+                "is_new": {
+                    "type": "boolean"
+                },
+                "is_popular": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateItemTranslation"
+                    }
                 },
                 "photos": {
                     "type": "array",

@@ -100,6 +100,63 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 	return &item, nil
 }
 
+func (db *DB) GetAllItems(ctx context.Context) ([]*models.ItemResponses, error) {
+	const op = "postgres.GetAllItems"
+
+	query := `
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew
+		FROM Item i`
+
+	rows, err := db.Pool.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query items: %w", op, err)
+	}
+	defer rows.Close()
+
+	var items []*models.ItemResponses
+
+	for rows.Next() {
+		var item models.ItemResponses
+		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
+			&item.IsPainted, &item.IsPopular, &item.IsNew); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
+		}
+
+		transQuery := `SELECT language_code, name, description FROM ItemTranslation WHERE item_id = $1`
+		transRows, err := db.Pool.Query(ctx, transQuery, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to query translations for item %d: %w", op, item.ID, err)
+		}
+		defer transRows.Close()
+
+		var translations []models.CreateItemTranslation
+		for transRows.Next() {
+			var trans models.CreateItemTranslation
+			if err := transRows.Scan(&trans.LanguageCode, &trans.Name, &trans.Description); err != nil {
+				return nil, fmt.Errorf("%s: failed to scan translation row: %w", op, err)
+			}
+			translations = append(translations, trans)
+		}
+
+		photos, color, err := db.getItemPhotos(ctx, item.ID)
+		if err != nil {
+		}
+
+		item.Items = translations
+		item.Photos = photos
+		item.Color = color
+
+		// Добавляем товар в список
+		items = append(items, &item)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return items, nil
+}
+
 func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, languageCode string) ([]*models.ItemResponse, error) {
 	const op = "postgres.GetItemsByCollectionID"
 

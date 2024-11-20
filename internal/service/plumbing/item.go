@@ -177,3 +177,19 @@ func (pr *Plumping) RemoveItem(ctx context.Context, token string, req models.Ite
 	}
 	return nil
 }
+
+func (pr *Plumping) GetItems(ctx context.Context) ([]*models.ItemResponses, error) {
+	const op = "service.GetItems"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	items, err := pr.plumpingRepository.GetAllItems(ctx)
+	if err != nil {
+		log.Error("Failed to get all items", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return items, nil
+}
