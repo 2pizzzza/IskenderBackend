@@ -164,12 +164,6 @@ func (db *DB) DeleteCategory(ctx context.Context, categoryID int) error {
 		return fmt.Errorf("%s: failed to delete item translations: %w", op, err)
 	}
 
-	deleteItemColors := `DELETE FROM ItemColor WHERE item_id IN (SELECT id FROM Item WHERE category_id = $1)`
-	_, err = tx.Exec(ctx, deleteItemColors, categoryID)
-	if err != nil {
-		return fmt.Errorf("%s: failed to delete item colors: %w", op, err)
-	}
-
 	deleteItemPhotos := `DELETE FROM ItemPhoto WHERE item_id IN (SELECT id FROM Item WHERE category_id = $1)`
 	_, err = tx.Exec(ctx, deleteItemPhotos, categoryID)
 	if err != nil {
