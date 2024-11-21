@@ -443,3 +443,41 @@ func (s *Server) GetAllCollection(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponseBody(w, reviews, http.StatusOK)
 }
+
+// GetCollectionId retrieves a collection by its ID and language code
+// @Summary Retrieve a collection by ID and language code
+// @Description Returns details of a specific collection in the specified language
+// @Tags collections
+// @Accept  json
+// @Produce  json
+// @Param  collection_id  query  int  true  "Collection ID"
+// @Success 200 {object} models.CollectionResponseForAdmin "Collection details"
+// @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
+// @Failure 404 {object} models.ErrorMessage "Collection not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /getCollectionById [get]
+func (s *Server) GetCollectionId(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("collection_id")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Collection Id"}, http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+
+	res, err := s.service.GetCollectionID(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to found collection"}, http.StatusNotFound)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get collection"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+}

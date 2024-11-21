@@ -61,6 +61,29 @@ definitions:
       price:
         type: number
     type: object
+  models.CollectionResponseForAdmin:
+    properties:
+      ID:
+        type: integer
+      collections:
+        items:
+          $ref: '#/definitions/models.CreateCollection'
+        type: array
+      isNew:
+        type: boolean
+      isPainted:
+        type: boolean
+      isPopular:
+        type: boolean
+      isProducer:
+        type: boolean
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+    type: object
   models.CollectionResponses:
     properties:
       ID:
@@ -317,6 +340,35 @@ definitions:
         type: string
       new_price:
         type: number
+      photos:
+        items:
+          $ref: '#/definitions/models.PhotosResponse'
+        type: array
+      price:
+        type: number
+      size:
+        type: string
+    type: object
+  models.ItemResponseForAdmin:
+    properties:
+      ID:
+        type: integer
+      category_id:
+        type: integer
+      collection_id:
+        type: integer
+      is_new:
+        type: boolean
+      is_popular:
+        type: boolean
+      isPainted:
+        type: boolean
+      isProducer:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/models.CreateItemTranslation'
+        type: array
       photos:
         items:
           $ref: '#/definitions/models.PhotosResponse'
@@ -1279,6 +1331,72 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorMessage'
       summary: Get all Items
+      tags:
+      - items
+  /getCollectionById:
+    get:
+      consumes:
+      - application/json
+      description: Returns details of a specific collection in the specified language
+      parameters:
+      - description: Collection ID
+        in: query
+        name: collection_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Collection details
+          schema:
+            $ref: '#/definitions/models.CollectionResponseForAdmin'
+        "400":
+          description: Missing or invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Collection not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve a collection by ID and language code
+      tags:
+      - collections
+  /getItemById:
+    get:
+      consumes:
+      - application/json
+      description: Returns details of a specific collection in the specified language
+      parameters:
+      - description: Collection ID
+        in: query
+        name: item_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Collection details
+          schema:
+            $ref: '#/definitions/models.ItemResponseForAdmin'
+        "400":
+          description: Missing or invalid parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Collection not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Retrieve a item by ID and language code
       tags:
       - items
   /item:

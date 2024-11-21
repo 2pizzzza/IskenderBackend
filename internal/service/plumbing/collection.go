@@ -195,3 +195,22 @@ func (pr *Plumping) GetCollection(ctx context.Context) ([]*models.CollectionResp
 
 	return collection, nil
 }
+
+func (pr *Plumping) GetCollectionID(ctx context.Context, collectionId int) (*models.CollectionResponseForAdmin, error) {
+	const op = "service.GetCollectionID"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collection, err := pr.plumpingRepository.GetCollection(ctx, collectionId)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			log.Error("Failed to found collection", sl.Err(err))
+			return nil, storage.ErrCollectionNotFound
+		}
+		log.Error("Failed to get collection", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+	return collection, nil
+}

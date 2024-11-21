@@ -89,3 +89,17 @@ type ItemResponses struct {
 	Items        []CreateItemTranslation `json:"items"`
 	Color        []ColorResponse         `json:"color"`
 }
+
+type ItemResponseForAdmin struct {
+	ID           int                     `json:"ID"`
+	CategoryID   int                     `json:"category_id"`
+	CollectionID int                     `json:"collection_id"`
+	Size         string                  `json:"size"`
+	Price        float64                 `json:"price"`
+	IsProducer   bool                    `json:"isProducer"`
+	IsPainted    bool                    `json:"isPainted"`
+	IsPopular    bool                    `json:"is_popular"`
+	IsNew        bool                    `json:"is_new"`
+	Photos       []PhotosResponse        `json:"photos"`
+	Items        []CreateItemTranslation `json:"items"`
+}

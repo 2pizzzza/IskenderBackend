@@ -103,3 +103,14 @@ type CollectionResponses struct {
 	Collections []CreateCollection `json:"collections"`
 	Color       []ColorResponse    `json:"color"`
 }
+
+type CollectionResponseForAdmin struct {
+	ID          int                `json:"ID"`
+	Price       float64            `json:"price,omitempty"`
+	IsProducer  bool               `json:"isProducer,omitempty"`
+	IsPainted   bool               `json:"isPainted,omitempty"`
+	IsPopular   bool               `json:"isPopular,omitempty"`
+	IsNew       bool               `json:"isNew,omitempty"`
+	Photos      []PhotosResponse   `json:"photos"`
+	Collections []CreateCollection `json:"collections"`
+}

@@ -660,6 +660,82 @@ func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionRespon
 	return collections, nil
 }
 
+func (db *DB) GetCollection(ctx context.Context, collectionID int) (*models.CollectionResponseForAdmin, error) {
+	const op = "postgres.GetItem"
+
+	var exist bool
+	checkCollectionQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, checkCollectionQuery, collectionID).Scan(&exist)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check collection existence: %w", op, err)
+	}
+	if !exist {
+		return nil, storage.ErrCollectionNotFound
+	}
+
+	query := `
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew
+		FROM Collection c WHERE c.id = $1`
+	var collection models.CollectionResponseForAdmin
+	err = db.Pool.QueryRow(ctx, query, collectionID).Scan(
+		&collection.ID,
+		&collection.Price,
+		&collection.IsProducer,
+		&collection.IsPainted,
+		&collection.IsPopular,
+		&collection.IsNew,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get collection details: %w", op, err)
+	}
+
+	transQuery := `SELECT language_code, name, description FROM CollectionTranslation WHERE collection_id = $1`
+	rows, err := db.Pool.Query(ctx, transQuery, collectionID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get collection translations: %w", op, err)
+	}
+	defer rows.Close()
+
+	var translations []models.CreateCollection
+	for rows.Next() {
+		var translation models.CreateCollection
+		if err := rows.Scan(&translation.LanguageCode, &translation.Name, &translation.Description); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan translation: %w", op, err)
+		}
+		translations = append(translations, translation)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: error iterating over translations: %w", op, err)
+	}
+	collection.Collections = translations
+
+	photosQuery := `
+		SELECT p.id, p.url, p.isMain, p.hash_color
+		FROM Photo p
+		JOIN CollectionPhoto cp ON p.id = cp.photo_id
+		WHERE cp.collection_id = $1`
+	photoRows, err := db.Pool.Query(ctx, photosQuery, collectionID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get collection photos: %w", op, err)
+	}
+	defer photoRows.Close()
+
+	var photos []models.PhotosResponse
+	for photoRows.Next() {
+		var photo models.PhotosResponse
+		if err := photoRows.Scan(&photo.ID, &photo.URL, &photo.IsMain, &photo.HashColor); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan photo: %w", op, err)
+		}
+		photos = append(photos, photo)
+	}
+	if err := photoRows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: error iterating over photos: %w", op, err)
+	}
+	collection.Photos = photos
+
+	return &collection, nil
+}
+
 func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models.CreateCollectionRequest) error {
 	const op = "postgres.UpdateCollection"
 
@@ -673,7 +749,6 @@ func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models
 		return storage.ErrCollectionNotFound
 	}
 
-	// Проверка обязательных языков
 	if len(req.Collections) != 3 {
 		return storage.ErrRequiredLanguage
 	}

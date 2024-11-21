@@ -441,6 +441,44 @@ func (s *Server) RemoveItem(w http.ResponseWriter, r *http.Request) {
 	utils.WriteResponseBody(w, models.Message{Message: "Successful remove iten"}, http.StatusCreated)
 }
 
+// GetItemId retrieves a item by its ID and language code
+// @Summary Retrieve a item by ID and language code
+// @Description Returns details of a specific collection in the specified language
+// @Tags items
+// @Accept  json
+// @Produce  json
+// @Param  item_id  query  int  true  "Collection ID"
+// @Success 200 {object} models.ItemResponseForAdmin "Collection details"
+// @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
+// @Failure 404 {object} models.ErrorMessage "Collection not found"
+// @Failure 500 {object} models.ErrorMessage "Internal server error"
+// @Router /getItemById [get]
+func (s *Server) GetItemId(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("item_id")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Collection Id"}, http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+
+	res, err := s.service.GetItemID(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, storage.ErrItemNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to found collection"}, http.StatusNotFound)
+			return
+		}
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get collection"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+}
+
 // GetAllItems retrieves all items
 // @Summary Get all Items
 // @Description Retrieves a list of all available items

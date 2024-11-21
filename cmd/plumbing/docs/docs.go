@@ -1190,6 +1190,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/getCollectionById": {
+            "get": {
+                "description": "Returns details of a specific collection in the specified language",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "collections"
+                ],
+                "summary": "Retrieve a collection by ID and language code",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Collection ID",
+                        "name": "collection_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Collection details",
+                        "schema": {
+                            "$ref": "#/definitions/models.CollectionResponseForAdmin"
+                        }
+                    },
+                    "400": {
+                        "description": "Missing or invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Collection not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/getItemById": {
+            "get": {
+                "description": "Returns details of a specific collection in the specified language",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Retrieve a item by ID and language code",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Collection ID",
+                        "name": "item_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Collection details",
+                        "schema": {
+                            "$ref": "#/definitions/models.ItemResponseForAdmin"
+                        }
+                    },
+                    "400": {
+                        "description": "Missing or invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Collection not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/item": {
             "get": {
                 "description": "Returns details of a specific item in the specified language",
@@ -2456,6 +2556,41 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CollectionResponseForAdmin": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "collections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateCollection"
+                    }
+                },
+                "isNew": {
+                    "type": "boolean"
+                },
+                "isPainted": {
+                    "type": "boolean"
+                },
+                "isPopular": {
+                    "type": "boolean"
+                },
+                "isProducer": {
+                    "type": "boolean"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
         "models.CollectionResponses": {
             "type": "object",
             "properties": {
@@ -2847,6 +2982,50 @@ const docTemplate = `{
                 },
                 "new_price": {
                     "type": "number"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.PhotosResponse"
+                    }
+                },
+                "price": {
+                    "type": "number"
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemResponseForAdmin": {
+            "type": "object",
+            "properties": {
+                "ID": {
+                    "type": "integer"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "collection_id": {
+                    "type": "integer"
+                },
+                "isPainted": {
+                    "type": "boolean"
+                },
+                "isProducer": {
+                    "type": "boolean"
+                },
+                "is_new": {
+                    "type": "boolean"
+                },
+                "is_popular": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateItemTranslation"
+                    }
                 },
                 "photos": {
                     "type": "array",

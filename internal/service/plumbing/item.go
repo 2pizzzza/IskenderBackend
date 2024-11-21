@@ -178,6 +178,25 @@ func (pr *Plumping) RemoveItem(ctx context.Context, token string, req models.Ite
 	return nil
 }
 
+func (pr *Plumping) GetItemID(ctx context.Context, itemId int) (*models.ItemResponseForAdmin, error) {
+	const op = "service.GetItemID"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collection, err := pr.plumpingRepository.GetItem(ctx, itemId)
+	if err != nil {
+		if errors.Is(err, storage.ErrItemNotFound) {
+			log.Error("Failed to found collection", sl.Err(err))
+			return nil, storage.ErrItemNotFound
+		}
+		log.Error("Failed to get collection", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+	return collection, nil
+}
+
 func (pr *Plumping) GetItems(ctx context.Context) ([]*models.ItemResponses, error) {
 	const op = "service.GetItems"
 

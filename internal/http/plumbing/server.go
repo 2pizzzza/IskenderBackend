@@ -57,6 +57,7 @@ type Service interface {
 	GetCollectionByPainted(ctx context.Context, code string) ([]*models.CollectionResponse, error)
 	CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error)
 	GetCollection(ctx context.Context) ([]*models.CollectionResponses, error)
+	GetCollectionID(ctx context.Context, collectionId int) (*models.CollectionResponseForAdmin, error)
 
 	//Popular and New
 	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
@@ -71,6 +72,7 @@ type Service interface {
 	UpdateItem(ctx context.Context, token string, itemId int, req models.CreateItem) error
 	RemoveItem(ctx context.Context, token string, req models.ItemRequest) error
 	GetItems(ctx context.Context) ([]*models.ItemResponses, error)
+	GetItemID(ctx context.Context, itemId int) (*models.ItemResponseForAdmin, error)
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string) (*models.PopularResponse, error)
@@ -140,6 +142,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /collection", s.CreateCollection)
 	mux.HandleFunc("PUT /collection", s.UpdateCollection)
 	mux.HandleFunc("GET /getAllCollection", s.GetAllCollection)
+	mux.HandleFunc("GET /getCollectionById", s.GetCollectionId)
 
 	//Popular and New
 	mux.HandleFunc("GET /popular", s.GetPopular)
@@ -154,6 +157,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /items", s.UpdateItem)
 	mux.HandleFunc("DELETE /items", s.RemoveItem)
 	mux.HandleFunc("GET /getAllItems", s.GetAllItems)
+	mux.HandleFunc("GET /getItemById", s.GetItemId)
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)

@@ -209,6 +209,87 @@ func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, lang
 	return items, nil
 }
 
+func (db *DB) GetItem(ctx context.Context, itemID int) (*models.ItemResponseForAdmin, error) {
+	const op = "postgres.GetItem"
+
+	var exist bool
+	checkItemQuery := `SELECT EXISTS(SELECT 1 FROM Item WHERE id = $1)`
+	err := db.Pool.QueryRow(ctx, checkItemQuery, itemID).Scan(&exist)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to check item existence: %w", op, err)
+	}
+	if !exist {
+		return nil, storage.ErrItemNotFound
+	}
+
+	query := `
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, 
+			i.isProducer, i.isPainted, i.isPopular, i.isNew
+		FROM Item i WHERE i.id = $1`
+	var item models.ItemResponseForAdmin
+	err = db.Pool.QueryRow(ctx, query, itemID).Scan(
+		&item.ID,
+		&item.CategoryID,
+		&item.CollectionID,
+		&item.Size,
+		&item.Price,
+		&item.IsProducer,
+		&item.IsPainted,
+		&item.IsPopular,
+		&item.IsNew,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get item details: %w", op, err)
+	}
+
+	// Запрос для получения переводов товара
+	transQuery := `SELECT language_code, name, description FROM ItemTranslation WHERE item_id = $1`
+	rows, err := db.Pool.Query(ctx, transQuery, itemID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get item translations: %w", op, err)
+	}
+	defer rows.Close()
+
+	var translations []models.CreateItemTranslation
+	for rows.Next() {
+		var translation models.CreateItemTranslation
+		if err := rows.Scan(&translation.LanguageCode, &translation.Name, &translation.Description); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan translation: %w", op, err)
+		}
+		translations = append(translations, translation)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: error iterating over translations: %w", op, err)
+	}
+	item.Items = translations
+
+	photosQuery := `
+		SELECT p.id, p.url, p.isMain, p.hash_color
+		FROM Photo p
+		JOIN ItemPhoto ip ON p.id = ip.photo_id
+		WHERE ip.item_id = $1`
+	photoRows, err := db.Pool.Query(ctx, photosQuery, itemID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get item photos: %w", op, err)
+	}
+	defer photoRows.Close()
+
+	var photos []models.PhotosResponse
+	for photoRows.Next() {
+		var photo models.PhotosResponse
+		if err := photoRows.Scan(&photo.ID, &photo.URL, &photo.IsMain, &photo.HashColor); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan photo: %w", op, err)
+		}
+		photos = append(photos, photo)
+	}
+	if err := photoRows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: error iterating over photos: %w", op, err)
+	}
+	item.Photos = photos
+
+	return &item, nil
+}
+
 func (db *DB) GetPopularItems(ctx context.Context, languageCode string) ([]*models.ItemResponse, error) {
 	const op = "postgres.GetPopularItems"
 
