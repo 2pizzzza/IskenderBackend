@@ -864,14 +864,6 @@ func (db *DB) RemoveItem(ctx context.Context, itemID int) error {
 		return fmt.Errorf("%s: failed to delete item: %w", op, err)
 	}
 
-	deleteOrphanedPhotosQuery := `
-		DELETE FROM Photo WHERE id NOT IN (SELECT photo_id FROM ItemPhoto)
-	`
-	_, err = tx.Exec(ctx, deleteOrphanedPhotosQuery)
-	if err != nil {
-		return fmt.Errorf("%s: failed to delete orphaned photos: %w", op, err)
-	}
-
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}
