@@ -352,16 +352,22 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	}
 	defer tx.Rollback(ctx)
 
-	deleteColorCollection := `DELETE FROM ColorCollection WHERE collection_id = $1`
-	_, err = tx.Exec(ctx, deleteColorCollection, collectionID)
+	updateItems := `UPDATE Item SET collection_id = NULL WHERE collection_id = $1`
+	_, err = tx.Exec(ctx, updateItems, collectionID)
 	if err != nil {
-		return fmt.Errorf("%s: failed to delete color associations for collection: %w", op, err)
+		return fmt.Errorf("%s: failed to update items for collection: %w", op, err)
 	}
 
-	deletePhotoCollection := `DELETE FROM PhotoCollection WHERE collection_id = $1`
+	deletePhotoCollection := `DELETE FROM CollectionPhoto WHERE collection_id = $1`
 	_, err = tx.Exec(ctx, deletePhotoCollection, collectionID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to delete photo associations for collection: %w", op, err)
+	}
+
+	deleteTransCollection := `DELETE FROM CollectionTranslation WHERE collection_id = $1`
+	_, err = tx.Exec(ctx, deleteTransCollection, collectionID)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete translations for collection: %w", op, err)
 	}
 
 	deleteCollection := `DELETE FROM Collection WHERE id = $1`
@@ -661,7 +667,7 @@ func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionRespon
 }
 
 func (db *DB) GetCollection(ctx context.Context, collectionID int) (*models.CollectionResponseForAdmin, error) {
-	const op = "postgres.GetItem"
+	const op = "postgres.GetCollection"
 
 	var exist bool
 	checkCollectionQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`

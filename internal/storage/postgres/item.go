@@ -91,9 +91,6 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 
 	photos, colors, err := db.getItemPhotos(ctx, item.ID)
 	newPrice, err := db.GetDiscountedPrice(ctx, "item", item.ID, item.Price)
-	if err != nil {
-		return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
-	}
 	item.NewPrice = newPrice
 	item.Photos = photos
 	item.Colors = colors
