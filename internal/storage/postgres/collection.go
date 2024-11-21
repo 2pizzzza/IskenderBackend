@@ -352,7 +352,7 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	}
 	defer tx.Rollback(ctx)
 
-	updateItems := `UPDATE Item SET collection_id = NULL WHERE collection_id = $1`
+	updateItems := `UPDATE Item SET collection_id = 0 WHERE collection_id = $1`
 	_, err = tx.Exec(ctx, updateItems, collectionID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update items for collection: %w", op, err)
