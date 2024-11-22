@@ -6,6 +6,7 @@ import (
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/lib/pq"
+	"log/slog"
 )
 
 func (db *DB) GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error) {
@@ -260,7 +261,8 @@ func (db *DB) CreateVacancy(ctx context.Context, req *models.VacancyResponses) (
 
 	var vacancyID int
 	insertVacancy := `INSERT INTO Vacancy (salary, isActive) VALUES ($1, $2) RETURNING id`
-	err = tx.QueryRow(ctx, insertVacancy, req.Salary, req.IsActive == true).Scan(&vacancyID)
+	slog.Info("is active", req.IsActive)
+	err = tx.QueryRow(ctx, insertVacancy, req.Salary, req.IsActive).Scan(&vacancyID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to insert vacancy: %w", op, err)
 	}

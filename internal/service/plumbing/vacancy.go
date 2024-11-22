@@ -111,7 +111,7 @@ func (pr Plumping) GetVacancyById(ctx context.Context, id int) (*models.VacancyR
 	if err != nil {
 		if errors.Is(err, storage.ErrVacancyNotFound) {
 			log.Error("Vacancy not found", sl.Err(err))
-			return nil, storage.ErrBrandNotFound
+			return nil, storage.ErrVacancyNotFound
 
 		}
 		log.Error("Failed to get brand", sl.Err(err))
