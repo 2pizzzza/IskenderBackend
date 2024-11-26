@@ -644,6 +644,9 @@ func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionRespon
 			if err := transRows.Scan(&trans.LanguageCode, &trans.Name, &trans.Description); err != nil {
 				return nil, fmt.Errorf("%s: failed to scan translation row: %w", op, err)
 			}
+			if trans.LanguageCode == "ru" {
+				collection.Name = trans.Name
+			}
 			translations = append(translations, trans)
 		}
 
@@ -651,7 +654,6 @@ func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionRespon
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for collection %d: %w", op, collection.ID, err)
 		}
-
 		collection.Collections = translations
 		collection.Photos = photos
 		collection.Color = colors

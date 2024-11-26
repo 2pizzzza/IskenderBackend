@@ -99,6 +99,7 @@ type CollectionResponses struct {
 	IsPainted   bool               `json:"isPainted,omitempty"`
 	IsPopular   bool               `json:"isPopular,omitempty"`
 	IsNew       bool               `json:"isNew,omitempty"`
+	Name        string             `json:"name"`
 	Photos      []PhotosResponse   `json:"photos"`
 	Collections []CreateCollection `json:"collections"`
 	Color       []ColorResponse    `json:"color"`

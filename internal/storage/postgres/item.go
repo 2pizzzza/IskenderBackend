@@ -132,6 +132,9 @@ func (db *DB) GetAllItems(ctx context.Context) ([]*models.ItemResponses, error) 
 			if err := transRows.Scan(&trans.LanguageCode, &trans.Name, &trans.Description); err != nil {
 				return nil, fmt.Errorf("%s: failed to scan translation row: %w", op, err)
 			}
+			if trans.LanguageCode == "ru" {
+				item.Name = trans.Name
+			}
 			translations = append(translations, trans)
 		}
 

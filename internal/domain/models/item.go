@@ -85,6 +85,7 @@ type ItemResponses struct {
 	IsPainted    bool                    `json:"isPainted"`
 	IsPopular    bool                    `json:"is_popular"`
 	IsNew        bool                    `json:"is_new"`
+	Name         string                  `json:"name"`
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 	Color        []ColorResponse         `json:"color"`
@@ -100,6 +101,7 @@ type ItemResponseForAdmin struct {
 	IsPainted    bool                    `json:"isPainted"`
 	IsPopular    bool                    `json:"is_popular"`
 	IsNew        bool                    `json:"is_new"`
+	Name         string                  `json:"name"`
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 }
