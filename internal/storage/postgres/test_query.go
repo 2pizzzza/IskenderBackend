@@ -101,7 +101,10 @@ func (db *DB) CreateStarter(ctx context.Context) error {
 		(2, 'en', 'Summer Dress', 'A light dress for hot weather'),
 		(3, 'ru', 'Кожаные туфли', 'Легкие туфли из натуральной кожи для осени'),
 		(3, 'kgz', 'Жайкы бут кийим', 'Күзгө ылайыктуу табигый териден жасалган жеңил бут кийимдер'),
-		(3, 'en', 'Leather Shoes', 'Light leather shoes for autumn')`)
+		(3, 'en', 'Leather Shoes', 'Light leather shoes for autumn');
+	SELECT setval('category_id_seq', (SELECT MAX(id) FROM Category));
+
+`)
 	if err != nil {
 		return fmt.Errorf("%s: failed to insert item translations: %w", op, err)
 	}
