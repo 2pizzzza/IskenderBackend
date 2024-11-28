@@ -43,7 +43,7 @@ type Service interface {
 	//Category
 	GetCategoriesByCode(ctx context.Context, languageCode string) ([]*models.Category, error)
 	CreateCategory(ctx context.Context, token string, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error)
-	UpdateCategory(ctx context.Context, token string, req *models.UpdateCategoryRequest) error
+	UpdateCategory(ctx context.Context, token string, categoryID int, req []models.UpdateCategoriesResponse) error
 	RemoveCategory(ctx context.Context, token string, req *models.RemoveCategoryRequest) error
 	GetCategoryById(ctx context.Context, id int) (*models.GetCategoryRequest, error)
 

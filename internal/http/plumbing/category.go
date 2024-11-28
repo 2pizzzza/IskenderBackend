@@ -150,13 +150,15 @@ func (s *Server) RemoveCategory(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateCategory updates an existing category
+// UpdateCategory updates an existing category
 // @Summary Update a category
 // @Description Updates a category with new details. Requires a valid token.
 // @Tags categories
 // @Accept  json
 // @Produce  json
 // @Param Authorization header string true "Bearer Token"
-// @Param category body models.UpdateCategoryRequest true "Category update details"
+// @Param category_id query integer true "Category ID to retrieve"
+// @Param category body []models.UpdateCategoriesResponse true "Category update details"
 // @Success 201 {object} models.Message "Successfully updated category"
 // @Failure 400 {object} models.ErrorMessage "Invalid request body or category not found"
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid format"
@@ -177,13 +179,22 @@ func (s *Server) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	token := parts[1]
 
-	var req models.UpdateCategoryRequest
+	idStr := r.URL.Query().Get("category_id")
+	if idStr == "" {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Collection Id"}, http.StatusBadRequest)
+		return
+	}
+	var req []models.UpdateCategoriesResponse
 	if err := utils.ReadRequestBody(r, &req); err != nil {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid request body"}, http.StatusBadRequest)
 		return
 	}
-
-	err := s.service.UpdateCategory(r.Context(), token, &req)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		return
+	}
+	err = s.service.UpdateCategory(r.Context(), token, id, req)
 	if err != nil {
 		if errors.Is(err, storage.ErrToken) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Permissions denied"}, http.StatusForbidden)

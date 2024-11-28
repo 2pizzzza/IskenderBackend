@@ -47,3 +47,8 @@ type CategoriesResponse struct {
 type Message struct {
 	Message string `json:"message"`
 }
+
+type UpdateCategoriesResponse struct {
+	Name         string `json:"name"`
+	LanguageCode string `json:"language_code"`
+}

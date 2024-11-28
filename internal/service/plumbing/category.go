@@ -63,7 +63,7 @@ func (pr *Plumping) CreateCategory(ctx context.Context, token string, req models
 	return category, nil
 }
 
-func (pr *Plumping) UpdateCategory(ctx context.Context, token string, req *models.UpdateCategoryRequest) error {
+func (pr *Plumping) UpdateCategory(ctx context.Context, token string, categoryID int, req []models.UpdateCategoriesResponse) error {
 	const op = "service.UpdateCategory"
 
 	log := pr.log.With(
@@ -76,8 +76,8 @@ func (pr *Plumping) UpdateCategory(ctx context.Context, token string, req *model
 		return storage.ErrToken
 	}
 
-	err = pr.plumpingRepository.UpdateCategory(ctx, req.CategoryID, req.Name, req.LanguageCode)
-	log.Info("id", req.CategoryID)
+	err = pr.plumpingRepository.UpdateCategory(ctx, categoryID, req)
+	log.Info("id", categoryID)
 	if err != nil {
 		if errors.Is(err, storage.ErrCategoryNotFound) {
 			log.Error("Category already exist", sl.Err(err))

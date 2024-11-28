@@ -51,9 +51,10 @@ func (db *DB) GetCategoriesByLanguageCode(ctx context.Context, languageCode stri
 	return categories, nil
 }
 
-func (db *DB) UpdateCategory(ctx context.Context, categoryID int, name string, languageCode string) error {
+func (db *DB) UpdateCategory(ctx context.Context, categoryID int, categories []models.UpdateCategoriesResponse) error {
 	const op = "postgres.UpdateCategory"
 
+	// Проверка существования категории
 	var exists bool
 	checkQuery := `SELECT EXISTS(SELECT 1 FROM Category WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkQuery, categoryID).Scan(&exists)
@@ -64,14 +65,39 @@ func (db *DB) UpdateCategory(ctx context.Context, categoryID int, name string, l
 		return storage.ErrCategoryNotFound
 	}
 
+	if len(categories) != 3 {
+		return storage.ErrRequiredLanguage
+	}
+
+	languageCodes := map[string]bool{"ru": false, "kgz": false, "en": false}
+	for _, translation := range categories {
+		if _, ok := languageCodes[translation.LanguageCode]; !ok {
+			return storage.ErrInvalidLanguageCode
+		}
+		languageCodes[translation.LanguageCode] = true
+	}
+
+	tx, err := db.Pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+	}
+	defer tx.Rollback(ctx)
+
 	updateQuery := `
 		INSERT INTO CategoryTranslation (category_id, language_code, name)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (category_id, language_code) DO UPDATE
 		SET name = EXCLUDED.name`
-	_, err = db.Pool.Exec(ctx, updateQuery, categoryID, languageCode, name)
-	if err != nil {
-		return fmt.Errorf("%s: failed to update category: %w", op, err)
+	for _, cat := range categories {
+		_, err := tx.Exec(ctx, updateQuery, categoryID, cat.LanguageCode, cat.Name)
+		if err != nil {
+			return fmt.Errorf("%s: failed to update category for language %s: %w", op, cat.LanguageCode, err)
+		}
+	}
+
+	// Коммитим транзакцию
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}
 
 	return nil

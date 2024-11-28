@@ -386,12 +386,22 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "Category ID to retrieve",
+                        "name": "category_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
                         "description": "Category update details",
                         "name": "category",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateCategoryRequest"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UpdateCategoriesResponse"
+                            }
                         }
                     }
                 ],
@@ -2621,6 +2631,9 @@ const docTemplate = `{
                 "isProducer": {
                     "type": "boolean"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "photos": {
                     "type": "array",
                     "items": {
@@ -3027,6 +3040,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.CreateItemTranslation"
                     }
                 },
+                "name": {
+                    "type": "string"
+                },
                 "photos": {
                     "type": "array",
                     "items": {
@@ -3076,6 +3092,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.CreateItemTranslation"
                     }
+                },
+                "name": {
+                    "type": "string"
                 },
                 "photos": {
                     "type": "array",
@@ -3204,12 +3223,9 @@ const docTemplate = `{
                 }
             }
         },
-        "models.UpdateCategoryRequest": {
+        "models.UpdateCategoriesResponse": {
             "type": "object",
             "properties": {
-                "category_id": {
-                    "type": "integer"
-                },
                 "language_code": {
                     "type": "string"
                 },

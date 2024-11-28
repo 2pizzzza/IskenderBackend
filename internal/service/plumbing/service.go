@@ -46,7 +46,7 @@ type PlumpingRepository interface {
 
 	//Category
 	GetCategoriesByLanguageCode(ctx context.Context, languageCode string) ([]*models.Category, error)
-	UpdateCategory(ctx context.Context, categoryID int, name string, languageCode string) error
+	UpdateCategory(ctx context.Context, categoryID int, categories []models.UpdateCategoriesResponse) error
 	CreateCategory(ctx context.Context, req models.CreateCategoryRequest) (*models.CreateCategoryResponse, error)
 	DeleteCategory(ctx context.Context, categoryID int) error
 	GetCategoryByID(ctx context.Context, id int) (*models.GetCategoryRequest, error)
