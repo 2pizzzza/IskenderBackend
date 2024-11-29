@@ -2,12 +2,14 @@ package plumbing
 
 import (
 	"errors"
+	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/2pizzzza/plumbing/internal/utils"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -36,6 +38,12 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 	searchQuery := r.URL.Query().Get("q")
 	code := r.URL.Query().Get("lang")
 
+	decodedQuery, err := url.QueryUnescape(searchQuery)
+	if err != nil {
+		fmt.Println("Error decoding query:", err)
+	}
+	fmt.Println("Decoded query:", decodedQuery)
+
 	var isProducerVal *bool
 	if isProducer != "" {
 		val, err := strconv.ParseBool(isProducer)
@@ -58,7 +66,7 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 		isPaintedVal = &val
 	}
 
-	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, searchQuery)
+	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, decodedQuery)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusNotFound)

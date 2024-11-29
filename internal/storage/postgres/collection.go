@@ -294,6 +294,8 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 		args = append(args, "%"+searchQuery+"%")
 	}
 
+	fmt.Printf("Executing query: %s\nWith arguments: %v\n", query, args)
+
 	rows, err := db.Pool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to search collections: %w", op, err)
@@ -301,7 +303,6 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 	defer rows.Close()
 
 	var collections []*models.CollectionResponse
-
 	for rows.Next() {
 		var collection models.CollectionResponse
 		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular,
@@ -319,7 +320,6 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 		collection.Colors = colors
 
 		collections = append(collections, &collection)
-
 	}
 
 	if len(collections) == 0 {

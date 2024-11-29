@@ -405,6 +405,8 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 		args = append(args, "%"+searchQuery+"%")
 	}
 
+	fmt.Printf("Executing query: %s\nWith arguments: %v\n", query, args)
+
 	rows, err := db.Pool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to search items: %w", op, err)

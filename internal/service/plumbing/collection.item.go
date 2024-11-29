@@ -72,26 +72,29 @@ func (pr *Plumping) Search(ctx context.Context, code string, isProducer *bool, i
 	)
 	count := 0
 	items, err := pr.plumpingRepository.SearchItems(ctx, code, isProducer, isPainted, searchQuery)
-	if err != nil {
-		if errors.Is(err, storage.ErrCollectionNotFound) {
-			count++
-		}
-		log.Error("Failed to get new items", sl.Err(err))
+	if errors.Is(err, storage.ErrCollectionNotFound) {
+		count++
+	} else if err != nil {
+		log.Error("Failed to get items", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
 	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, isPainted, searchQuery)
-	if err != nil {
-		if errors.Is(err, storage.ErrCollectionNotFound) {
-			count++
-			if count == 2 {
-				return nil, storage.ErrCollectionNotFound
-			}
+	if errors.Is(err, storage.ErrCollectionNotFound) {
+		count++
+		if count == 2 {
+			return nil, storage.ErrCollectionNotFound
 		}
-		log.Error("Failed to get new collections", sl.Err(err))
+	} else if err != nil {
+		log.Error("Failed to get collections", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-
+	if collection == nil {
+		collection = []*models.CollectionResponse{}
+	}
+	if items == nil {
+		items = []*models.ItemResponse{}
+	}
 	res := &models.PopularResponse{
 		Collections: collection,
 		Items:       items,
