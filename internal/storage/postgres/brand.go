@@ -65,7 +65,6 @@ func (db *DB) GetAllBrand(ctx context.Context) ([]*models.BrandResponse, error) 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
 	}
-
 	return brands, nil
 }
 

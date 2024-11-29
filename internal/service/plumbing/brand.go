@@ -50,7 +50,9 @@ func (pr *Plumping) GetAllBrand(ctx context.Context) ([]*models.BrandResponse, e
 		log.Error("Failed to get all brands", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-
+	if brands == nil {
+		brands = []*models.BrandResponse{}
+	}
 	return brands, nil
 }
 

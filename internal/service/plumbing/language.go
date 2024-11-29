@@ -21,5 +21,8 @@ func (pr *Plumping) GetAllLanguages(ctx context.Context) ([]*models.Language, er
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if languages == nil {
+		languages = []*models.Language{}
+	}
 	return languages, nil
 }

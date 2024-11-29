@@ -22,6 +22,8 @@ import (
 // @Param  lang  query  string  false  "Language code"
 // @Param  is_producer  query  bool  false  "Filter by producer status"
 // @Param  is_painted  query  bool  false  "Filter by painted"
+// @Param min query integer false "min price"
+// @Param max query integer false "max price"
 // @Param  q  query  string  false  "Search query"
 // @Success 200 {object} models.PopularResponse "Search results"
 // @Failure 400 {object} models.ErrorMessage "Bad request - invalid query parameters"
@@ -37,13 +39,36 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 	isPainted := r.URL.Query().Get("is_painted")
 	searchQuery := r.URL.Query().Get("q")
 	code := r.URL.Query().Get("lang")
+	priceLowStr := r.URL.Query().Get("min")
+	priceHighStr := r.URL.Query().Get("max")
 
 	decodedQuery, err := url.QueryUnescape(searchQuery)
 	if err != nil {
 		fmt.Println("Error decoding query:", err)
 	}
-	fmt.Println("Decoded query:", decodedQuery)
 
+	var priceLow *float64
+
+	if priceLowStr != "" {
+		priceLowInt, err := strconv.Atoi(priceLowStr)
+		if err != nil || priceLowInt <= 0 {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid price low"}, http.StatusBadRequest)
+			return
+		}
+		priceHighVal := float64(priceLowInt)
+		priceLow = &priceHighVal
+	}
+
+	var priceHigh *float64
+	if priceLowStr != "" {
+		priceHighInt, err := strconv.Atoi(priceHighStr)
+		if err != nil || priceHighInt <= 0 {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid price high"}, http.StatusBadRequest)
+			return
+		}
+		priceHighVal := float64(priceHighInt)
+		priceHigh = &priceHighVal
+	}
 	var isProducerVal *bool
 	if isProducer != "" {
 		val, err := strconv.ParseBool(isProducer)
@@ -66,7 +91,7 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 		isPaintedVal = &val
 	}
 
-	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, decodedQuery)
+	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, decodedQuery, priceLow, priceHigh)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusNotFound)

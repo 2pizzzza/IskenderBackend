@@ -28,6 +28,9 @@ func (pr *Plumping) GetItemsByCategoryId(ctx context.Context, id int, code strin
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if items == nil {
+		items = []*models.ItemResponse{}
+	}
 	return items, nil
 }
 
@@ -67,7 +70,9 @@ func (pr *Plumping) GetItemsByCollectionId(ctx context.Context, id int, code str
 		log.Error("Failed to get item", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-
+	if items == nil {
+		items = []*models.ItemResponse{}
+	}
 	return items, nil
 }
 
@@ -88,6 +93,9 @@ func (pr *Plumping) GetItemsRec(ctx context.Context, id int, code string) ([]*mo
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if items == nil {
+		items = []*models.ItemResponse{}
+	}
 	return items, nil
 }
 
@@ -210,5 +218,8 @@ func (pr *Plumping) GetItems(ctx context.Context) ([]*models.ItemResponses, erro
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if items == nil {
+		items = []*models.ItemResponses{}
+	}
 	return items, nil
 }

@@ -28,7 +28,9 @@ func (pr *Plumping) GetAllDiscounts(ctx context.Context, languageCode string) ([
 		log.Error("Error get all discount", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-
+	if discounts == nil {
+		discounts = []models.Discount{}
+	}
 	return discounts, nil
 }
 

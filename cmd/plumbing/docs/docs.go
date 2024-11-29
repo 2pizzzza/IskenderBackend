@@ -2074,6 +2074,18 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "min price",
+                        "name": "min",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max price",
+                        "name": "max",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Search query",
                         "name": "q",

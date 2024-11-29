@@ -75,7 +75,7 @@ type Service interface {
 	GetItemID(ctx context.Context, itemId int) (*models.ItemResponseForAdmin, error)
 
 	//Seach
-	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string) (*models.PopularResponse, error)
+	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error)
 
 	//Photo
 	GetImagePath(ctx context.Context, imageName string) (string, error)

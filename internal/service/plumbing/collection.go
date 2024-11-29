@@ -24,6 +24,9 @@ func (pr *Plumping) GetCollectionByCategoryId(ctx context.Context, code string) 
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if collections == nil {
+		collections = []*models.CollectionResponse{}
+	}
 	return collections, nil
 }
 
@@ -79,12 +82,16 @@ func (pr *Plumping) GetCollectionRec(ctx context.Context, language string) ([]*m
 		slog.String("op: ", op),
 	)
 
-	collection, err := pr.plumpingRepository.GetRandomCollectionsWithPopularity(ctx, language)
+	collections, err := pr.plumpingRepository.GetRandomCollectionsWithPopularity(ctx, language)
 	if err != nil {
 		log.Error("Failed to get collection", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-	return collection, nil
+
+	if collections == nil {
+		collections = []*models.CollectionResponse{}
+	}
+	return collections, nil
 }
 
 func (pr *Plumping) GetCollectionByStadart(ctx context.Context, code string) ([]*models.CollectionResponse, error) {
@@ -99,7 +106,9 @@ func (pr *Plumping) GetCollectionByStadart(ctx context.Context, code string) ([]
 		log.Error("Failed to get collections", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-
+	if collections == nil {
+		collections = []*models.CollectionResponse{}
+	}
 	return collections, nil
 }
 
@@ -114,6 +123,10 @@ func (pr *Plumping) GetCollectionByPainted(ctx context.Context, code string) ([]
 	if err != nil {
 		log.Error("Failed to get collections", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	if collections == nil {
+		collections = []*models.CollectionResponse{}
 	}
 
 	return collections, nil
@@ -187,13 +200,15 @@ func (pr *Plumping) GetCollection(ctx context.Context) ([]*models.CollectionResp
 		slog.String("op: ", op),
 	)
 
-	collection, err := pr.plumpingRepository.GetAllCollections(ctx)
+	collections, err := pr.plumpingRepository.GetAllCollections(ctx)
 	if err != nil {
 		log.Error("Failed to get all collections", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
-
-	return collection, nil
+	if collections == nil {
+		collections = []*models.CollectionResponses{}
+	}
+	return collections, nil
 }
 
 func (pr *Plumping) GetCollectionID(ctx context.Context, collectionId int) (*models.CollectionResponseForAdmin, error) {

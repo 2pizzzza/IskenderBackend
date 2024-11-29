@@ -266,7 +266,7 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 
 	return &collection, nil
 }
-func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string) ([]*models.CollectionResponse, error) {
+func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error) {
 	const op = "postgres.SearchCollections"
 
 	query := `
@@ -294,6 +294,15 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 		args = append(args, "%"+searchQuery+"%")
 	}
 
+	if minPrice != nil {
+		query += ` AND c.price >= $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *minPrice)
+	}
+
+	if maxPrice != nil {
+		query += ` AND c.price <= $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *maxPrice)
+	}
 	fmt.Printf("Executing query: %s\nWith arguments: %v\n", query, args)
 
 	rows, err := db.Pool.Query(ctx, query, args...)

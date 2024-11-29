@@ -28,6 +28,9 @@ func (pr *Plumping) GetCategoriesByCode(ctx context.Context, languageCode string
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if category == nil {
+		category = []*models.Category{}
+	}
 	return category, nil
 }
 

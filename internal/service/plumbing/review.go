@@ -37,5 +37,8 @@ func (pr *Plumping) GetAllReview(ctx context.Context) ([]*models.ReviewResponse,
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
+	if reviews == nil {
+		reviews = []*models.ReviewResponse{}
+	}
 	return reviews, nil
 }

@@ -18,13 +18,16 @@ func (pr *Plumping) GetAllActiveVacancyByLang(ctx context.Context, code string) 
 		slog.String("op: ", op),
 	)
 
-	brands, err := pr.plumpingRepository.GetAllActiveVacanciesByLanguage(ctx, code)
+	vacancy, err := pr.plumpingRepository.GetAllActiveVacanciesByLanguage(ctx, code)
 	if err != nil {
 		log.Error("Failed to get all vacancy", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
-	return brands, nil
+	if vacancy == nil {
+		vacancy = []models.VacancyResponse{}
+	}
+	return vacancy, nil
 }
 
 func (pr *Plumping) UpdateVacancy(ctx context.Context, token string, req models.VacancyResponse) error {
@@ -91,13 +94,16 @@ func (pr *Plumping) GetAllVacancyByLang(ctx context.Context, code string) ([]mod
 		slog.String("op: ", op),
 	)
 
-	brands, err := pr.plumpingRepository.GetAllVacanciesByLanguage(ctx, code)
+	vacancy, err := pr.plumpingRepository.GetAllVacanciesByLanguage(ctx, code)
 	if err != nil {
 		log.Error("Failed to get all vacancy", sl.Err(err))
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
-	return brands, nil
+	if vacancy == nil {
+		vacancy = []models.VacancyResponse{}
+	}
+	return vacancy, nil
 }
 
 func (pr Plumping) GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error) {

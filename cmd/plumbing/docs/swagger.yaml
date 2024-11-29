@@ -1924,6 +1924,14 @@ paths:
         in: query
         name: is_painted
         type: boolean
+      - description: min price
+        in: query
+        name: min
+        type: integer
+      - description: max price
+        in: query
+        name: max
+        type: integer
       - description: Search query
         in: query
         name: q

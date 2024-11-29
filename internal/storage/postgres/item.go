@@ -377,7 +377,7 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 	return items, nil
 }
 
-func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string) ([]*models.ItemResponse, error) {
+func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error) {
 	const op = "postgres.SearchItems"
 
 	query := `
@@ -405,6 +405,15 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 		args = append(args, "%"+searchQuery+"%")
 	}
 
+	if minPrice != nil {
+		query += ` AND i.price >= $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *minPrice)
+	}
+
+	if maxPrice != nil {
+		query += ` AND i.price <= $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *maxPrice)
+	}
 	fmt.Printf("Executing query: %s\nWith arguments: %v\n", query, args)
 
 	rows, err := db.Pool.Query(ctx, query, args...)
