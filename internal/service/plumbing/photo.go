@@ -8,13 +8,18 @@ import (
 	"io"
 	"log/slog"
 	"mime/multipart"
+	"net/url"
 	"os"
 	"path/filepath"
 )
 
 func (rp *Plumping) GetImagePath(ctx context.Context, imageName string) (string, error) {
-	imagePath := filepath.Join(rp.baseDir, "media", "images", imageName)
+	imagePathStr := filepath.Join(rp.baseDir, "media", "images", imageName)
 
+	imagePath, err := url.QueryUnescape(imagePathStr)
+	if err != nil {
+		fmt.Println("Error decoding query:", err)
+	}
 	if _, err := os.Stat(imagePath); errors.Is(err, os.ErrNotExist) {
 		return "", fmt.Errorf("image not found: %s", imageName)
 	}

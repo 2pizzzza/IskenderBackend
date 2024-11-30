@@ -271,6 +271,9 @@ func (s *Server) GetBrandById(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveImage(file io.Reader, filename string) (string, error) {
+
+	filename = strings.ReplaceAll(filename, " ", "")
+
 	path := filepath.Join(imageDir, filename)
 	if _, err := os.Stat(path); err == nil {
 		newFilename := fmt.Sprintf("copy_%s", filename)
