@@ -56,8 +56,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: 22
-          script:
-            git clone https://github.com/2pizzzza/IskenderBackend.git
+          script: |
+            cd /var/www/IskenderBackend
+            git pull
+            systemctl restart backend.service
       - name: Update deployment Status (success)
         if: success()
         uses: chrnorm/deployment-status@v2
