@@ -5,7 +5,6 @@ import (
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/2pizzzza/plumbing/internal/utils"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -109,7 +108,6 @@ func (s *Server) UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parts := strings.Split(authHeader, " ")
-	slog.Info("token", parts)
 	if len(parts) != 2 || parts[0] != "Bearer" {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid token format"}, http.StatusUnauthorized)
 		return

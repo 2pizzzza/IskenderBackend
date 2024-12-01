@@ -60,7 +60,7 @@ func (pr *Plumping) CreateCategory(ctx context.Context, token string, req models
 		}
 
 		log.Error("Failed to create category", sl.Err(err))
-		return nil, fmt.Errorf("%s, %w", sl.Err(err))
+		return nil, fmt.Errorf("%s", sl.Err(err))
 	}
 
 	return category, nil
@@ -80,7 +80,6 @@ func (pr *Plumping) UpdateCategory(ctx context.Context, token string, categoryID
 	}
 
 	err = pr.plumpingRepository.UpdateCategory(ctx, categoryID, req)
-	log.Info("id", categoryID)
 	if err != nil {
 		if errors.Is(err, storage.ErrCategoryNotFound) {
 			log.Error("Category already exist", sl.Err(err))

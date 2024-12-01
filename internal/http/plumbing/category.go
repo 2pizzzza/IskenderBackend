@@ -172,7 +172,6 @@ func (s *Server) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parts := strings.Split(authHeader, " ")
-	slog.Info("token", parts)
 	if len(parts) != 2 || parts[0] != "Bearer" {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid token format"}, http.StatusUnauthorized)
 		return
