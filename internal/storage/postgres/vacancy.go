@@ -45,7 +45,7 @@ func (db *DB) GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode 
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+		return nil, fmt.Errorf("%s %w", op, err)
 	}
 
 	return vacancies, nil
@@ -58,7 +58,7 @@ func (db *DB) UpdateVacancy(ctx context.Context, req models.VacancyResponse) err
 	checkVacancyQuery := `SELECT EXISTS(SELECT 1 FROM Vacancy WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkVacancyQuery, req.Id).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("%s: failed to check vacancy existence: %w", op, err)
+		return fmt.Errorf("%s %w", op, err)
 	}
 	if !exists {
 		return storage.ErrVacancyNotFound
@@ -76,7 +76,7 @@ func (db *DB) UpdateVacancy(ctx context.Context, req models.VacancyResponse) err
 
 	tx, err := db.Pool.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
+		return fmt.Errorf("%s  %w", op, err)
 	}
 	defer tx.Rollback(ctx)
 
@@ -104,7 +104,7 @@ func (db *DB) UpdateVacancy(ctx context.Context, req models.VacancyResponse) err
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
+		return fmt.Errorf("%s %w", op, err)
 	}
 
 	return nil
