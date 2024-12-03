@@ -61,7 +61,7 @@ func (db *DB) GetAllDiscount(ctx context.Context, languageCode string) ([]models
 			slog.Error("Failed", sl.Err(err))
 			return nil, storage.ErrDiscountExists
 		}
-		discount.ID = temp
+		discount.DiscountID = temp
 		discounts = append(discounts, discount)
 	}
 

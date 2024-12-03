@@ -9,6 +9,7 @@ type Discount struct {
 	Description        string           `json:"description"`
 	NewPrice           float64          `json:"new_price"`
 	OldPrice           float64          `json:"old_price"`
+	DiscountID         int              `json:"discount_id"`
 	DiscountType       string           `json:"discount_type"`
 	TargetID           int              `json:"target_id"`
 	DiscountPercentage float64          `json:"discount_percentage"`
