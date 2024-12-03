@@ -139,7 +139,7 @@ func (pr *Plumping) CreateVacancy(ctx context.Context, token string, req *models
 		log.Error("Failed validate token")
 		return nil, storage.ErrToken
 	}
-
+	log.Info("amit", req.Vacancy)
 	vacancy, err := pr.plumpingRepository.CreateVacancy(ctx, req)
 	if err != nil {
 		if errors.Is(err, storage.ErrRequiredLanguage) {

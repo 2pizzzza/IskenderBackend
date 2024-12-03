@@ -76,6 +76,8 @@ type Service interface {
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error)
+	SearchCollection(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error)
+	SearchItem(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error)
 
 	//Photo
 	GetImagePath(ctx context.Context, imageName string) (string, error)
@@ -161,6 +163,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 
 	//Search
 	mux.HandleFunc("GET /search", s.Search)
+	mux.HandleFunc("GET /searchItems", s.SearchItems)
+	mux.HandleFunc("GET /searchCollections", s.SearchCollections)
 
 	//Photo
 	mux.HandleFunc("GET /media/images/", s.GetImage)

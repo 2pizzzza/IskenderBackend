@@ -2093,12 +2093,140 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Search results",
+                    "400": {
+                        "description": "Bad request - invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/models.PopularResponse"
+                            "$ref": "#/definitions/models.ErrorMessage"
                         }
                     },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/searchCollections": {
+            "get": {
+                "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search for collections and items based on language, producer status, and search query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language code",
+                        "name": "lang",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by producer status",
+                        "name": "is_producer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by painted",
+                        "name": "is_painted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min price",
+                        "name": "min",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max price",
+                        "name": "max",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request - invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/searchItems": {
+            "get": {
+                "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search for collections and items based on language, producer status, and search query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language code",
+                        "name": "lang",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by producer status",
+                        "name": "is_producer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by painted",
+                        "name": "is_painted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "min price",
+                        "name": "min",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max price",
+                        "name": "max",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
                     "400": {
                         "description": "Bad request - invalid query parameters",
                         "schema": {

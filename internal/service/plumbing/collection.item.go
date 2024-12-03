@@ -102,3 +102,47 @@ func (pr *Plumping) Search(ctx context.Context, code string, isProducer *bool, i
 
 	return res, nil
 }
+
+func (pr *Plumping) SearchItem(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error) {
+	const op = "service.Search"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+	items, err := pr.plumpingRepository.SearchItems(ctx, code, isProducer, isPainted, searchQuery, minPrice, maxPrice)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			return nil, storage.ErrCollectionNotFound
+		}
+		log.Error("Failed to get items", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	if items == nil {
+		items = []*models.ItemResponse{}
+	}
+
+	return items, nil
+}
+
+func (pr *Plumping) SearchCollection(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error) {
+	const op = "service.SearchCollection"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, isPainted, searchQuery, minPrice, maxPrice)
+	if err != nil {
+		if errors.Is(err, storage.ErrCollectionNotFound) {
+			return nil, storage.ErrCollectionNotFound
+		}
+		log.Error("Failed to get collections", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+	if collection == nil {
+		collection = []*models.CollectionResponse{}
+	}
+
+	return collection, nil
+}

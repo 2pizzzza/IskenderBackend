@@ -238,7 +238,6 @@ func (s *Server) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid request body"}, http.StatusBadRequest)
 		return
 	}
-
 	res, err := s.service.CreateVacancy(r.Context(), token, &req)
 	if err != nil {
 		if errors.Is(err, storage.ErrToken) {

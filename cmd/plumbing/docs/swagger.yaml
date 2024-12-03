@@ -1939,10 +1939,98 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: Search results
+        "400":
+          description: Bad request - invalid query parameters
           schema:
-            $ref: '#/definitions/models.PopularResponse'
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Search for collections and items based on language, producer status,
+        and search query
+      tags:
+      - search
+  /searchCollections:
+    get:
+      consumes:
+      - application/json
+      description: Performs a search for collections and items based on the provided
+        parameters such as language, producer status, and search query.
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        type: string
+      - description: Filter by producer status
+        in: query
+        name: is_producer
+        type: boolean
+      - description: Filter by painted
+        in: query
+        name: is_painted
+        type: boolean
+      - description: min price
+        in: query
+        name: min
+        type: integer
+      - description: max price
+        in: query
+        name: max
+        type: integer
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad request - invalid query parameters
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Search for collections and items based on language, producer status,
+        and search query
+      tags:
+      - search
+  /searchItems:
+    get:
+      consumes:
+      - application/json
+      description: Performs a search for collections and items based on the provided
+        parameters such as language, producer status, and search query.
+      parameters:
+      - description: Language code
+        in: query
+        name: lang
+        type: string
+      - description: Filter by producer status
+        in: query
+        name: is_producer
+        type: boolean
+      - description: Filter by painted
+        in: query
+        name: is_painted
+        type: boolean
+      - description: min price
+        in: query
+        name: min
+        type: integer
+      - description: max price
+        in: query
+        name: max
+        type: integer
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
         "400":
           description: Bad request - invalid query parameters
           schema:
