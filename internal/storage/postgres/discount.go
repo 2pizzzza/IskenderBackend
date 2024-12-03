@@ -55,11 +55,13 @@ func (db *DB) GetAllDiscount(ctx context.Context, languageCode string) ([]models
 		); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan discount row: %w", op, err)
 		}
+		temp := discount.ID
 		err := db.fillDiscountDetails(ctx, &discount, languageCode)
 		if err != nil {
 			slog.Error("Failed", sl.Err(err))
 			return nil, storage.ErrDiscountExists
 		}
+		discount.ID = temp
 		discounts = append(discounts, discount)
 	}
 
