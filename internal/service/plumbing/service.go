@@ -28,7 +28,7 @@ type PlumpingRepository interface {
 
 	//Vacancy
 	GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error)
-	UpdateVacancy(ctx context.Context, req models.VacancyResponse) error
+	UpdateVacancy(ctx context.Context, req models.VacancyUpdateRequest) error
 	RemoveVacancy(ctx context.Context, id int) error
 	GetAllVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error)
 	GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error)

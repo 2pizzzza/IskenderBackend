@@ -543,6 +543,19 @@ definitions:
           $ref: '#/definitions/models.CreateVacancy'
         type: array
     type: object
+  models.VacancyUpdateRequest:
+    properties:
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      salary:
+        type: integer
+      vacancy:
+        items:
+          $ref: '#/definitions/models.CreateVacancy'
+        type: array
+    type: object
 host: 127.0.0.1:8080
 info:
   contact:
@@ -2264,7 +2277,7 @@ paths:
         name: vacancy
         required: true
         schema:
-          $ref: '#/definitions/models.VacancyResponse'
+          $ref: '#/definitions/models.VacancyUpdateRequest'
       produces:
       - application/json
       responses:

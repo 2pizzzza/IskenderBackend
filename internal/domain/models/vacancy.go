@@ -18,6 +18,22 @@ type VacancyResponses struct {
 	Vacancy  []*CreateVacancy `json:"vacancy"`
 }
 
+type VacancyUpdateRequest struct {
+	Id       int              `json:"id,omitempty"`
+	Salary   int              `json:"salary" json:"salary,omitempty"`
+	IsActive bool             `json:"is_active" json:"isActive,omitempty"`
+	Vacancy  []*CreateVacancy `json:"vacancy" json:"vacancy,omitempty"`
+}
+
+type UpdateVacancy struct {
+	LanguageCode     string   `json:"language_code"`
+	Title            string   `json:"title"`
+	Requirements     []string `json:"requirements"`
+	Responsibilities []string `json:"responsibilities"`
+	Conditions       []string `json:"conditions"`
+	Information      []string `json:"information"`
+}
+
 type CreateVacancy struct {
 	Id               int      `json:"id,omitempty"`
 	LanguageCode     string   `json:"language_code"`

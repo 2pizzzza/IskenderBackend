@@ -20,7 +20,7 @@ type Service interface {
 
 	//Vacancy
 	GetAllActiveVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
-	UpdateVacancy(ctx context.Context, token string, req models.VacancyResponse) error
+	UpdateVacancy(ctx context.Context, token string, req models.VacancyUpdateRequest) error
 	RemoveVacancy(ctx context.Context, token string, req *models.RemoveVacancyRequest) error
 	GetAllVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
 	GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error)

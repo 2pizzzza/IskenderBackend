@@ -94,7 +94,7 @@ func (s *Server) RemoveVacancy(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param Authorization header string true "Bearer <token>"
-// @Param vacancy body models.VacancyResponse true "Updated vacancy details"
+// @Param vacancy body models.VacancyUpdateRequest true "Updated vacancy details"
 // @Success 201 {object} models.Message "Successfully updated vacancy"
 // @Failure 400 {object} models.ErrorMessage "Invalid request body, vacancy not found, or vacancy translation not found"
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid token format"
@@ -114,7 +114,7 @@ func (s *Server) UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 	token := parts[1]
 
-	var req models.VacancyResponse
+	var req models.VacancyUpdateRequest
 	if err := utils.ReadRequestBody(r, &req); err != nil {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid request body"}, http.StatusBadRequest)
 		return
@@ -130,8 +130,12 @@ func (s *Server) UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Vacancy not found"}, http.StatusBadRequest)
 			return
 		}
-		if errors.Is(err, storage.ErrVacancyTranslationNotFound) {
-			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Vacancy Translation not found"}, http.StatusBadRequest)
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 languages"}, http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, storage.ErrInvalidLanguageCode) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 languages kgz, ru, en"}, http.StatusBadRequest)
 			return
 		}
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to update vacancy"}, http.StatusInternalServerError)

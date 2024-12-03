@@ -2446,7 +2446,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.VacancyResponse"
+                            "$ref": "#/definitions/models.VacancyUpdateRequest"
                         }
                     }
                 ],
@@ -3432,6 +3432,26 @@ const docTemplate = `{
         "models.VacancyResponses": {
             "type": "object",
             "properties": {
+                "is_active": {
+                    "type": "boolean"
+                },
+                "salary": {
+                    "type": "integer"
+                },
+                "vacancy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CreateVacancy"
+                    }
+                }
+            }
+        },
+        "models.VacancyUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "is_active": {
                     "type": "boolean"
                 },

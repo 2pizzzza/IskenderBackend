@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
-	"github.com/lib/pq"
 )
 
 func (db *DB) GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error) {
@@ -50,60 +49,88 @@ func (db *DB) GetAllActiveVacanciesByLanguage(ctx context.Context, languageCode 
 	return vacancies, nil
 }
 
-func (db *DB) UpdateVacancy(ctx context.Context, req models.VacancyResponse) error {
+func (db *DB) UpdateVacancy(ctx context.Context, req models.VacancyUpdateRequest) error {
 	const op = "postgres.UpdateVacancy"
 
 	var exists bool
 	checkVacancyQuery := `SELECT EXISTS(SELECT 1 FROM Vacancy WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkVacancyQuery, req.Id).Scan(&exists)
 	if err != nil {
-		return fmt.Errorf("%s %w", op, err)
+		return fmt.Errorf("%s: failed to check vacancy existence: %w", op, err)
 	}
 	if !exists {
-		return storage.ErrVacancyNotFound
+		return fmt.Errorf("%s: vacancy with id %d not found", op, req.Id)
 	}
 
-	var translationExists bool
-	checkTranslationQuery := `SELECT EXISTS(SELECT 1 FROM VacancyTranslation WHERE vacancy_id = $1 AND language_code = $2)`
-	err = db.Pool.QueryRow(ctx, checkTranslationQuery, req.Id, req.LanguageCode).Scan(&translationExists)
-	if err != nil {
-		return fmt.Errorf("%s: failed to check vacancy translation existence: %w", op, err)
+	if len(req.Vacancy) != 3 {
+		return fmt.Errorf("%s: all translations for vacancy must be provided (3 languages required)", op)
 	}
-	if !translationExists {
-		return storage.ErrVacancyTranslationNotFound
+	languageCodes := map[string]bool{"ru": false, "kgz": false, "en": false}
+	for _, translation := range req.Vacancy {
+		if _, ok := languageCodes[translation.LanguageCode]; !ok {
+			return fmt.Errorf("%s: invalid language code %s", op, translation.LanguageCode)
+		}
+		languageCodes[translation.LanguageCode] = true
 	}
 
 	tx, err := db.Pool.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("%s  %w", op, err)
+		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
 	}
 	defer tx.Rollback(ctx)
 
 	updateVacancyQuery := `
-		UPDATE Vacancy SET isActive = $1, salary = $2 WHERE id = $3`
-	_, err = tx.Exec(ctx, updateVacancyQuery, req.IsActive, req.Salary, req.Id)
+		UPDATE Vacancy
+		SET salary = $1, isActive = $2
+		WHERE id = $3
+	`
+	_, err = tx.Exec(ctx, updateVacancyQuery, req.Salary, req.IsActive, req.Id)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update vacancy: %w", op, err)
 	}
 
 	updateTranslationQuery := `
-		UPDATE VacancyTranslation 
+		UPDATE VacancyTranslation
 		SET title = $1, requirements = $2, responsibilities = $3, conditions = $4, information = $5
-		WHERE vacancy_id = $6 AND language_code = $7`
-	_, err = tx.Exec(ctx, updateTranslationQuery,
-		req.Title,
-		// Передаем массивы строк
-		pq.Array(req.Requirements),
-		pq.Array(req.Responsibilities),
-		pq.Array(req.Conditions),
-		pq.Array(req.Information),
-		req.Id, req.LanguageCode)
-	if err != nil {
-		return fmt.Errorf("%s: failed to update vacancy translation: %w", op, err)
+		WHERE vacancy_id = $6 AND language_code = $7
+	`
+	insertTranslationQuery := `
+		INSERT INTO VacancyTranslation (vacancy_id, language_code, title, requirements, responsibilities, conditions, information)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+	for _, translation := range req.Vacancy {
+		result, err := tx.Exec(ctx, updateTranslationQuery,
+			translation.Title,
+			translation.Requirements,
+			translation.Responsibilities,
+			translation.Conditions,
+			translation.Information,
+			req.Id,
+			translation.LanguageCode,
+		)
+		if err != nil {
+			return fmt.Errorf("%s: failed to update translation for language %s: %w", op, translation.LanguageCode, err)
+		}
+
+		rowsAffected := result.RowsAffected()
+		if rowsAffected == 0 {
+			_, err = tx.Exec(ctx, insertTranslationQuery,
+				req.Id,
+				translation.LanguageCode,
+				translation.Title,
+				translation.Requirements,
+				translation.Responsibilities,
+				translation.Conditions,
+				translation.Information,
+			)
+			if err != nil {
+				return fmt.Errorf("%s: failed to insert translation for language %s: %w", op, translation.LanguageCode, err)
+			}
+		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("%s %w", op, err)
+		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}
 
 	return nil

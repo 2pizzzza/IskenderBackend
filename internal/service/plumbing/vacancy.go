@@ -30,7 +30,7 @@ func (pr *Plumping) GetAllActiveVacancyByLang(ctx context.Context, code string) 
 	return vacancy, nil
 }
 
-func (pr *Plumping) UpdateVacancy(ctx context.Context, token string, req models.VacancyResponse) error {
+func (pr *Plumping) UpdateVacancy(ctx context.Context, token string, req models.VacancyUpdateRequest) error {
 	const op = "service.UpdateVacancy"
 
 	log := pr.log.With(
@@ -49,9 +49,13 @@ func (pr *Plumping) UpdateVacancy(ctx context.Context, token string, req models.
 			log.Error("Vacancy not found", sl.Err(err))
 			return storage.ErrVacancyNotFound
 		}
-		if errors.Is(err, storage.ErrVacancyTranslationNotFound) {
-			log.Error("Translation not found", sl.Err(err))
-			return storage.ErrVacancyTranslationNotFound
+		if errors.Is(err, storage.ErrRequiredLanguage) {
+			log.Error("Required 3 languages", sl.Err(err))
+			return storage.ErrRequiredLanguage
+		}
+		if errors.Is(err, storage.ErrInvalidLanguageCode) {
+			log.Error("Required 3 languages kgz, ru, en", sl.Err(err))
+			return storage.ErrInvalidLanguageCode
 		}
 		log.Error("Failed to update brand", sl.Err(err))
 		return fmt.Errorf("%s, %w", op, err)
