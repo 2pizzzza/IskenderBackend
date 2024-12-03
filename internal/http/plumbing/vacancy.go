@@ -2,10 +2,12 @@ package plumbing
 
 import (
 	"errors"
+	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/2pizzzza/plumbing/internal/utils"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -261,4 +263,33 @@ func (s *Server) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteResponseBody(w, res, http.StatusCreated)
+}
+
+// SearchVacancy
+// @Description Retrieves
+// @Tags search
+// @Accept json
+// @Produce json
+// @Param  q  query  string  false  "Search query"
+// @Success 200 {object} models.VacancyResponse "Successfully retrieved vacancy"
+// @Failure 400 {object} models.ErrorMessage "Invalid or missing vacancy ID"
+// @Failure 404 {object} models.ErrorMessage "Vacancy not found"
+// @Failure 500 {object} models.ErrorMessage "Failed to get vacancy by ID"
+// @Router /searchVacancy [get]
+func (s *Server) SearchVacancy(w http.ResponseWriter, r *http.Request) {
+	searchQuery := r.URL.Query().Get("q")
+
+	decodedQuery, err := url.QueryUnescape(searchQuery)
+	if err != nil {
+		fmt.Println("Error decoding query:", err)
+	}
+
+	res, err := s.service.SearchVacancy(r.Context(), decodedQuery)
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed search vacancy"}, http.StatusInternalServerError)
+		return
+
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
 }

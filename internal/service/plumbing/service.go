@@ -33,6 +33,7 @@ type PlumpingRepository interface {
 	GetAllVacanciesByLanguage(ctx context.Context, languageCode string) ([]models.VacancyResponse, error)
 	GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error)
 	CreateVacancy(ctx context.Context, req *models.VacancyResponses) (*models.VacancyResponses, error)
+	SearchVacancies(ctx context.Context, query string) ([]models.VacancyResponse, error)
 
 	//Review
 	CreateReview(ctx context.Context, username string, rating int, text string) error

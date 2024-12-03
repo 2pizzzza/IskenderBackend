@@ -340,3 +340,115 @@ func (db *DB) CreateVacancy(ctx context.Context, req *models.VacancyResponses) (
 
 	return response, nil
 }
+
+func (db *DB) SearchVacancies(ctx context.Context, query string) ([]models.VacancyResponse, error) {
+	const op = "postgres.SearchVacancies"
+
+	getVacancyIdsQuery := `
+		SELECT 
+			vacancy_id
+		FROM 
+			VacancyTranslation
+		WHERE 
+			language_code = 'ru' 
+		  AND title ILIKE $1 
+	`
+
+	rows, err := db.Pool.Query(ctx, getVacancyIdsQuery, "%"+query+"%")
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get vacancy IDs: %w", op, err)
+	}
+	defer rows.Close()
+
+	var vacancyIds []int
+	for rows.Next() {
+		var vacancyId int
+		if err := rows.Scan(&vacancyId); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan vacancy ID: %w", op, err)
+		}
+		vacancyIds = append(vacancyIds, vacancyId)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: rows iteration error: %w", op, err)
+	}
+
+	if len(vacancyIds) == 0 {
+		return []models.VacancyResponse{}, nil
+	}
+
+	getVacanciesQuery := `
+		SELECT 
+			id, isActive, salary
+		FROM 
+			Vacancy
+		WHERE 
+			id = ANY($1)
+	`
+
+	rows, err = db.Pool.Query(ctx, getVacanciesQuery, vacancyIds)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get vacancies: %w", op, err)
+	}
+	defer rows.Close()
+
+	vacancyMap := make(map[int]*models.VacancyResponse)
+	for rows.Next() {
+		var id int
+		var isActive bool
+		var salary int
+		if err := rows.Scan(&id, &isActive, &salary); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan vacancy: %w", op, err)
+		}
+		vacancyMap[id] = &models.VacancyResponse{
+			Id:       id,
+			IsActive: isActive,
+			Salary:   salary,
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: rows iteration error: %w", op, err)
+	}
+
+	getTranslationsQuery := `
+		SELECT 
+			vacancy_id, title, requirements, responsibilities, conditions, information
+		FROM 
+			VacancyTranslation
+		WHERE 
+			language_code = 'ru' AND vacancy_id = ANY($1)
+	`
+
+	rows, err = db.Pool.Query(ctx, getTranslationsQuery, vacancyIds)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to get translations: %w", op, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		var title string
+		var requirements, responsibilities, conditions, information []string
+		if err := rows.Scan(&id, &title, &requirements, &responsibilities, &conditions, &information); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan translation: %w", op, err)
+		}
+
+		if vacancy, ok := vacancyMap[id]; ok {
+			vacancy.LanguageCode = "ru"
+			vacancy.Title = title
+			vacancy.Requirements = requirements
+			vacancy.Responsibilities = responsibilities
+			vacancy.Conditions = conditions
+			vacancy.Information = information
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: rows iteration error: %w", op, err)
+	}
+
+	var result []models.VacancyResponse
+	for _, vacancy := range vacancyMap {
+		result = append(result, *vacancy)
+	}
+
+	return result, nil
+}

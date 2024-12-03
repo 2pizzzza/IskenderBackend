@@ -162,3 +162,19 @@ func (pr *Plumping) CreateVacancy(ctx context.Context, token string, req *models
 
 	return vacancy, nil
 }
+
+func (pr Plumping) SearchVacancy(ctx context.Context, query string) ([]models.VacancyResponse, error) {
+	const op = "service.GetVacancyById"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	vacancy, err := pr.plumpingRepository.SearchVacancies(ctx, query)
+	if err != nil {
+		log.Error("Failed to get brand", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	return vacancy, nil
+}

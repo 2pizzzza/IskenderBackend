@@ -2056,6 +2056,37 @@ paths:
         and search query
       tags:
       - search
+  /searchVacancy:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves
+      parameters:
+      - description: Search query
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved vacancy
+          schema:
+            $ref: '#/definitions/models.VacancyResponse'
+        "400":
+          description: Invalid or missing vacancy ID
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "404":
+          description: Vacancy not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Failed to get vacancy by ID
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      tags:
+      - search
   /starter:
     post:
       consumes:

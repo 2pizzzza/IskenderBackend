@@ -2242,6 +2242,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/searchVacancy": {
+            "get": {
+                "description": "Retrieves",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved vacancy",
+                        "schema": {
+                            "$ref": "#/definitions/models.VacancyResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing vacancy ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "404": {
+                        "description": "Vacancy not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get vacancy by ID",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/starter": {
             "post": {
                 "description": "Starts the service, potentially creating necessary data or performing required tasks.",

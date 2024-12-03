@@ -25,6 +25,7 @@ type Service interface {
 	GetAllVacancyByLang(ctx context.Context, code string) ([]models.VacancyResponse, error)
 	GetVacancyById(ctx context.Context, id int) (*models.VacancyResponses, error)
 	CreateVacancy(ctx context.Context, token string, req *models.VacancyResponses) (*models.VacancyResponses, error)
+	SearchVacancy(ctx context.Context, query string) ([]models.VacancyResponse, error)
 
 	//Brand
 	CreateBrand(ctx context.Context, token string, req *models.BrandRequest) (*models.BrandResponse, error)
@@ -111,6 +112,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /vacancy", s.UpdateVacancy)
 	mux.HandleFunc("GET /vacancies", s.GetAllVacancy)
 	mux.HandleFunc("GET /vacancy", s.GetVacancyById)
+	mux.HandleFunc("GET /searchVacancy", s.SearchVacancy)
 	mux.HandleFunc("POST /vacancy", s.CreateVacancy)
 
 	//Brand
