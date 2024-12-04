@@ -57,9 +57,11 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: 22
           script: |
-            cd /var/www/IskenderBackend
+            cd /var/www/backend
             git pull
-            systemctl restart backend.service
+            go build cmd/plumbing/main.go
+            systemctl daemon-reload
+            systemctl restart garant-backend.service
       - name: Update deployment Status (success)
         if: success()
         uses: chrnorm/deployment-status@v2

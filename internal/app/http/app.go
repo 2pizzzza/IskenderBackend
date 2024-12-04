@@ -23,7 +23,7 @@ func New(log *slog.Logger, host string, port int, app *plumbingRouters.Server, a
 	mux := http.NewServeMux()
 
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
+		AllowedOrigins:   []string{"*", "http://64.176.71.25:5174", "http://127.0.0.1:5173/", "http://garant-asia.com", "http://64.176.71.25:8081/"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"*"},
 		ExposedHeaders:   []string{"Content-Length"},
