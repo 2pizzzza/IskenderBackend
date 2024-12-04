@@ -12,7 +12,7 @@ import (
 func (db *DB) CreateBrand(ctx context.Context, name, url string) (*models.BrandResponse, error) {
 	const op = "postgres.CreateBrand"
 
-	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+	baseURL := fmt.Sprintf("http://%s:%d/api", db.Config.HttpHost, db.Config.HttpPort)
 
 	var exists bool
 	checkBrandQuery := `SELECT EXISTS(SELECT 1 FROM Brand WHERE name = $1)`
@@ -49,7 +49,7 @@ func (db *DB) GetAllBrand(ctx context.Context) ([]*models.BrandResponse, error) 
 		return nil, fmt.Errorf("%s: failed to query brands: %w", op, err)
 	}
 	defer rows.Close()
-	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+	baseURL := fmt.Sprintf("http://%s:%d/api", db.Config.HttpHost, db.Config.HttpPort)
 
 	var brands []*models.BrandResponse
 	for rows.Next() {
@@ -96,7 +96,7 @@ func (db *DB) UpdateBrand(ctx context.Context, id int, name, url string) (*model
 	var exists bool
 	checkBrandQuery := `SELECT EXISTS(SELECT 1 FROM Brand WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkBrandQuery, id).Scan(&exists)
-	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+	baseURL := fmt.Sprintf("http://%s:%d/api", db.Config.HttpHost, db.Config.HttpPort)
 
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to check brand existence: %w", op, err)
@@ -120,7 +120,7 @@ func (db *DB) UpdateBrand(ctx context.Context, id int, name, url string) (*model
 func (db *DB) GetBrandByID(ctx context.Context, id int) (*models.BrandResponse, error) {
 	const op = "postgres.GetBrandByID"
 
-	baseURL := fmt.Sprintf("http://%s:%d", db.Config.HttpHost, db.Config.HttpPort)
+	baseURL := fmt.Sprintf("http://%s:%d/api", db.Config.HttpHost, db.Config.HttpPort)
 
 	var brand models.BrandResponse
 	query := `SELECT id, name, url FROM Brand WHERE id = $1`

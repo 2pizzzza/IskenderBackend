@@ -18,7 +18,7 @@ import (
 // @Success 201 "User successfully registered"
 // @Failure 400 {object} models.ErrorMessage "Invalid input"
 // @Failure 500 {object} models.ErrorMessage "Could not register"
-// @Router /register [post]
+// @Router /api/register [post]
 func (h *Server) Register(w http.ResponseWriter, r *http.Request) {
 	var req models.UserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -45,7 +45,7 @@ func (h *Server) Register(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} models.Token "Successful login with JWT token"
 // @Failure 400 {object} models.ErrorMessage "Invalid input"
 // @Failure 401 {object} models.ErrorMessage "Could not login"
-// @Router /login [post]
+// @Router /api/login [post]
 func (h *Server) Login(w http.ResponseWriter, r *http.Request) {
 	var req models.UserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

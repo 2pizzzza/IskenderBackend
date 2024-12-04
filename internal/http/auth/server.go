@@ -24,6 +24,6 @@ func New(log *slog.Logger, service Service) *Server {
 }
 
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /register", s.Register)
-	mux.HandleFunc("POST /login", s.Login)
+	mux.HandleFunc("POST /api/register", s.Register)
+	mux.HandleFunc("POST /api/login", s.Login)
 }
