@@ -20,7 +20,7 @@ import (
 // @Success 200 {object} models.ErrorMessage "Successfully created"
 // @Failure 400 {object} models.ErrorMessage "already exists"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /starter [post]
+// @Router /api/starter [post]
 func (s *Server) Starter(w http.ResponseWriter, r *http.Request) {
 
 	err := s.service.Starter(r.Context())

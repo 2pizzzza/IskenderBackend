@@ -22,7 +22,7 @@ import (
 // @Failure 400 {object} models.ErrorMessage "Missing language code"
 // @Failure 404 {object} models.ErrorMessage "Language code not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /category [get]
+// @Router /api/category [get]
 func (s *Server) GetAllCategoriesByCode(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("lang")
 	if code == "" {
@@ -58,7 +58,7 @@ func (s *Server) GetAllCategoriesByCode(w http.ResponseWriter, r *http.Request) 
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to create category"
-// @Router /category [post]
+// @Router /api/category [post]
 func (s *Server) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -112,7 +112,7 @@ func (s *Server) CreateCategory(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to remove category"
-// @Router /category [delete]
+// @Router /api/category [delete]
 func (s *Server) RemoveCategory(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -164,7 +164,7 @@ func (s *Server) RemoveCategory(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to update category"
-// @Router /category [put]
+// @Router /api/category [put]
 func (s *Server) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -221,7 +221,7 @@ func (s *Server) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid or missing category ID"
 // @Failure 404 {object} models.ErrorMessage "Category not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /category/by/id [get]
+// @Router /api/category/by/id [get]
 func (s *Server) GetCategoryById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("category_id")
 	if idStr == "" {

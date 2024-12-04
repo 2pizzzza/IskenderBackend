@@ -17,7 +17,7 @@ import (
 // @Param  lang  query  string  true  "Language code"
 // @Success 200 {array} models.Discount "List of discounts"
 // @Failure 500 {object} models.ErrorMessage "Failed to get all discounts"
-// @Router /discounts [get]
+// @Router /api/discounts [get]
 func (s Server) GetAllDiscount(w http.ResponseWriter, r *http.Request) {
 	s.log.Info("Get all discount")
 	code := r.URL.Query().Get("lang")
@@ -51,7 +51,7 @@ func (s Server) GetAllDiscount(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid request or discount already exists"
 // @Failure 401 {object} models.ErrorMessage "Unauthorized or invalid token"
 // @Failure 500 {object} models.ErrorMessage "Failed to create discount"
-// @Router /discount [post]
+// @Router /api/discount [post]
 func (s *Server) CreateDiscount(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -95,7 +95,7 @@ func (s *Server) CreateDiscount(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid request or discount already exists"
 // @Failure 401 {object} models.ErrorMessage "Unauthorized or invalid token"
 // @Failure 500 {object} models.ErrorMessage "Failed to create discount"
-// @Router /discount [delete]
+// @Router /api/discount [delete]
 func (s *Server) RemoveDiscount(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {

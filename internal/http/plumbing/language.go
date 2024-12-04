@@ -14,7 +14,7 @@ import (
 // @Produce  json
 // @Success 200 {array} models.Language "List of languages"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /languages [get]
+// @Router /api/languages [get]
 func (s *Server) GetAllLanguages(w http.ResponseWriter, r *http.Request) {
 	s.log.Info("Get All Languages")
 

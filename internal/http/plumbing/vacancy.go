@@ -22,7 +22,7 @@ import (
 // @Success 200 {array} models.VacancyResponse "Successfully retrieved vacancies"
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid language parameter"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /vacancies/activ [get]
+// @Router /api/vacancies/activ [get]
 func (s *Server) GetAllVacancyActive(w http.ResponseWriter, r *http.Request) {
 	lang := r.URL.Query().Get("lang")
 	if lang == "" {
@@ -52,7 +52,7 @@ func (s *Server) GetAllVacancyActive(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid token format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /vacancy [delete]
+// @Router /api/vacancy [delete]
 func (s *Server) RemoveVacancy(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -102,7 +102,7 @@ func (s *Server) RemoveVacancy(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid token format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /vacancy [put]
+// @Router /api/vacancy [put]
 func (s *Server) UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -157,7 +157,7 @@ func (s *Server) UpdateVacancy(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} models.VacancyResponse "Successfully retrieved vacancies"
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid language parameter"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /vacancies [get]
+// @Router /api/vacancies [get]
 func (s *Server) GetAllVacancy(w http.ResponseWriter, r *http.Request) {
 	lang := r.URL.Query().Get("lang")
 	if lang == "" {
@@ -185,7 +185,7 @@ func (s *Server) GetAllVacancy(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid or missing vacancy ID"
 // @Failure 404 {object} models.ErrorMessage "Vacancy not found"
 // @Failure 500 {object} models.ErrorMessage "Failed to get vacancy by ID"
-// @Router /vacancy [get]
+// @Router /api/vacancy [get]
 func (s *Server) GetVacancyById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("vacancy_id")
 	if idStr == "" {
@@ -225,7 +225,7 @@ func (s *Server) GetVacancyById(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Unauthorized"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to create vacancy"
-// @Router /vacancy [post]
+// @Router /api/vacancy [post]
 func (s *Server) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -275,7 +275,7 @@ func (s *Server) CreateVacancy(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid or missing vacancy ID"
 // @Failure 404 {object} models.ErrorMessage "Vacancy not found"
 // @Failure 500 {object} models.ErrorMessage "Failed to get vacancy by ID"
-// @Router /searchVacancy [get]
+// @Router /api/searchVacancy [get]
 func (s *Server) SearchVacancy(w http.ResponseWriter, r *http.Request) {
 	searchQuery := r.URL.Query().Get("q")
 

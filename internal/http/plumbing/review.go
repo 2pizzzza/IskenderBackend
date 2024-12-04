@@ -13,7 +13,7 @@ import (
 // @Produce  json
 // @Success 200 {array} models.ReviewResponse "List of reviews"
 // @Failure 500 {object} models.ErrorMessage "Failed to get reviews"
-// @Router /reviews [get]
+// @Router /api/reviews [get]
 func (s *Server) GetAllReviews(w http.ResponseWriter, r *http.Request) {
 	s.log.Info("Get all review")
 
@@ -36,7 +36,7 @@ func (s *Server) GetAllReviews(w http.ResponseWriter, r *http.Request) {
 // @Success 201 {object} models.Message "Successfully created review"
 // @Failure 400 {object} models.ErrorMessage "Invalid request body"
 // @Failure 500 {object} models.ErrorMessage "Failed to create review"
-// @Router /reviews [post]
+// @Router /api/reviews [post]
 func (s *Server) CreateReview(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateReviewRequest
 	if err := utils.ReadRequestBody(r, &req); err != nil {

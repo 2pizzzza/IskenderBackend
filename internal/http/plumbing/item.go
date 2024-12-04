@@ -25,7 +25,7 @@ import (
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Category not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /items [get]
+// @Router /api/items [get]
 func (s *Server) GetItemsByCategoryId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("category_id")
 	lang := r.URL.Query().Get("lang")
@@ -71,7 +71,7 @@ func (s *Server) GetItemsByCategoryId(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Item not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /item [get]
+// @Router /api/item [get]
 func (s *Server) GetItemsById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("item_id")
 	lang := r.URL.Query().Get("lang")
@@ -118,7 +118,7 @@ func (s *Server) GetItemsById(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /items/collection [get]
+// @Router /api/items/collection [get]
 func (s *Server) GetItemsByCollectionId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("collection_id")
 	lang := r.URL.Query().Get("lang")
@@ -165,7 +165,7 @@ func (s *Server) GetItemsByCollectionId(w http.ResponseWriter, r *http.Request) 
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /items/rec [get]
+// @Router /api/items/rec [get]
 func (s *Server) GetItemsRec(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("item_id")
 	lang := r.URL.Query().Get("lang")
@@ -210,7 +210,7 @@ func (s *Server) GetItemsRec(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid request data or item already exists"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to create item"
-// @Router /items [post]
+// @Router /api/items [post]
 func (s *Server) CreateItem(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid form-data"}, http.StatusBadRequest)
@@ -297,7 +297,7 @@ func (s *Server) CreateItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Failed to update collection"
-// @Router /items [put]
+// @Router /api/items [put]
 func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -404,7 +404,7 @@ func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Unauthorized or invalid token"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to remove item"
-// @Router /items [delete]
+// @Router /api/items [delete]
 func (s *Server) RemoveItem(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -452,7 +452,7 @@ func (s *Server) RemoveItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /getItemById [get]
+// @Router /api/getItemById [get]
 func (s *Server) GetItemId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("item_id")
 	if idStr == "" {
@@ -486,7 +486,7 @@ func (s *Server) GetItemId(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Success 200 {array} models.ItemResponses "Successfully retrieved all items"
 // @Failure 500 {object} models.ErrorMessage "Failed to get items"
-// @Router /getAllItems [get]
+// @Router /api/getAllItems [get]
 func (s *Server) GetAllItems(w http.ResponseWriter, r *http.Request) {
 	s.log.Info("Get all review")
 

@@ -23,7 +23,7 @@ import (
 // @Success 200 {array} models.CollectionResponse "List of collections"
 // @Failure 400 {object} models.ErrorMessage "Missing language code"
 // @Failure 500 {object} models.ErrorMessage "Failed to get collections"
-// @Router /collections [get]
+// @Router /api/collections [get]
 func (s *Server) GetCollectionsByCategoryId(w http.ResponseWriter, r *http.Request) {
 	lang := r.URL.Query().Get("lang")
 	if lang == "" {
@@ -55,7 +55,7 @@ func (s *Server) GetCollectionsByCategoryId(w http.ResponseWriter, r *http.Reque
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /collection [get]
+// @Router /api/collection [get]
 func (s *Server) GetCollectionById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("collection_id")
 	lang := r.URL.Query().Get("lang")
@@ -102,7 +102,7 @@ func (s *Server) GetCollectionById(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to remove collection"
-// @Router /collection [delete]
+// @Router /api/collection [delete]
 func (s *Server) RemoveCollection(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -149,7 +149,7 @@ func (s *Server) RemoveCollection(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} models.CollectionResponse "List of collections"
 // @Failure 400 {object} models.ErrorMessage "Missing language code"
 // @Failure 500 {object} models.ErrorMessage "Failed to get collections"
-// @Router /collections/rec [get]
+// @Router /api/collections/rec [get]
 func (s *Server) GetCollectionsRec(w http.ResponseWriter, r *http.Request) {
 	lang := r.URL.Query().Get("lang")
 	if lang == "" {
@@ -179,7 +179,7 @@ func (s *Server) GetCollectionsRec(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} models.CollectionResponse "List of collections"
 // @Failure 400 {object} models.ErrorMessage "Missing language code"
 // @Failure 500 {object} models.ErrorMessage "Failed to get collections"
-// @Router /collections [get]
+// @Router /api/collections [get]
 func (s *Server) GetCollectionsStandart(w http.ResponseWriter, r *http.Request) {
 	lang := r.URL.Query().Get("lang")
 	if lang == "" {
@@ -209,7 +209,7 @@ func (s *Server) GetCollectionsStandart(w http.ResponseWriter, r *http.Request) 
 // @Success 200 {array} models.CollectionResponse "List of collections"
 // @Failure 400 {object} models.ErrorMessage "Missing language code"
 // @Failure 500 {object} models.ErrorMessage "Failed to get collections"
-// @Router /collections [get]
+// @Router /api/collections [get]
 func (s *Server) GetCollectionsByPainted(w http.ResponseWriter, r *http.Request) {
 	lang := r.URL.Query().Get("lang")
 	if lang == "" {
@@ -243,7 +243,7 @@ func (s *Server) GetCollectionsByPainted(w http.ResponseWriter, r *http.Request)
 // @Failure 400 {object} models.ErrorMessage "Invalid request data or collection already exists"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Failed to create collection"
-// @Router /collection [post]
+// @Router /api/collection [post]
 func (s *Server) CreateCollection(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid form-data"}, http.StatusBadRequest)
@@ -330,7 +330,7 @@ func (s *Server) CreateCollection(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Failed to update collection"
-// @Router /collections [put]
+// @Router /api/collections [put]
 func (s *Server) UpdateCollection(w http.ResponseWriter, r *http.Request) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -431,7 +431,7 @@ func (s *Server) UpdateCollection(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Success 200 {array} models.CollectionResponses "Successfully retrieved all collections"
 // @Failure 500 {object} models.ErrorMessage "Failed to get collections"
-// @Router /getAllCollection [get]
+// @Router /api/getAllCollection [get]
 func (s *Server) GetAllCollection(w http.ResponseWriter, r *http.Request) {
 	s.log.Info("Get all review")
 
@@ -455,7 +455,7 @@ func (s *Server) GetAllCollection(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid parameters"
 // @Failure 404 {object} models.ErrorMessage "Collection not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /getCollectionById [get]
+// @Router /api/getCollectionById [get]
 func (s *Server) GetCollectionId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("collection_id")
 	if idStr == "" {

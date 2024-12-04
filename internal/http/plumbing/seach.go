@@ -27,7 +27,7 @@ import (
 // @Param  q  query  string  false  "Search query"
 // @Failure 400 {object} models.ErrorMessage "Bad request - invalid query parameters"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /search [get]
+// @Router /api/search [get]
 func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.Search"
 	log := s.log.With(
@@ -119,7 +119,7 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 // @Param  q  query  string  false  "Search query"
 // @Failure 400 {object} models.ErrorMessage "Bad request - invalid query parameters"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /searchCollections [get]
+// @Router /api/searchCollections [get]
 func (s *Server) SearchCollections(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.Search"
 	log := s.log.With(
@@ -211,7 +211,7 @@ func (s *Server) SearchCollections(w http.ResponseWriter, r *http.Request) {
 // @Param  q  query  string  false  "Search query"
 // @Failure 400 {object} models.ErrorMessage "Bad request - invalid query parameters"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /searchItems [get]
+// @Router /api/searchItems [get]
 func (s *Server) SearchItems(w http.ResponseWriter, r *http.Request) {
 	const op = "handler.Search"
 	log := s.log.With(

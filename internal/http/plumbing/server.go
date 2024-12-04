@@ -99,76 +99,76 @@ func New(log *slog.Logger, service Service) *Server {
 
 func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Starter
-	mux.HandleFunc("POST /starter", s.Starter)
+	mux.HandleFunc("POST /api/starter", s.Starter)
 
 	//Discount
-	mux.HandleFunc("GET /discounts", s.GetAllDiscount)
-	mux.HandleFunc("POST /discount", s.CreateDiscount)
-	mux.HandleFunc("DELETE /discount", s.RemoveDiscount)
+	mux.HandleFunc("GET /api/discounts", s.GetAllDiscount)
+	mux.HandleFunc("POST /api/discount", s.CreateDiscount)
+	mux.HandleFunc("DELETE /api/discount", s.RemoveDiscount)
 
 	//Vacancy
-	mux.HandleFunc("GET /vacancies/activ", s.GetAllVacancyActive)
-	mux.HandleFunc("DELETE /vacancy", s.RemoveVacancy)
-	mux.HandleFunc("PUT /vacancy", s.UpdateVacancy)
-	mux.HandleFunc("GET /vacancies", s.GetAllVacancy)
-	mux.HandleFunc("GET /vacancy", s.GetVacancyById)
-	mux.HandleFunc("GET /searchVacancy", s.SearchVacancy)
-	mux.HandleFunc("POST /vacancy", s.CreateVacancy)
+	mux.HandleFunc("GET /api/vacancies/activ", s.GetAllVacancyActive)
+	mux.HandleFunc("DELETE /api/vacancy", s.RemoveVacancy)
+	mux.HandleFunc("PUT /api/vacancy", s.UpdateVacancy)
+	mux.HandleFunc("GET /api/vacancies", s.GetAllVacancy)
+	mux.HandleFunc("GET /api/vacancy", s.GetVacancyById)
+	mux.HandleFunc("GET /api/searchVacancy", s.SearchVacancy)
+	mux.HandleFunc("POST /api/vacancy", s.CreateVacancy)
 
 	//Brand
-	mux.HandleFunc("GET /brands", s.GetAllBrands)
-	mux.HandleFunc("POST /brand", s.CreateBrand)
-	mux.HandleFunc("DELETE /brand", s.RemoveBrand)
-	mux.HandleFunc("PUT /brand", s.UpdateBrand)
-	mux.HandleFunc("GET /brand", s.GetBrandById)
+	mux.HandleFunc("GET /api/brands", s.GetAllBrands)
+	mux.HandleFunc("POST /api/brand", s.CreateBrand)
+	mux.HandleFunc("DELETE /api/brand", s.RemoveBrand)
+	mux.HandleFunc("PUT /api/brand", s.UpdateBrand)
+	mux.HandleFunc("GET /api/brand", s.GetBrandById)
 
 	//Review
-	mux.HandleFunc("GET /reviews", s.GetAllReviews)
-	mux.HandleFunc("POST /reviews", s.CreateReview)
+	mux.HandleFunc("GET /api/reviews", s.GetAllReviews)
+	mux.HandleFunc("POST /api/reviews", s.CreateReview)
 
 	//Language
-	mux.HandleFunc("GET /languages", s.GetAllLanguages)
+	mux.HandleFunc("GET /api/languages", s.GetAllLanguages)
 
 	//Category
-	mux.HandleFunc("GET /category", s.GetAllCategoriesByCode)
-	mux.HandleFunc("POST /category", s.CreateCategory)
-	mux.HandleFunc("PUT /category", s.UpdateCategory)
-	mux.HandleFunc("DELETE /category", s.RemoveCategory)
-	mux.HandleFunc("GET /category/by/id", s.GetCategoryById)
+	mux.HandleFunc("GET /api/category", s.GetAllCategoriesByCode)
+	mux.HandleFunc("POST /api/category", s.CreateCategory)
+	mux.HandleFunc("PUT /api/category", s.UpdateCategory)
+	mux.HandleFunc("DELETE /api/category", s.RemoveCategory)
+	mux.HandleFunc("GET /api/category/by/id", s.GetCategoryById)
 
 	//Collection
-	mux.HandleFunc("GET /collections", s.GetCollectionsByCategoryId)
-	mux.HandleFunc("GET /collection", s.GetCollectionById)
-	mux.HandleFunc("DELETE /collection", s.RemoveCollection)
-	mux.HandleFunc("GET /collections/rec", s.GetCollectionsRec)
-	mux.HandleFunc("GET /collections/standart", s.GetCollectionsStandart)
-	mux.HandleFunc("GET /collections/painted", s.GetCollectionsByPainted)
-	mux.HandleFunc("POST /collection", s.CreateCollection)
-	mux.HandleFunc("PUT /collection", s.UpdateCollection)
-	mux.HandleFunc("GET /getAllCollection", s.GetAllCollection)
-	mux.HandleFunc("GET /getCollectionById", s.GetCollectionId)
+	mux.HandleFunc("GET /api/collections", s.GetCollectionsByCategoryId)
+	mux.HandleFunc("GET /api/collection", s.GetCollectionById)
+	mux.HandleFunc("DELETE /api/collection", s.RemoveCollection)
+	mux.HandleFunc("GET /api/collections/rec", s.GetCollectionsRec)
+	mux.HandleFunc("GET /api/collections/standart", s.GetCollectionsStandart)
+	mux.HandleFunc("GET /api/collections/painted", s.GetCollectionsByPainted)
+	mux.HandleFunc("POST /api/collection", s.CreateCollection)
+	mux.HandleFunc("PUT /api/collection", s.UpdateCollection)
+	mux.HandleFunc("GET /api/getAllCollection", s.GetAllCollection)
+	mux.HandleFunc("GET /api/getCollectionById", s.GetCollectionId)
 
 	//Popular and New
-	mux.HandleFunc("GET /popular", s.GetPopular)
-	mux.HandleFunc("GET /new", s.GetNew)
+	mux.HandleFunc("GET /api/popular", s.GetPopular)
+	mux.HandleFunc("GET /api/new", s.GetNew)
 
 	//Item
-	mux.HandleFunc("GET /items", s.GetItemsByCategoryId)
-	mux.HandleFunc("GET /item", s.GetItemsById)
-	mux.HandleFunc("GET /items/collection", s.GetItemsByCollectionId)
-	mux.HandleFunc("GET /items/rec", s.GetItemsRec)
-	mux.HandleFunc("POST /items", s.CreateItem)
-	mux.HandleFunc("PUT /items", s.UpdateItem)
-	mux.HandleFunc("DELETE /items", s.RemoveItem)
-	mux.HandleFunc("GET /getAllItems", s.GetAllItems)
-	mux.HandleFunc("GET /getItemById", s.GetItemId)
+	mux.HandleFunc("GET /api/items", s.GetItemsByCategoryId)
+	mux.HandleFunc("GET /api/item", s.GetItemsById)
+	mux.HandleFunc("GET /api/items/collection", s.GetItemsByCollectionId)
+	mux.HandleFunc("GET /api/items/rec", s.GetItemsRec)
+	mux.HandleFunc("POST /api/items", s.CreateItem)
+	mux.HandleFunc("PUT /api/items", s.UpdateItem)
+	mux.HandleFunc("DELETE /api/items", s.RemoveItem)
+	mux.HandleFunc("GET /api/getAllItems", s.GetAllItems)
+	mux.HandleFunc("GET /api/getItemById", s.GetItemId)
 
 	//Search
-	mux.HandleFunc("GET /search", s.Search)
-	mux.HandleFunc("GET /searchItems", s.SearchItems)
-	mux.HandleFunc("GET /searchCollections", s.SearchCollections)
+	mux.HandleFunc("GET /api/search", s.Search)
+	mux.HandleFunc("GET /api/searchItems", s.SearchItems)
+	mux.HandleFunc("GET /api/searchCollections", s.SearchCollections)
 
 	//Photo
-	mux.HandleFunc("GET /media/images/", s.GetImage)
+	mux.HandleFunc("GET /api/media/images/", s.GetImage)
 
 }

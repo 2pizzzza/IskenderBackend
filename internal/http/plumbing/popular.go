@@ -17,7 +17,7 @@ import (
 // @Success 200 {object} models.PopularResponse "List of popular collections and items"
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid language parameter"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /popular [get]
+// @Router /api/popular [get]
 func (s *Server) GetPopular(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("lang")
 	if code == "" {
@@ -46,7 +46,7 @@ func (s *Server) GetPopular(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} models.PopularResponse "List of new collections and items"
 // @Failure 400 {object} models.ErrorMessage "Missing or invalid language parameter"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /new [get]
+// @Router /api/new [get]
 func (s *Server) GetNew(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("lang")
 	if code == "" {

@@ -32,7 +32,7 @@ const (
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid token format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /brand [post]
+// @Router /api/brand [post]
 func (s *Server) CreateBrand(w http.ResponseWriter, r *http.Request) {
 
 	authHeader := r.Header.Get("Authorization")
@@ -96,7 +96,7 @@ func (s *Server) CreateBrand(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Success 200 {array} models.BrandResponse "Successfully retrieved all brands"
 // @Failure 500 {object} models.ErrorMessage "Failed to get brands"
-// @Router /brands [get]
+// @Router /api/brands [get]
 func (s *Server) GetAllBrands(w http.ResponseWriter, r *http.Request) {
 	s.log.Info("Get all review")
 
@@ -122,7 +122,7 @@ func (s *Server) GetAllBrands(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} models.ErrorMessage "Token required or invalid token format"
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /brand [delete]
+// @Router /api/brand [delete]
 func (s *Server) RemoveBrand(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -175,7 +175,7 @@ func (s *Server) RemoveBrand(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 {object} models.ErrorMessage "Permissions denied"
 // @Failure 404 {object} models.ErrorMessage "Brand not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /brand [put]
+// @Router /api/brand [put]
 func (s *Server) UpdateBrand(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
@@ -243,7 +243,7 @@ func (s *Server) UpdateBrand(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorMessage "Invalid or missing brand ID"
 // @Failure 404 {object} models.ErrorMessage "Brand not found"
 // @Failure 500 {object} models.ErrorMessage "Internal server error"
-// @Router /brand [get]
+// @Router /api/brand [get]
 func (s *Server) GetBrandById(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("brand_id")
 	if idStr == "" {
