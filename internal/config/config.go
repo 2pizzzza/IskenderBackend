@@ -17,6 +17,7 @@ type Config struct {
 	Env        string
 	HttpHost   string
 	HttpPort   int
+	BaseUrl    string
 }
 
 func MustLoad() (db *Config, err error) {
@@ -34,6 +35,7 @@ func MustLoad() (db *Config, err error) {
 	env := os.Getenv("ENV")
 	httpHost := os.Getenv("HTTP_HOST")
 	httpPort, _ := strconv.Atoi(os.Getenv("HTTP_PORT"))
+	baseUrl := os.Getenv("BASE_URL")
 	log.Printf("Succses load env %s", pass)
 
 	return &Config{
@@ -45,5 +47,6 @@ func MustLoad() (db *Config, err error) {
 		Env:        env,
 		HttpHost:   httpHost,
 		HttpPort:   httpPort,
+		BaseUrl:    baseUrl,
 	}, nil
 }

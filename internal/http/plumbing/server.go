@@ -169,6 +169,6 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api/searchCollections", s.SearchCollections)
 
 	//Photo
-	mux.HandleFunc("GET /api/media/images/", s.GetImage)
+	mux.HandleFunc("GET /media/images/", s.GetImage)
 
 }
