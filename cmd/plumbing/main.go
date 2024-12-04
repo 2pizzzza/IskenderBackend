@@ -37,7 +37,7 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	log.Info("Starting Apllication", cfg.DBPort)
+	log.Info("Starting Apllication")
 
 	dir, err := getBaseDir()
 	if err != nil {
