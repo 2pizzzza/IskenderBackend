@@ -314,13 +314,13 @@ func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("item_id")
 	if idStr == "" {
-		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing Collection Id"}, http.StatusBadRequest)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing item Id"}, http.StatusBadRequest)
 		return
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection id"}, http.StatusBadRequest)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid item id"}, http.StatusBadRequest)
 		return
 	}
 
@@ -329,15 +329,16 @@ func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	itemData := r.FormValue("collection")
+	itemData := r.FormValue("item")
 	if itemData == "" {
-		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing collection data"}, http.StatusBadRequest)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Missing item data"}, http.StatusBadRequest)
 		return
 	}
 
-	var req models.CreateCollectionRequest
+	var req models.CreateItem
 	if err := json.Unmarshal([]byte(itemData), &req); err != nil {
-		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid collection data"}, http.StatusBadRequest)
+		s.log.Info("sjfdb", err)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid item data"}, http.StatusBadRequest)
 		return
 	}
 
@@ -370,25 +371,25 @@ func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 
 	req.Photos = photos
 
-	err = s.service.UpdateCollection(r.Context(), token, id, req)
+	err = s.service.UpdateItem(r.Context(), token, id, req)
 	if err != nil {
 		if errors.Is(err, storage.ErrToken) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Permissions denied"}, http.StatusForbidden)
 			return
 		}
-		if errors.Is(err, storage.ErrCollectionNotFound) {
-			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Collection not fount"}, http.StatusNotFound)
+		if errors.Is(err, storage.ErrItemNotFound) {
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Item not fount"}, http.StatusNotFound)
 			return
 		}
 		if errors.Is(err, storage.ErrRequiredLanguage) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Required 3 languages"}, http.StatusBadRequest)
 			return
 		}
-		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to create collection"}, http.StatusInternalServerError)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to create item"}, http.StatusInternalServerError)
 		return
 	}
 
-	utils.WriteResponseBody(w, models.Message{Message: "Successful update collection"}, http.StatusCreated)
+	utils.WriteResponseBody(w, models.Message{Message: "Successful update item"}, http.StatusCreated)
 }
 
 // RemoveItem godoc

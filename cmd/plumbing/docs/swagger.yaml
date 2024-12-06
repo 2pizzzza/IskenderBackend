@@ -244,6 +244,8 @@ definitions:
         type: array
       description:
         type: string
+      discount_id:
+        type: integer
       discount_percentage:
         type: number
       discount_type:
@@ -568,7 +570,7 @@ info:
   title: Swagger Plumbing API
   version: "1.0"
 paths:
-  /brand:
+  /api/brand:
     delete:
       consumes:
       - application/json
@@ -744,7 +746,7 @@ paths:
       summary: Updates a brand's information
       tags:
       - brand
-  /brands:
+  /api/brands:
     get:
       description: Retrieves a list of all available brands
       produces:
@@ -763,7 +765,7 @@ paths:
       summary: Get all brands
       tags:
       - brand
-  /category:
+  /api/category:
     delete:
       consumes:
       - application/json
@@ -933,7 +935,7 @@ paths:
       summary: Update a category
       tags:
       - categories
-  /category/by/id:
+  /api/category/by/id:
     get:
       consumes:
       - application/json
@@ -967,7 +969,7 @@ paths:
       summary: Get a category by ID
       tags:
       - categories
-  /collection:
+  /api/collection:
     delete:
       consumes:
       - application/json
@@ -1092,7 +1094,7 @@ paths:
       summary: Create a new collection
       tags:
       - collections
-  /collections:
+  /api/collections:
     get:
       consumes:
       - application/json
@@ -1186,7 +1188,7 @@ paths:
       summary: Update an existing collection
       tags:
       - collections
-  /collections/rec:
+  /api/collections/rec:
     get:
       consumes:
       - application/json
@@ -1217,7 +1219,7 @@ paths:
       summary: Retrieve collections recommendation by language code
       tags:
       - collections
-  /discount:
+  /api/discount:
     delete:
       consumes:
       - application/json
@@ -1294,7 +1296,7 @@ paths:
       summary: Create a new discount
       tags:
       - Discounts
-  /discounts:
+  /api/discounts:
     get:
       description: Retrieve a list of all available discounts.
       parameters:
@@ -1319,7 +1321,7 @@ paths:
       summary: Get all discounts
       tags:
       - Discounts
-  /getAllCollection:
+  /api/getAllCollection:
     get:
       description: Retrieves a list of all available collections
       produces:
@@ -1338,7 +1340,7 @@ paths:
       summary: Get all collections
       tags:
       - collections
-  /getAllItems:
+  /api/getAllItems:
     get:
       description: Retrieves a list of all available items
       produces:
@@ -1357,7 +1359,7 @@ paths:
       summary: Get all Items
       tags:
       - items
-  /getCollectionById:
+  /api/getCollectionById:
     get:
       consumes:
       - application/json
@@ -1390,7 +1392,7 @@ paths:
       summary: Retrieve a collection by ID and language code
       tags:
       - collections
-  /getItemById:
+  /api/getItemById:
     get:
       consumes:
       - application/json
@@ -1423,7 +1425,7 @@ paths:
       summary: Retrieve a item by ID and language code
       tags:
       - items
-  /item:
+  /api/item:
     get:
       consumes:
       - application/json
@@ -1461,7 +1463,7 @@ paths:
       summary: Retrieve an item by ID and language code
       tags:
       - items
-  /items:
+  /api/items:
     delete:
       consumes:
       - application/json
@@ -1651,7 +1653,7 @@ paths:
       summary: Update an existing item
       tags:
       - items
-  /items/collection:
+  /api/items/collection:
     get:
       consumes:
       - application/json
@@ -1691,7 +1693,7 @@ paths:
       summary: Retrieve items by collection ID and language code
       tags:
       - items
-  /items/rec:
+  /api/items/rec:
     get:
       consumes:
       - application/json
@@ -1731,7 +1733,7 @@ paths:
       summary: Retrieve items recommendation language code
       tags:
       - items
-  /languages:
+  /api/languages:
     get:
       consumes:
       - application/json
@@ -1752,7 +1754,7 @@ paths:
       summary: Retrieve all languages
       tags:
       - languages
-  /login:
+  /api/login:
     post:
       consumes:
       - application/json
@@ -1783,7 +1785,7 @@ paths:
       summary: User login
       tags:
       - auth
-  /new:
+  /api/new:
     get:
       consumes:
       - application/json
@@ -1812,7 +1814,7 @@ paths:
       summary: Retrieve new collections and items by language
       tags:
       - new
-  /popular:
+  /api/popular:
     get:
       consumes:
       - application/json
@@ -1842,7 +1844,7 @@ paths:
       summary: Retrieve popular collections and items by language
       tags:
       - popular
-  /register:
+  /api/register:
     post:
       consumes:
       - application/json
@@ -1870,7 +1872,7 @@ paths:
       summary: Register a new user
       tags:
       - auth
-  /reviews:
+  /api/reviews:
     get:
       description: Fetches all reviews from the database
       produces:
@@ -1918,7 +1920,7 @@ paths:
       summary: Create a new review
       tags:
       - reviews
-  /search:
+  /api/search:
     get:
       consumes:
       - application/json
@@ -1964,7 +1966,7 @@ paths:
         and search query
       tags:
       - search
-  /searchCollections:
+  /api/searchCollections:
     get:
       consumes:
       - application/json
@@ -2010,7 +2012,7 @@ paths:
         and search query
       tags:
       - search
-  /searchItems:
+  /api/searchItems:
     get:
       consumes:
       - application/json
@@ -2056,7 +2058,7 @@ paths:
         and search query
       tags:
       - search
-  /searchVacancy:
+  /api/searchVacancy:
     get:
       consumes:
       - application/json
@@ -2087,7 +2089,7 @@ paths:
             $ref: '#/definitions/models.ErrorMessage'
       tags:
       - search
-  /starter:
+  /api/starter:
     post:
       consumes:
       - application/json
@@ -2111,7 +2113,7 @@ paths:
       summary: Initialize the service or perform a start-up operation
       tags:
       - starter
-  /vacancies:
+  /api/vacancies:
     get:
       consumes:
       - application/json
@@ -2142,7 +2144,7 @@ paths:
       summary: Get all active vacancies
       tags:
       - vacancy
-  /vacancies/activ:
+  /api/vacancies/activ:
     get:
       consumes:
       - application/json
@@ -2174,7 +2176,7 @@ paths:
       summary: Get all active vacancies
       tags:
       - vacancy
-  /vacancy:
+  /api/vacancy:
     delete:
       consumes:
       - application/json

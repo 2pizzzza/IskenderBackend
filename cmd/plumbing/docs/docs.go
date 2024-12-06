@@ -23,7 +23,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/brand": {
+        "/api/brand": {
             "get": {
                 "description": "Retrieves the details of a brand using its ID from the query parameter",
                 "consumes": [
@@ -284,7 +284,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/brands": {
+        "/api/brands": {
             "get": {
                 "description": "Retrieves a list of all available brands",
                 "produces": [
@@ -313,7 +313,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/category": {
+        "/api/category": {
             "get": {
                 "description": "Returns a list of categories for a specified language code",
                 "consumes": [
@@ -565,7 +565,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/category/by/id": {
+        "/api/category/by/id": {
             "get": {
                 "description": "Retrieves the details of a category using its ID from the query parameter",
                 "consumes": [
@@ -615,7 +615,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/collection": {
+        "/api/collection": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
                 "consumes": [
@@ -801,7 +801,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/collections": {
+        "/api/collections": {
             "get": {
                 "description": "Returns a list of collections in the specified language for a category",
                 "consumes": [
@@ -941,7 +941,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/collections/rec": {
+        "/api/collections/rec": {
             "get": {
                 "description": "Returns a list of collections recommendation",
                 "consumes": [
@@ -988,7 +988,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/discount": {
+        "/api/discount": {
             "post": {
                 "description": "Create a new discount with the specified details.",
                 "consumes": [
@@ -1104,7 +1104,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/discounts": {
+        "/api/discounts": {
             "get": {
                 "description": "Retrieve a list of all available discounts.",
                 "produces": [
@@ -1142,7 +1142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/getAllCollection": {
+        "/api/getAllCollection": {
             "get": {
                 "description": "Retrieves a list of all available collections",
                 "produces": [
@@ -1171,7 +1171,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/getAllItems": {
+        "/api/getAllItems": {
             "get": {
                 "description": "Retrieves a list of all available items",
                 "produces": [
@@ -1200,7 +1200,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/getCollectionById": {
+        "/api/getCollectionById": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
                 "consumes": [
@@ -1250,7 +1250,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/getItemById": {
+        "/api/getItemById": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
                 "consumes": [
@@ -1300,7 +1300,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/item": {
+        "/api/item": {
             "get": {
                 "description": "Returns details of a specific item in the specified language",
                 "consumes": [
@@ -1357,7 +1357,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items": {
+        "/api/items": {
             "get": {
                 "description": "Returns a list of items in the specified language for a category",
                 "consumes": [
@@ -1639,7 +1639,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/collection": {
+        "/api/items/collection": {
             "get": {
                 "description": "Returns a list of items in the specified language for a collection",
                 "consumes": [
@@ -1699,7 +1699,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/items/rec": {
+        "/api/items/rec": {
             "get": {
                 "description": "Returns a list of items in the specified language for recommendation",
                 "consumes": [
@@ -1759,7 +1759,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/languages": {
+        "/api/languages": {
             "get": {
                 "description": "Returns a list of all available languages",
                 "consumes": [
@@ -1791,7 +1791,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/login": {
+        "/api/login": {
             "post": {
                 "description": "Authenticates a user and provides a JWT token if credentials are valid",
                 "consumes": [
@@ -1837,7 +1837,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/new": {
+        "/api/new": {
             "get": {
                 "description": "Returns a list of new collections and items for the specified language",
                 "consumes": [
@@ -1881,7 +1881,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/popular": {
+        "/api/popular": {
             "get": {
                 "description": "Returns a list of popular collections and items for the specified language",
                 "consumes": [
@@ -1925,7 +1925,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/api/register": {
             "post": {
                 "description": "Creates a new user account with a username and password",
                 "consumes": [
@@ -1968,7 +1968,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/reviews": {
+        "/api/reviews": {
             "get": {
                 "description": "Fetches all reviews from the database",
                 "produces": [
@@ -2041,7 +2041,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/search": {
+        "/api/search": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
                 "consumes": [
@@ -2108,7 +2108,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/searchCollections": {
+        "/api/searchCollections": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
                 "consumes": [
@@ -2175,7 +2175,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/searchItems": {
+        "/api/searchItems": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
                 "consumes": [
@@ -2242,7 +2242,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/searchVacancy": {
+        "/api/searchVacancy": {
             "get": {
                 "description": "Retrieves",
                 "consumes": [
@@ -2290,7 +2290,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/starter": {
+        "/api/starter": {
             "post": {
                 "description": "Starts the service, potentially creating necessary data or performing required tasks.",
                 "consumes": [
@@ -2325,7 +2325,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/vacancies": {
+        "/api/vacancies": {
             "get": {
                 "description": "Retrieves all  vacancies filtered by the specified language code",
                 "consumes": [
@@ -2372,7 +2372,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/vacancies/activ": {
+        "/api/vacancies/activ": {
             "get": {
                 "description": "Retrieves all active vacancies filtered by the specified language code",
                 "consumes": [
@@ -2419,7 +2419,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/vacancy": {
+        "/api/vacancy": {
             "get": {
                 "description": "Retrieves the details of a specific vacancy using the provided vacancy ID parameter",
                 "consumes": [
@@ -3033,6 +3033,9 @@ const docTemplate = `{
                 },
                 "description": {
                     "type": "string"
+                },
+                "discount_id": {
+                    "type": "integer"
                 },
                 "discount_percentage": {
                     "type": "number"

@@ -16,7 +16,7 @@
     "host": "127.0.0.1:8080",
     "basePath": "/",
     "paths": {
-        "/brand": {
+        "/api/brand": {
             "get": {
                 "description": "Retrieves the details of a brand using its ID from the query parameter",
                 "consumes": [
@@ -277,7 +277,7 @@
                 }
             }
         },
-        "/brands": {
+        "/api/brands": {
             "get": {
                 "description": "Retrieves a list of all available brands",
                 "produces": [
@@ -306,7 +306,7 @@
                 }
             }
         },
-        "/category": {
+        "/api/category": {
             "get": {
                 "description": "Returns a list of categories for a specified language code",
                 "consumes": [
@@ -558,7 +558,7 @@
                 }
             }
         },
-        "/category/by/id": {
+        "/api/category/by/id": {
             "get": {
                 "description": "Retrieves the details of a category using its ID from the query parameter",
                 "consumes": [
@@ -608,7 +608,7 @@
                 }
             }
         },
-        "/collection": {
+        "/api/collection": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
                 "consumes": [
@@ -794,7 +794,7 @@
                 }
             }
         },
-        "/collections": {
+        "/api/collections": {
             "get": {
                 "description": "Returns a list of collections in the specified language for a category",
                 "consumes": [
@@ -934,7 +934,7 @@
                 }
             }
         },
-        "/collections/rec": {
+        "/api/collections/rec": {
             "get": {
                 "description": "Returns a list of collections recommendation",
                 "consumes": [
@@ -981,7 +981,7 @@
                 }
             }
         },
-        "/discount": {
+        "/api/discount": {
             "post": {
                 "description": "Create a new discount with the specified details.",
                 "consumes": [
@@ -1097,7 +1097,7 @@
                 }
             }
         },
-        "/discounts": {
+        "/api/discounts": {
             "get": {
                 "description": "Retrieve a list of all available discounts.",
                 "produces": [
@@ -1135,7 +1135,7 @@
                 }
             }
         },
-        "/getAllCollection": {
+        "/api/getAllCollection": {
             "get": {
                 "description": "Retrieves a list of all available collections",
                 "produces": [
@@ -1164,7 +1164,7 @@
                 }
             }
         },
-        "/getAllItems": {
+        "/api/getAllItems": {
             "get": {
                 "description": "Retrieves a list of all available items",
                 "produces": [
@@ -1193,7 +1193,7 @@
                 }
             }
         },
-        "/getCollectionById": {
+        "/api/getCollectionById": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
                 "consumes": [
@@ -1243,7 +1243,7 @@
                 }
             }
         },
-        "/getItemById": {
+        "/api/getItemById": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
                 "consumes": [
@@ -1293,7 +1293,7 @@
                 }
             }
         },
-        "/item": {
+        "/api/item": {
             "get": {
                 "description": "Returns details of a specific item in the specified language",
                 "consumes": [
@@ -1350,7 +1350,7 @@
                 }
             }
         },
-        "/items": {
+        "/api/items": {
             "get": {
                 "description": "Returns a list of items in the specified language for a category",
                 "consumes": [
@@ -1632,7 +1632,7 @@
                 }
             }
         },
-        "/items/collection": {
+        "/api/items/collection": {
             "get": {
                 "description": "Returns a list of items in the specified language for a collection",
                 "consumes": [
@@ -1692,7 +1692,7 @@
                 }
             }
         },
-        "/items/rec": {
+        "/api/items/rec": {
             "get": {
                 "description": "Returns a list of items in the specified language for recommendation",
                 "consumes": [
@@ -1752,7 +1752,7 @@
                 }
             }
         },
-        "/languages": {
+        "/api/languages": {
             "get": {
                 "description": "Returns a list of all available languages",
                 "consumes": [
@@ -1784,7 +1784,7 @@
                 }
             }
         },
-        "/login": {
+        "/api/login": {
             "post": {
                 "description": "Authenticates a user and provides a JWT token if credentials are valid",
                 "consumes": [
@@ -1830,7 +1830,7 @@
                 }
             }
         },
-        "/new": {
+        "/api/new": {
             "get": {
                 "description": "Returns a list of new collections and items for the specified language",
                 "consumes": [
@@ -1874,7 +1874,7 @@
                 }
             }
         },
-        "/popular": {
+        "/api/popular": {
             "get": {
                 "description": "Returns a list of popular collections and items for the specified language",
                 "consumes": [
@@ -1918,7 +1918,7 @@
                 }
             }
         },
-        "/register": {
+        "/api/register": {
             "post": {
                 "description": "Creates a new user account with a username and password",
                 "consumes": [
@@ -1961,7 +1961,7 @@
                 }
             }
         },
-        "/reviews": {
+        "/api/reviews": {
             "get": {
                 "description": "Fetches all reviews from the database",
                 "produces": [
@@ -2034,7 +2034,7 @@
                 }
             }
         },
-        "/search": {
+        "/api/search": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
                 "consumes": [
@@ -2101,7 +2101,7 @@
                 }
             }
         },
-        "/searchCollections": {
+        "/api/searchCollections": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
                 "consumes": [
@@ -2168,7 +2168,7 @@
                 }
             }
         },
-        "/searchItems": {
+        "/api/searchItems": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",
                 "consumes": [
@@ -2235,7 +2235,7 @@
                 }
             }
         },
-        "/searchVacancy": {
+        "/api/searchVacancy": {
             "get": {
                 "description": "Retrieves",
                 "consumes": [
@@ -2283,7 +2283,7 @@
                 }
             }
         },
-        "/starter": {
+        "/api/starter": {
             "post": {
                 "description": "Starts the service, potentially creating necessary data or performing required tasks.",
                 "consumes": [
@@ -2318,7 +2318,7 @@
                 }
             }
         },
-        "/vacancies": {
+        "/api/vacancies": {
             "get": {
                 "description": "Retrieves all  vacancies filtered by the specified language code",
                 "consumes": [
@@ -2365,7 +2365,7 @@
                 }
             }
         },
-        "/vacancies/activ": {
+        "/api/vacancies/activ": {
             "get": {
                 "description": "Retrieves all active vacancies filtered by the specified language code",
                 "consumes": [
@@ -2412,7 +2412,7 @@
                 }
             }
         },
-        "/vacancy": {
+        "/api/vacancy": {
             "get": {
                 "description": "Retrieves the details of a specific vacancy using the provided vacancy ID parameter",
                 "consumes": [
@@ -3026,6 +3026,9 @@
                 },
                 "description": {
                     "type": "string"
+                },
+                "discount_id": {
+                    "type": "integer"
                 },
                 "discount_percentage": {
                     "type": "number"
