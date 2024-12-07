@@ -419,6 +419,11 @@ definitions:
       size:
         type: string
     type: object
+  models.ItemWithoutDiscount:
+    properties:
+      name:
+        type: string
+    type: object
   models.Language:
     properties:
       code:
@@ -1392,6 +1397,25 @@ paths:
       summary: Retrieve a collection by ID and language code
       tags:
       - collections
+  /api/getCollectionWithoutDiscount:
+    get:
+      description: Retrieves a list of all available collections without discount
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all collections
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemWithoutDiscount'
+            type: array
+        "500":
+          description: Failed to get collections
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all collections without discount
+      tags:
+      - collections
   /api/getItemById:
     get:
       consumes:
@@ -1423,6 +1447,25 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorMessage'
       summary: Retrieve a item by ID and language code
+      tags:
+      - items
+  /api/getItemWithoutDiscount:
+    get:
+      description: Retrieves a list of all available items without discount
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all items
+          schema:
+            items:
+              $ref: '#/definitions/models.ItemWithoutDiscount'
+            type: array
+        "500":
+          description: Failed to get items
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all Items without discount
       tags:
       - items
   /api/item:

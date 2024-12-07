@@ -105,3 +105,7 @@ type ItemResponseForAdmin struct {
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 }
+
+type ItemWithoutDiscount struct {
+	Name string `json:"name"`
+}

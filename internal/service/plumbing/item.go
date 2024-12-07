@@ -223,3 +223,24 @@ func (pr *Plumping) GetItems(ctx context.Context) ([]*models.ItemResponses, erro
 	}
 	return items, nil
 }
+
+func (pr *Plumping) GetItemWithoutDiscount(ctx context.Context) ([]models.ItemWithoutDiscount, error) {
+	const op = "item.GetItemWithoutDiscount"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	items, err := pr.plumpingRepository.GetItemsWithoutDiscount(ctx)
+	if err != nil {
+		log.Error("Failed to get items without discount", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	if items == nil {
+		items = []models.ItemWithoutDiscount{}
+	}
+
+	return items, nil
+
+}

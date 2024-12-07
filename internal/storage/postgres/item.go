@@ -883,3 +883,45 @@ func (db *DB) RemoveItem(ctx context.Context, itemID int) error {
 
 	return nil
 }
+
+func (db *DB) GetItemsWithoutDiscount(ctx context.Context) ([]models.ItemWithoutDiscount, error) {
+	const op = "postgres.GetItemsWithoutDiscount"
+
+	query := `
+		SELECT name
+		FROM ItemTranslation
+		WHERE language_code = 'ru'
+		AND item_id IN (
+			SELECT i.id
+			FROM Item i
+			WHERE NOT EXISTS (
+				SELECT 1 
+				FROM Discount d 
+				WHERE d.discount_type = 'item' AND d.target_id = i.id
+			)
+		)
+	`
+
+	rows, err := db.Pool.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query items without discount: %w", op, err)
+	}
+	defer rows.Close()
+
+	var items []models.ItemWithoutDiscount
+	var item models.ItemWithoutDiscount
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan row: %w", op, err)
+		}
+		item.Name = name
+		items = append(items, item)
+	}
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("%s: rows iteration error: %w", op, err)
+	}
+
+	return items, nil
+}

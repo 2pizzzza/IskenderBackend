@@ -481,3 +481,22 @@ func (s *Server) GetCollectionId(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponseBody(w, res, http.StatusOK)
 }
+
+// GetCollectionsWithoutDiscount retrieves all collections without discount
+// @Summary Get all collections without discount
+// @Description Retrieves a list of all available collections without discount
+// @Tags collections
+// @Produce json
+// @Success 200 {array} models.ItemWithoutDiscount "Successfully retrieved all collections"
+// @Failure 500 {object} models.ErrorMessage "Failed to get collections"
+// @Router /api/getCollectionWithoutDiscount [get]
+func (s *Server) GetCollectionsWithoutDiscount(w http.ResponseWriter, r *http.Request) {
+
+	res, err := s.service.GetCollectionWithoutDiscount(r.Context())
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get collections without discount"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
+}

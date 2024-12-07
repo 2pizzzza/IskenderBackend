@@ -63,6 +63,7 @@ type PlumpingRepository interface {
 	CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error)
 	GetAllCollections(ctx context.Context) ([]*models.CollectionResponses, error)
 	GetCollection(ctx context.Context, collectionID int) (*models.CollectionResponseForAdmin, error)
+	GetCollectionsWithoutDiscount(ctx context.Context) ([]models.CollectionWithoutDiscount, error)
 
 	//Popular and new
 	GetPopularCollections(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error)
@@ -84,6 +85,7 @@ type PlumpingRepository interface {
 	RemoveItem(ctx context.Context, itemID int) error
 	GetAllItems(ctx context.Context) ([]*models.ItemResponses, error)
 	GetItem(ctx context.Context, itemID int) (*models.ItemResponseForAdmin, error)
+	GetItemsWithoutDiscount(ctx context.Context) ([]models.ItemWithoutDiscount, error)
 }
 
 func New(log *slog.Logger, baseDir string, repository PlumpingRepository) *Plumping {

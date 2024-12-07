@@ -59,6 +59,7 @@ type Service interface {
 	CreateCollection(ctx context.Context, req models.CreateCollectionRequest) (*models.CreateCollectionResponse, error)
 	GetCollection(ctx context.Context) ([]*models.CollectionResponses, error)
 	GetCollectionID(ctx context.Context, collectionId int) (*models.CollectionResponseForAdmin, error)
+	GetCollectionWithoutDiscount(ctx context.Context) ([]models.CollectionWithoutDiscount, error)
 
 	//Popular and New
 	GetPopular(ctx context.Context, code string) (*models.PopularResponse, error)
@@ -74,6 +75,7 @@ type Service interface {
 	RemoveItem(ctx context.Context, token string, req models.ItemRequest) error
 	GetItems(ctx context.Context) ([]*models.ItemResponses, error)
 	GetItemID(ctx context.Context, itemId int) (*models.ItemResponseForAdmin, error)
+	GetItemWithoutDiscount(ctx context.Context) ([]models.ItemWithoutDiscount, error)
 
 	//Seach
 	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error)
@@ -147,6 +149,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /api/collection", s.UpdateCollection)
 	mux.HandleFunc("GET /api/getAllCollection", s.GetAllCollection)
 	mux.HandleFunc("GET /api/getCollectionById", s.GetCollectionId)
+	mux.HandleFunc("GET /api/getCollectionWithoutDiscount", s.GetCollectionsWithoutDiscount)
 
 	//Popular and New
 	mux.HandleFunc("GET /api/popular", s.GetPopular)
@@ -162,6 +165,7 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("DELETE /api/items", s.RemoveItem)
 	mux.HandleFunc("GET /api/getAllItems", s.GetAllItems)
 	mux.HandleFunc("GET /api/getItemById", s.GetItemId)
+	mux.HandleFunc("GET /api/getItemWithoutDiscount", s.GetItemsWithoutDiscount)
 
 	//Search
 	mux.HandleFunc("GET /api/search", s.Search)

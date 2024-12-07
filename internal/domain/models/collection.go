@@ -115,3 +115,7 @@ type CollectionResponseForAdmin struct {
 	Photos      []PhotosResponse   `json:"photos"`
 	Collections []CreateCollection `json:"collections"`
 }
+
+type CollectionWithoutDiscount struct {
+	Name string `json:"name"`
+}

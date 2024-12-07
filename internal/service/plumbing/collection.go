@@ -229,3 +229,24 @@ func (pr *Plumping) GetCollectionID(ctx context.Context, collectionId int) (*mod
 	}
 	return collection, nil
 }
+
+func (pr *Plumping) GetCollectionWithoutDiscount(ctx context.Context) ([]models.CollectionWithoutDiscount, error) {
+	const op = "item.GetCollectionWithoutDiscount"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	collections, err := pr.plumpingRepository.GetCollectionsWithoutDiscount(ctx)
+	if err != nil {
+		log.Error("Failed to get items without discount", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	if collections == nil {
+		collections = []models.CollectionWithoutDiscount{}
+	}
+
+	return collections, nil
+
+}

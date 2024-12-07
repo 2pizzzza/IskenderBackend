@@ -1243,6 +1243,35 @@
                 }
             }
         },
+        "/api/getCollectionWithoutDiscount": {
+            "get": {
+                "description": "Retrieves a list of all available collections without discount",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "collections"
+                ],
+                "summary": "Get all collections without discount",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all collections",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ItemWithoutDiscount"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get collections",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/api/getItemById": {
             "get": {
                 "description": "Returns details of a specific collection in the specified language",
@@ -1286,6 +1315,35 @@
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/getItemWithoutDiscount": {
+            "get": {
+                "description": "Retrieves a list of all available items without discount",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "items"
+                ],
+                "summary": "Get all Items without discount",
+                "responses": {
+                    "200": {
+                        "description": "Successfully retrieved all items",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ItemWithoutDiscount"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get items",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMessage"
                         }
@@ -3290,6 +3348,14 @@
                     "type": "number"
                 },
                 "size": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ItemWithoutDiscount": {
+            "type": "object",
+            "properties": {
+                "name": {
                     "type": "string"
                 }
             }

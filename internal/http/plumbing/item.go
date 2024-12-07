@@ -489,13 +489,30 @@ func (s *Server) GetItemId(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} models.ErrorMessage "Failed to get items"
 // @Router /api/getAllItems [get]
 func (s *Server) GetAllItems(w http.ResponseWriter, r *http.Request) {
-	s.log.Info("Get all review")
-
-	reviews, err := s.service.GetItems(r.Context())
+	res, err := s.service.GetItems(r.Context())
 	if err != nil {
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get brands"}, http.StatusInternalServerError)
 		return
 	}
 
-	utils.WriteResponseBody(w, reviews, http.StatusOK)
+	utils.WriteResponseBody(w, res, http.StatusOK)
+}
+
+// GetItemsWithoutDiscount retrieves all items without discount
+// @Summary Get all Items without discount
+// @Description Retrieves a list of all available items without discount
+// @Tags items
+// @Produce json
+// @Success 200 {array} models.ItemWithoutDiscount "Successfully retrieved all items"
+// @Failure 500 {object} models.ErrorMessage "Failed to get items"
+// @Router /api/getItemWithoutDiscount [get]
+func (s *Server) GetItemsWithoutDiscount(w http.ResponseWriter, r *http.Request) {
+
+	res, err := s.service.GetItemWithoutDiscount(r.Context())
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get items without discount"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, res, http.StatusOK)
 }

@@ -858,3 +858,45 @@ func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models
 
 	return nil
 }
+
+func (db *DB) GetCollectionsWithoutDiscount(ctx context.Context) ([]models.CollectionWithoutDiscount, error) {
+	const op = "postgres.GetCollectionsWithoutDiscount"
+
+	query := `
+		SELECT name
+		FROM CollectionTranslation
+		WHERE language_code = 'ru'
+		AND collection_id IN (
+			SELECT c.id
+			FROM Collection c
+			WHERE NOT EXISTS (
+				SELECT 1 
+				FROM Discount d 
+				WHERE d.discount_type = 'collection' AND d.target_id = c.id
+			)
+		)
+	`
+
+	rows, err := db.Pool.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query collections without discount: %w", op, err)
+	}
+	defer rows.Close()
+
+	var collections []models.CollectionWithoutDiscount
+	var collection models.CollectionWithoutDiscount
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan row: %w", op, err)
+		}
+		collection.Name = name
+		collections = append(collections, collection)
+	}
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("%s: rows iteration error: %w", op, err)
+	}
+
+	return collections, nil
+}
