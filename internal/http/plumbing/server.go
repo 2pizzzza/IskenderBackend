@@ -37,6 +37,8 @@ type Service interface {
 	//Review
 	CreateReview(ctx context.Context, req *models.CreateReviewRequest) error
 	GetAllReview(ctx context.Context) ([]*models.ReviewResponse, error)
+	RemoveReview(ctx context.Context, token string, req models.RemoveReview) error
+	SwitchIsShowReview(ctx context.Context, token string, req models.RemoveReview) error
 
 	//Language
 	GetAllLanguages(ctx context.Context) ([]*models.Language, error)
@@ -127,6 +129,8 @@ func (s *Server) RegisterRoutes(mux *http.ServeMux) {
 	//Review
 	mux.HandleFunc("GET /api/reviews", s.GetAllReviews)
 	mux.HandleFunc("POST /api/reviews", s.CreateReview)
+	mux.HandleFunc("DELETE /api/reviews", s.RemoveReview)
+	mux.HandleFunc("POST /api/switchIsShowReview", s.SwitchIsShowReview)
 
 	//Language
 	mux.HandleFunc("GET /api/languages", s.GetAllLanguages)

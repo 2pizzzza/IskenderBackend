@@ -725,28 +725,7 @@ func (db *DB) GetCollection(ctx context.Context, collectionID int) (*models.Coll
 	}
 	collection.Collections = translations
 
-	photosQuery := `
-		SELECT p.id, p.url, p.isMain, p.hash_color
-		FROM Photo p
-		JOIN CollectionPhoto cp ON p.id = cp.photo_id
-		WHERE cp.collection_id = $1`
-	photoRows, err := db.Pool.Query(ctx, photosQuery, collectionID)
-	if err != nil {
-		return nil, fmt.Errorf("%s: failed to get collection photos: %w", op, err)
-	}
-	defer photoRows.Close()
-
-	var photos []models.PhotosResponse
-	for photoRows.Next() {
-		var photo models.PhotosResponse
-		if err := photoRows.Scan(&photo.ID, &photo.URL, &photo.IsMain, &photo.HashColor); err != nil {
-			return nil, fmt.Errorf("%s: failed to scan photo: %w", op, err)
-		}
-		photos = append(photos, photo)
-	}
-	if err := photoRows.Err(); err != nil {
-		return nil, fmt.Errorf("%s: error iterating over photos: %w", op, err)
-	}
+	photos, _, err := db.getCollectionPhotos(ctx, collectionID)
 	collection.Photos = photos
 
 	return &collection, nil

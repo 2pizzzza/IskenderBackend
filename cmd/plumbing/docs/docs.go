@@ -2097,6 +2097,69 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Removes a review by ID with authorization token required",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviews"
+                ],
+                "summary": "Deletes a review",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "review ID to delete",
+                        "name": "RemoveReview",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RemoveReview"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully removed review",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or review not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Token required or invalid token format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
             }
         },
         "/api/search": {
@@ -2370,6 +2433,70 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/switchIsShowReview": {
+            "post": {
+                "description": "Switch isShow a review by ID with authorization token required",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviews"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003ctoken\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "review ID to delete",
+                        "name": "RemoveReview",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RemoveReview"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Successfully switch review",
+                        "schema": {
+                            "$ref": "#/definitions/models.Message"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or review not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Token required or invalid token format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    },
+                    "403": {
+                        "description": "Permissions denied",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMessage"
                         }
@@ -3362,6 +3489,9 @@ const docTemplate = `{
         "models.ItemWithoutDiscount": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -3437,6 +3567,14 @@ const docTemplate = `{
             }
         },
         "models.RemoveCollectionRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RemoveReview": {
             "type": "object",
             "properties": {
                 "id": {

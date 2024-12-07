@@ -42,7 +42,10 @@ func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, language
 		if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer, &item.IsPainted); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
-
+		if item.CollectionID == nil {
+			a := 0
+			item.CollectionID = &a
+		}
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -85,6 +88,10 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 		&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
 		&item.IsPainted, &item.Name, &item.Description,
 	)
+	if item.CollectionID == nil {
+		a := 0
+		item.CollectionID = &a
+	}
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to retrieve item data: %w", op, err)
 	}
@@ -118,7 +125,10 @@ func (db *DB) GetAllItems(ctx context.Context) ([]*models.ItemResponses, error) 
 			&item.IsPainted, &item.IsPopular, &item.IsNew); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
-
+		if item.CollectionID == nil {
+			a := 0
+			item.CollectionID = &a
+		}
 		transQuery := `SELECT language_code, name, description FROM ItemTranslation WHERE item_id = $1`
 		transRows, err := db.Pool.Query(ctx, transQuery, item.ID)
 		if err != nil {
@@ -238,11 +248,14 @@ func (db *DB) GetItem(ctx context.Context, itemID int) (*models.ItemResponseForA
 		&item.IsPopular,
 		&item.IsNew,
 	)
+	if item.CollectionID == nil {
+		a := 0
+		item.CollectionID = &a
+	}
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to get item details: %w", op, err)
 	}
 
-	// Запрос для получения переводов товара
 	transQuery := `SELECT language_code, name, description FROM ItemTranslation WHERE item_id = $1`
 	rows, err := db.Pool.Query(ctx, transQuery, itemID)
 	if err != nil {
@@ -263,27 +276,9 @@ func (db *DB) GetItem(ctx context.Context, itemID int) (*models.ItemResponseForA
 	}
 	item.Items = translations
 
-	photosQuery := `
-		SELECT p.id, p.url, p.isMain, p.hash_color
-		FROM Photo p
-		JOIN ItemPhoto ip ON p.id = ip.photo_id
-		WHERE ip.item_id = $1`
-	photoRows, err := db.Pool.Query(ctx, photosQuery, itemID)
+	photos, _, err := db.getItemPhotos(ctx, itemID)
 	if err != nil {
-		return nil, fmt.Errorf("%s: failed to get item photos: %w", op, err)
-	}
-	defer photoRows.Close()
-
-	var photos []models.PhotosResponse
-	for photoRows.Next() {
-		var photo models.PhotosResponse
-		if err := photoRows.Scan(&photo.ID, &photo.URL, &photo.IsMain, &photo.HashColor); err != nil {
-			return nil, fmt.Errorf("%s: failed to scan photo: %w", op, err)
-		}
-		photos = append(photos, photo)
-	}
-	if err := photoRows.Err(); err != nil {
-		return nil, fmt.Errorf("%s: error iterating over photos: %w", op, err)
+		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 	item.Photos = photos
 
@@ -315,6 +310,10 @@ func (db *DB) GetPopularItems(ctx context.Context, languageCode string) ([]*mode
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 
+		if item.CollectionID == nil {
+			a := 0
+			item.CollectionID = &a
+		}
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -358,6 +357,10 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 
+		if item.CollectionID == nil {
+			a := 0
+			item.CollectionID = &a
+		}
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -430,7 +433,10 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
-
+		if item.CollectionID == nil {
+			a := 0
+			item.CollectionID = &a
+		}
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -496,6 +502,8 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 			&item.IsPainted,
 			&item.IsPopular,
 			&item.IsNew,
+			&item.CollectionID,
+			&item.CollectionID,
 			&name,
 			&description,
 		); err != nil {
@@ -513,7 +521,7 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 		} else {
 			item.Description = ""
 		}
-
+		
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -646,21 +654,36 @@ func (db *DB) CreateItem(ctx context.Context, req models.CreateItem) (*models.Cr
 	defer tx.Rollback(ctx)
 
 	var itemID int
-	insertItemQuery := `
-		INSERT INTO Item (category_id, collection_id, size, price, isProducer, isPainted, isPopular, isNew)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		RETURNING id
-	`
-	err = tx.QueryRow(ctx, insertItemQuery,
-		req.CategoryID,
-		req.CollectionID,
-		req.Size,
-		req.Price,
-		req.IsProducer,
-		req.IsPainted,
-		req.IsPopular,
-		req.IsNew,
-	).Scan(&itemID)
+	if req.CollectionID == 0 {
+		err = tx.QueryRow(ctx, `
+        INSERT INTO Item (category_id, size, price, isProducer, isPainted, isPopular, isNew)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id
+    `,
+			req.CategoryID,
+			req.Size,
+			req.Price,
+			req.IsProducer,
+			req.IsPainted,
+			req.IsPopular,
+			req.IsNew,
+		).Scan(&itemID)
+	} else {
+		err = tx.QueryRow(ctx, `
+        INSERT INTO Item (category_id, collection_id, size, price, isProducer, isPainted, isPopular, isNew)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id
+    `,
+			req.CategoryID,
+			req.CollectionID,
+			req.Size,
+			req.Price,
+			req.IsProducer,
+			req.IsPainted,
+			req.IsPopular,
+			req.IsNew,
+		).Scan(&itemID)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to insert item: %w", op, err)
 	}

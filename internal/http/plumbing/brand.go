@@ -154,7 +154,7 @@ func (s *Server) RemoveBrand(w http.ResponseWriter, r *http.Request) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Brand not found"}, http.StatusBadRequest)
 			return
 		}
-		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to brand category"}, http.StatusInternalServerError)
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to remove brand"}, http.StatusInternalServerError)
 		return
 	}
 

@@ -2,9 +2,12 @@ package plumbing
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	token2 "github.com/2pizzzza/plumbing/internal/lib/jwt"
 	"github.com/2pizzzza/plumbing/internal/lib/logger/sl"
+	"github.com/2pizzzza/plumbing/internal/storage"
 	"log/slog"
 )
 
@@ -41,4 +44,58 @@ func (pr *Plumping) GetAllReview(ctx context.Context) ([]*models.ReviewResponse,
 		reviews = []*models.ReviewResponse{}
 	}
 	return reviews, nil
+}
+
+func (pr *Plumping) RemoveReview(ctx context.Context, token string, req models.RemoveReview) error {
+	const op = "service.RemoveReview"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.DeleteReview(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, storage.ErrReviewNotFound) {
+			log.Error("Review not found", sl.Err(err))
+			return storage.ErrReviewNotFound
+
+		}
+		log.Error("Failed to remove review", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+
+	return nil
+}
+
+func (pr *Plumping) SwitchIsShowReview(ctx context.Context, token string, req models.RemoveReview) error {
+	const op = "service.SwitchIsShowReview"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	_, err := token2.ValidateToken(token)
+	if err != nil {
+		log.Error("Failed validate token")
+		return storage.ErrToken
+	}
+
+	err = pr.plumpingRepository.ToggleReviewVisibility(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, storage.ErrReviewNotFound) {
+			log.Error("Review not found", sl.Err(err))
+			return storage.ErrReviewNotFound
+
+		}
+		log.Error("Failed to remove review", sl.Err(err))
+		return fmt.Errorf("%s, %w", op, err)
+	}
+
+	return nil
 }

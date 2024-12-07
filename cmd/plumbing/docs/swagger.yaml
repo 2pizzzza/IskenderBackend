@@ -421,6 +421,8 @@ definitions:
     type: object
   models.ItemWithoutDiscount:
     properties:
+      id:
+        type: integer
       name:
         type: string
     type: object
@@ -469,6 +471,11 @@ definitions:
         type: integer
     type: object
   models.RemoveCollectionRequest:
+    properties:
+      id:
+        type: integer
+    type: object
+  models.RemoveReview:
     properties:
       id:
         type: integer
@@ -1916,6 +1923,48 @@ paths:
       tags:
       - auth
   /api/reviews:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a review by ID with authorization token required
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: review ID to delete
+        in: body
+        name: RemoveReview
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveReview'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully removed review
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body or review not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Deletes a review
+      tags:
+      - reviews
     get:
       description: Fetches all reviews from the database
       produces:
@@ -2156,6 +2205,48 @@ paths:
       summary: Initialize the service or perform a start-up operation
       tags:
       - starter
+  /api/switchIsShowReview:
+    post:
+      consumes:
+      - application/json
+      description: Switch isShow a review by ID with authorization token required
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: review ID to delete
+        in: body
+        name: RemoveReview
+        required: true
+        schema:
+          $ref: '#/definitions/models.RemoveReview'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully switch review
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Invalid request body or review not found
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "401":
+          description: Token required or invalid token format
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "403":
+          description: Permissions denied
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      tags:
+      - reviews
   /api/vacancies:
     get:
       consumes:

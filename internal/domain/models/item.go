@@ -30,7 +30,7 @@ type ItemResponse struct {
 	Name         string           `json:"name"`
 	Description  string           `json:"description"`
 	CategoryID   int              `json:"category_id"`
-	CollectionID int              `json:"collection_id"`
+	CollectionID *int             `json:"collection_id"`
 	Size         string           `json:"size"`
 	Price        float64          `json:"price"`
 	NewPrice     float64          `json:"new_price"`
@@ -78,7 +78,7 @@ type CreateItemResponse struct {
 type ItemResponses struct {
 	ID           int                     `json:"ID"`
 	CategoryID   int                     `json:"category_id"`
-	CollectionID int                     `json:"collection_id"`
+	CollectionID *int                    `json:"collection_id"`
 	Size         string                  `json:"size"`
 	Price        float64                 `json:"price"`
 	IsProducer   bool                    `json:"isProducer"`
@@ -94,7 +94,7 @@ type ItemResponses struct {
 type ItemResponseForAdmin struct {
 	ID           int                     `json:"ID"`
 	CategoryID   int                     `json:"category_id"`
-	CollectionID int                     `json:"collection_id"`
+	CollectionID *int                    `json:"collection_id"`
 	Size         string                  `json:"size"`
 	Price        float64                 `json:"price"`
 	IsProducer   bool                    `json:"isProducer"`

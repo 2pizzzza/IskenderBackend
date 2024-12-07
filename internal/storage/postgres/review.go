@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/2pizzzza/plumbing/internal/domain/models"
+	"github.com/2pizzzza/plumbing/internal/storage"
+	"github.com/jackc/pgx/v5"
 )
 
 func (db *DB) CreateReview(ctx context.Context, username string, rating int, text string) error {
@@ -26,7 +28,8 @@ func (db *DB) GetAllReviews(ctx context.Context) ([]*models.ReviewResponse, erro
 	query := `
 		SELECT id, username, rating, text, created_at
 		FROM Review
-		ORDER BY created_at DESC
+		WHERE isShow=TRUE
+		ORDER BY created_at DESC 
 	`
 
 	rows, err := db.Pool.Query(ctx, query)
@@ -49,4 +52,64 @@ func (db *DB) GetAllReviews(ctx context.Context) ([]*models.ReviewResponse, erro
 	}
 
 	return reviews, nil
+}
+
+func (db *DB) DeleteReview(ctx context.Context, id int) error {
+	const op = "postgres.DeleteReview"
+
+	existsQuery := `
+    SELECT 1 
+    FROM Review 
+    WHERE id = $1`
+
+	var exists int
+	err := db.Pool.QueryRow(ctx, existsQuery, id).Scan(&exists)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return storage.ErrReviewNotFound
+		}
+		return fmt.Errorf("%s: failed to check if review exists: %w", op, err)
+	}
+
+	// Удаляем отзыв
+	deleteQuery := `
+    DELETE FROM Review 
+    WHERE id = $1`
+
+	_, err = db.Pool.Exec(ctx, deleteQuery, id)
+	if err != nil {
+		return fmt.Errorf("%s: failed to delete review with ID %d: %w", op, id, err)
+	}
+
+	return nil
+}
+
+func (db *DB) ToggleReviewVisibility(ctx context.Context, id int) error {
+	const op = "postgres.ToggleReviewVisibility"
+
+	existsQuery := `
+    SELECT isShow 
+    FROM Review 
+    WHERE id = $1`
+
+	var isShow bool
+	err := db.Pool.QueryRow(ctx, existsQuery, id).Scan(&isShow)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return storage.ErrReviewNotFound
+		}
+		return fmt.Errorf("%s: failed to check if review exists: %w", op, err)
+	}
+
+	updateQuery := `
+    UPDATE Review 
+    SET isShow = NOT isShow 
+    WHERE id = $1`
+
+	_, err = db.Pool.Exec(ctx, updateQuery, id)
+	if err != nil {
+		return fmt.Errorf("%s: failed to toggle visibility for review with ID %d: %w", op, id, err)
+	}
+
+	return nil
 }

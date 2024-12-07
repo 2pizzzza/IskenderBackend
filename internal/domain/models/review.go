@@ -15,3 +15,7 @@ type ReviewResponse struct {
 	Text      string    `json:"text"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type RemoveReview struct {
+	ID int `json:"id"`
+}
