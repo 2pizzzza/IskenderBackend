@@ -863,7 +863,7 @@ func (db *DB) GetCollectionsWithoutDiscount(ctx context.Context) ([]models.Colle
 	const op = "postgres.GetCollectionsWithoutDiscount"
 
 	query := `
-		SELECT name
+		SELECT collection_id, name
 		FROM CollectionTranslation
 		WHERE language_code = 'ru'
 		AND collection_id IN (
@@ -886,10 +886,12 @@ func (db *DB) GetCollectionsWithoutDiscount(ctx context.Context) ([]models.Colle
 	var collections []models.CollectionWithoutDiscount
 	var collection models.CollectionWithoutDiscount
 	for rows.Next() {
+		var id int
 		var name string
-		if err := rows.Scan(&name); err != nil {
+		if err := rows.Scan(&id, &name); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan row: %w", op, err)
 		}
+		collection.ID = id
 		collection.Name = name
 		collections = append(collections, collection)
 	}

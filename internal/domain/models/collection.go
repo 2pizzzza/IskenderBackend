@@ -117,5 +117,6 @@ type CollectionResponseForAdmin struct {
 }
 
 type CollectionWithoutDiscount struct {
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }

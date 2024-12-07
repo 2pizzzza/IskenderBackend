@@ -107,5 +107,6 @@ type ItemResponseForAdmin struct {
 }
 
 type ItemWithoutDiscount struct {
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }

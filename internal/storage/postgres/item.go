@@ -888,7 +888,7 @@ func (db *DB) GetItemsWithoutDiscount(ctx context.Context) ([]models.ItemWithout
 	const op = "postgres.GetItemsWithoutDiscount"
 
 	query := `
-		SELECT name
+		SELECT item_id, name
 		FROM ItemTranslation
 		WHERE language_code = 'ru'
 		AND item_id IN (
@@ -911,10 +911,12 @@ func (db *DB) GetItemsWithoutDiscount(ctx context.Context) ([]models.ItemWithout
 	var items []models.ItemWithoutDiscount
 	var item models.ItemWithoutDiscount
 	for rows.Next() {
+		var id int
 		var name string
-		if err := rows.Scan(&name); err != nil {
+		if err := rows.Scan(&id, &name); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan row: %w", op, err)
 		}
+		item.ID = id
 		item.Name = name
 		items = append(items, item)
 	}
