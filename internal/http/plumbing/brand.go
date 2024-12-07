@@ -10,8 +10,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -271,21 +273,21 @@ func (s *Server) GetBrandById(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveImage(file io.Reader, filename string) (string, error) {
+	re := regexp.MustCompile(`[^a-zA-Z0-9._-]`)
+	filename = re.ReplaceAllString(filename, "_")
 
-	filename = strings.ReplaceAll(filename, " ", "")
-
+	filename = fmt.Sprintf("%s_%d%s", strings.TrimSuffix(filename, filepath.Ext(filename)), time.Now().Unix(), filepath.Ext(filename))
 	path := filepath.Join(imageDir, filename)
-	if _, err := os.Stat(path); err == nil {
-		newFilename := fmt.Sprintf("copy_%s", filename)
-		path = filepath.Join(imageDir, newFilename)
-		filename = newFilename
-	}
 
 	out, err := os.Create(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %w", err)
 	}
-	defer out.Close()
+	defer func() {
+		if cerr := out.Close(); cerr != nil {
+			fmt.Printf("failed to close file: %v\n", cerr)
+		}
+	}()
 
 	if _, err := io.Copy(out, file); err != nil {
 		return "", fmt.Errorf("failed to save image: %w", err)
