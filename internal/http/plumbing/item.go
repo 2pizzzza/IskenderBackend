@@ -337,7 +337,6 @@ func (s *Server) UpdateItem(w http.ResponseWriter, r *http.Request) {
 
 	var req models.CreateItem
 	if err := json.Unmarshal([]byte(itemData), &req); err != nil {
-		s.log.Info("sjfdb", err)
 		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid item data"}, http.StatusBadRequest)
 		return
 	}

@@ -70,7 +70,7 @@ func (s *Server) CreateBrand(w http.ResponseWriter, r *http.Request) {
 
 	req := &models.BrandRequest{
 		Name: name,
-		Url:  fmt.Sprintf("/%s/%s", imageDir, filename),
+		Url:  fmt.Sprintf("%s/%s", imageDir, filename),
 	}
 
 	res, err := s.service.CreateBrand(r.Context(), token, req)
