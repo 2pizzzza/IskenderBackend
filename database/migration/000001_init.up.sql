@@ -93,14 +93,13 @@ CREATE TABLE IF NOT EXISTS Review (
 
 CREATE TABLE IF NOT EXISTS Discount (
     id SERIAL PRIMARY KEY,
-    discount_type VARCHAR(50) NOT NULL,
+    discount_type VARCHAR(50) NOT NULL CHECK (discount_type IN ('collection', 'item')),
     target_id INT NOT NULL,
     discount_percentage DECIMAL(5, 2) NOT NULL,
     start_date TIMESTAMP NOT NULL,
-    end_date TIMESTAMP NOT NULL,
-    CONSTRAINT fk_target_collection FOREIGN KEY (target_id) REFERENCES Collection(id) ON DELETE CASCADE,
-    CONSTRAINT fk_target_item FOREIGN KEY (target_id) REFERENCES Item(id) ON DELETE CASCADE
+    end_date TIMESTAMP NOT NULL
     );
+
 
 CREATE TABLE IF NOT EXISTS Photo (
     id SERIAL PRIMARY KEY,
@@ -121,4 +120,30 @@ CREATE TABLE IF NOT EXISTS ItemPhoto (
     photo_id INT REFERENCES Photo(id),
     PRIMARY KEY (item_id, photo_id)
     );
+
+
+CREATE OR REPLACE FUNCTION validate_discount_type()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.discount_type = 'collection' THEN
+        IF NOT EXISTS (SELECT 1 FROM Collection WHERE id = NEW.target_id) THEN
+            RAISE EXCEPTION 'Collection with id % does not exist', NEW.target_id;
+END IF;
+    ELSIF NEW.discount_type = 'item' THEN
+        IF NOT EXISTS (SELECT 1 FROM Item WHERE id = NEW.target_id) THEN
+            RAISE EXCEPTION 'Item with id % does not exist', NEW.target_id;
+END IF;
+ELSE
+        RAISE EXCEPTION 'Invalid discount_type: %', NEW.discount_type;
+END IF;
+
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER discount_target_validation
+    BEFORE INSERT ON Discount
+    FOR EACH ROW
+    EXECUTE FUNCTION validate_discount_type();
 
