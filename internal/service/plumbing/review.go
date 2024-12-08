@@ -99,3 +99,22 @@ func (pr *Plumping) SwitchIsShowReview(ctx context.Context, token string, req mo
 
 	return nil
 }
+
+func (pr *Plumping) GetAllReviewAdmin(ctx context.Context) ([]*models.ReviewResponseAdmin, error) {
+	const op = "service.GetAllReviewAdmin"
+
+	log := pr.log.With(
+		slog.String("op: ", op),
+	)
+
+	reviews, err := pr.plumpingRepository.GetAllReviewsAdmin(ctx)
+	if err != nil {
+		log.Error("Failed to get all reviews", sl.Err(err))
+		return nil, fmt.Errorf("%s, %w", op, err)
+	}
+
+	if reviews == nil {
+		reviews = []*models.ReviewResponseAdmin{}
+	}
+	return reviews, nil
+}

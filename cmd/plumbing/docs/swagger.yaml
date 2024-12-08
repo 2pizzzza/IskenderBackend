@@ -2012,6 +2012,25 @@ paths:
       summary: Create a new review
       tags:
       - reviews
+  /api/reviewsAdmin:
+    get:
+      description: Fetches all reviews from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of reviews
+          schema:
+            items:
+              $ref: '#/definitions/models.ReviewResponse'
+            type: array
+        "500":
+          description: Failed to get reviews
+          schema:
+            $ref: '#/definitions/models.ErrorMessage'
+      summary: Get all reviews admin
+      tags:
+      - reviews
   /api/search:
     get:
       consumes:

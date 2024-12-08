@@ -2155,6 +2155,35 @@
                 }
             }
         },
+        "/api/reviewsAdmin": {
+            "get": {
+                "description": "Fetches all reviews from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviews"
+                ],
+                "summary": "Get all reviews admin",
+                "responses": {
+                    "200": {
+                        "description": "List of reviews",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ReviewResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to get reviews",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMessage"
+                        }
+                    }
+                }
+            }
+        },
         "/api/search": {
             "get": {
                 "description": "Performs a search for collections and items based on the provided parameters such as language, producer status, and search query.",

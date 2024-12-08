@@ -155,3 +155,21 @@ func (s *Server) SwitchIsShowReview(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteResponseBody(w, models.Message{Message: "Successful switch isShow review"}, http.StatusCreated)
 }
+
+// GetAllReviewsAdmin retrieves all reviews admin
+// @Summary Get all reviews admin
+// @Description Fetches all reviews from the database
+// @Tags reviews
+// @Produce  json
+// @Success 200 {array} models.ReviewResponse "List of reviews"
+// @Failure 500 {object} models.ErrorMessage "Failed to get reviews"
+// @Router /api/reviewsAdmin [get]
+func (s *Server) GetAllReviewsAdmin(w http.ResponseWriter, r *http.Request) {
+	reviews, err := s.service.GetAllReviewAdmin(r.Context())
+	if err != nil {
+		utils.WriteResponseBody(w, models.ErrorMessage{Message: "Failed to get reviews"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.WriteResponseBody(w, reviews, http.StatusOK)
+}

@@ -113,3 +113,34 @@ func (db *DB) ToggleReviewVisibility(ctx context.Context, id int) error {
 
 	return nil
 }
+
+func (db *DB) GetAllReviewsAdmin(ctx context.Context) ([]*models.ReviewResponseAdmin, error) {
+	const op = "postgres.GetAllReviews"
+
+	query := `
+		SELECT id, username, rating, text, created_at, isShow
+		FROM Review
+		ORDER BY created_at DESC 
+	`
+
+	rows, err := db.Pool.Query(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("%s: failed to query reviews: %w", op, err)
+	}
+	defer rows.Close()
+
+	var reviews []*models.ReviewResponseAdmin
+	for rows.Next() {
+		var review models.ReviewResponseAdmin
+		if err := rows.Scan(&review.ID, &review.Username, &review.Rating, &review.Text, &review.CreatedAt, &review.IsShow); err != nil {
+			return nil, fmt.Errorf("%s: failed to scan review row: %w", op, err)
+		}
+		reviews = append(reviews, &review)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: row iteration error: %w", op, err)
+	}
+
+	return reviews, nil
+}

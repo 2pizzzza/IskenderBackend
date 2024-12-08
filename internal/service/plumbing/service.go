@@ -40,6 +40,7 @@ type PlumpingRepository interface {
 	GetAllReviews(ctx context.Context) ([]*models.ReviewResponse, error)
 	DeleteReview(ctx context.Context, id int) error
 	ToggleReviewVisibility(ctx context.Context, id int) error
+	GetAllReviewsAdmin(ctx context.Context) ([]*models.ReviewResponseAdmin, error)
 
 	//Starter
 	CreateStarter(ctx context.Context) error
