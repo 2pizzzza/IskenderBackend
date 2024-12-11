@@ -344,7 +344,6 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	const op = "postgres.DeleteCollection"
 
-	// Проверяем, существует ли коллекция
 	var exists bool
 	checkQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkQuery, collectionID).Scan(&exists)
@@ -493,7 +492,7 @@ func (db *DB) getCollectionPhotos(ctx context.Context, collectionID int) ([]mode
 			return nil, nil, fmt.Errorf("getCollectionPhotos: failed to scan photo row: %w", err)
 		}
 		colors = append(colors, models.ColorResponse{HashColor: photo.HashColor})
-		photo.URL = fmt.Sprintf("%s/%s", db.Config.BaseUrl, photo.URL)
+		photo.URL = fmt.Sprintf("%s%s", db.Config.BaseUrl, photo.URL)
 		photos = append(photos, photo)
 	}
 

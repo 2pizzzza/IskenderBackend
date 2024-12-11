@@ -417,7 +417,6 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 		query += ` AND i.price <= $` + fmt.Sprintf("%d", len(args)+1)
 		args = append(args, *maxPrice)
 	}
-	fmt.Printf("Executing query: %s\nWith arguments: %v\n", query, args)
 
 	rows, err := db.Pool.Query(ctx, query, args...)
 	if err != nil {
@@ -521,7 +520,7 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 		} else {
 			item.Description = ""
 		}
-		
+
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -570,7 +569,7 @@ func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosRes
 			return nil, nil, fmt.Errorf("getItemPhotos: failed to scan photo row: %w", err)
 		}
 		colors = append(colors, models.ColorResponse{HashColor: photo.HashColor})
-		photo.URL = fmt.Sprintf("%s/%s", db.Config.BaseUrl, photo.URL)
+		photo.URL = fmt.Sprintf("%s%s", db.Config.BaseUrl, photo.URL)
 		photos = append(photos, photo)
 	}
 
