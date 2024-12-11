@@ -246,12 +246,22 @@ func (s *Server) CreateItem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		isMain := r.FormValue(fmt.Sprintf("isMain_%s", fileHeader.Filename)) == "true"
+		isMainStr := r.FormValue(fmt.Sprintf("isMain_%s", fileHeader.Filename))
 		hashColor := r.FormValue(fmt.Sprintf("hashColor_%s", fileHeader.Filename))
+
+		var isMain *bool
+		if isMainStr != "" {
+			val, err := strconv.ParseBool(isMainStr)
+			if err != nil {
+				utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid isMain value"}, http.StatusInternalServerError)
+				return
+			}
+			isMain = &val
+		}
 
 		photos = append(photos, models.PhotosResponse{
 			URL:       "/media/images/" + filename,
-			IsMain:    isMain,
+			IsMain:    *isMain,
 			HashColor: hashColor,
 		})
 	}
