@@ -303,7 +303,6 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 		query += ` AND c.price <= $` + fmt.Sprintf("%d", len(args)+1)
 		args = append(args, *maxPrice)
 	}
-	fmt.Printf("Executing query: %s\nWith arguments: %v\n", query, args)
 
 	rows, err := db.Pool.Query(ctx, query, args...)
 	if err != nil {
@@ -345,6 +344,7 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	const op = "postgres.DeleteCollection"
 
+	// Проверяем, существует ли коллекция
 	var exists bool
 	checkQuery := `SELECT EXISTS(SELECT 1 FROM Collection WHERE id = $1)`
 	err := db.Pool.QueryRow(ctx, checkQuery, collectionID).Scan(&exists)
@@ -361,7 +361,7 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	}
 	defer tx.Rollback(ctx)
 
-	updateItems := `UPDATE Item SET collection_id = 0 WHERE collection_id = $1`
+	updateItems := `UPDATE Item SET collection_id = NULL WHERE collection_id = $1`
 	_, err = tx.Exec(ctx, updateItems, collectionID)
 	if err != nil {
 		return fmt.Errorf("%s: failed to update items for collection: %w", op, err)
@@ -385,6 +385,7 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 		return fmt.Errorf("%s: failed to delete collection: %w", op, err)
 	}
 
+	// Фиксируем изменения
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}

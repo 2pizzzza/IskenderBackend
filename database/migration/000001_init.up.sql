@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS CategoryTranslation (
 
 CREATE TABLE IF NOT EXISTS Collection (
     id SERIAL PRIMARY KEY,
-    price DECIMAL NOT NULL,
+    price DECIMAL DEFAULT 0,
     isProducer BOOLEAN DEFAULT false,
     isPainted BOOLEAN DEFAULT false,
     isPopular BOOLEAN DEFAULT false,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS Item (
     category_id INT NOT NULL REFERENCES Category(id),
     collection_id INT REFERENCES Collection(id),
     size VARCHAR(50) NOT NULL,
-    price DECIMAL NOT NULL,
+    price DECIMAL DEFAULT 0,
     isProducer BOOLEAN DEFAULT false,
     isPainted BOOLEAN DEFAULT false,
     isPopular BOOLEAN DEFAULT false,
