@@ -6,6 +6,7 @@ type Discount struct {
 	ID                 int              `json:"id"`
 	LanguageCode       string           `json:"language_code"`
 	Name               string           `json:"name"`
+	CollectionID       *int             `json:"collection_id,omitempty"`
 	Description        string           `json:"description"`
 	NewPrice           float64          `json:"new_price"`
 	OldPrice           float64          `json:"old_price"`

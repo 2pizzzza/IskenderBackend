@@ -180,6 +180,7 @@ func (db *DB) fillDiscountDetails(ctx context.Context, discount *models.Discount
 		discount.Name = item.Name
 		discount.Description = item.Description
 		discount.IsPopular = item.IsPopular
+		discount.CollectionID = item.CollectionID
 		discount.IsNew = item.IsNew
 		discount.IsProducer = item.IsProducer
 		discount.OldPrice = item.Price
