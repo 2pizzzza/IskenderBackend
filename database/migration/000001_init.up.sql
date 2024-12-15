@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS Review (
     username VARCHAR(255) NOT NULL,
     rating INT CHECK (rating >= 1 AND rating <= 5),
     text TEXT,
-    isShow BOOLEAN DEFAULT false,
+    isShow BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 

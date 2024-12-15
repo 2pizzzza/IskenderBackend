@@ -360,6 +360,19 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 	}
 	defer tx.Rollback(ctx)
 
+	checkDiscountQuery := `SELECT EXISTS(SELECT 1 FROM Discount WHERE discount_type = 'collection' AND target_id = $1)`
+	err = tx.QueryRow(ctx, checkDiscountQuery, collectionID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check discount existence: %w", op, err)
+	}
+	if exists {
+		deleteDiscountQuery := `DELETE FROM Discount WHERE discount_type = 'collection' AND target_id = $1`
+		_, err = tx.Exec(ctx, deleteDiscountQuery, collectionID)
+		if err != nil {
+			return fmt.Errorf("%s: failed to delete discount: %w", op, err)
+		}
+	}
+
 	updateItems := `UPDATE Item SET collection_id = NULL WHERE collection_id = $1`
 	_, err = tx.Exec(ctx, updateItems, collectionID)
 	if err != nil {
@@ -384,7 +397,6 @@ func (db *DB) DeleteCollection(ctx context.Context, collectionID int) error {
 		return fmt.Errorf("%s: failed to delete collection: %w", op, err)
 	}
 
-	// Фиксируем изменения
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("%s: failed to commit transaction: %w", op, err)
 	}

@@ -569,7 +569,7 @@ func (db *DB) getItemPhotos(ctx context.Context, itemID int) ([]models.PhotosRes
 			return nil, nil, fmt.Errorf("getItemPhotos: failed to scan photo row: %w", err)
 		}
 		colors = append(colors, models.ColorResponse{HashColor: photo.HashColor})
-		photo.URL = fmt.Sprintf("%s%s", db.Config.BaseUrl, photo.URL)
+		photo.URL = fmt.Sprintf("%s	%s", db.Config.BaseUrl, photo.URL)
 		photos = append(photos, photo)
 	}
 
@@ -880,6 +880,19 @@ func (db *DB) RemoveItem(ctx context.Context, itemID int) error {
 		return fmt.Errorf("%s: failed to begin transaction: %w", op, err)
 	}
 	defer tx.Rollback(ctx)
+
+	checkDiscountQuery := `SELECT EXISTS(SELECT 1 FROM Discount WHERE discount_type = 'item' AND target_id = $1)`
+	err = tx.QueryRow(ctx, checkDiscountQuery, itemID).Scan(&exists)
+	if err != nil {
+		return fmt.Errorf("%s: failed to check discount existence: %w", op, err)
+	}
+	if exists {
+		deleteDiscountQuery := `DELETE FROM Discount WHERE discount_type = 'item' AND target_id = $1`
+		_, err = tx.Exec(ctx, deleteDiscountQuery, itemID)
+		if err != nil {
+			return fmt.Errorf("%s: failed to delete discount: %w", op, err)
+		}
+	}
 
 	deleteItemTranslationQuery := `DELETE FROM ItemTranslation WHERE item_id = $1`
 	_, err = tx.Exec(ctx, deleteItemTranslationQuery, itemID)
