@@ -2224,6 +2224,18 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Filter by garant status",
+                        "name": "is_garant",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by aqua",
+                        "name": "is_aqua",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "min price",
                         "name": "min",
@@ -2288,6 +2300,18 @@ const docTemplate = `{
                         "type": "boolean",
                         "description": "Filter by painted",
                         "name": "is_painted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by garant status",
+                        "name": "is_garant",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by aqua",
+                        "name": "is_aqua",
                         "in": "query"
                     },
                     {
@@ -2939,6 +2963,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isPainted": {
                     "type": "boolean"
                 },
@@ -2980,6 +3010,12 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.CreateCollection"
                     }
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isNew": {
                     "type": "boolean"
                 },
@@ -3020,6 +3056,12 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.ColorResponse"
                     }
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isNew": {
                     "type": "boolean"
@@ -3102,6 +3144,12 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.CreateCollection"
                     }
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isNew": {
                     "type": "boolean"
@@ -3239,6 +3287,9 @@ const docTemplate = `{
         "models.Discount": {
             "type": "object",
             "properties": {
+                "collection_id": {
+                    "type": "integer"
+                },
                 "color": {
                     "type": "array",
                     "items": {

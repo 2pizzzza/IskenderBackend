@@ -22,6 +22,8 @@ import (
 // @Param  lang  query  string  false  "Language code"
 // @Param  is_producer  query  bool  false  "Filter by producer status"
 // @Param  is_painted  query  bool  false  "Filter by painted"
+// @Param  is_garant  query  bool  false  "Filter by garant status"
+// @Param  is_aqua  query  bool  false  "Filter by aqua"
 // @Param min query integer false "min price"
 // @Param max query integer false "max price"
 // @Param  q  query  string  false  "Search query"
@@ -36,6 +38,8 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 
 	isProducer := r.URL.Query().Get("is_producer")
 	isPainted := r.URL.Query().Get("is_painted")
+	isGarant := r.URL.Query().Get("is_garant")
+	isAqua := r.URL.Query().Get("is_aqua")
 	searchQuery := r.URL.Query().Get("q")
 	code := r.URL.Query().Get("lang")
 	priceLowStr := r.URL.Query().Get("min")
@@ -90,7 +94,29 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 		isPaintedVal = &val
 	}
 
-	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, decodedQuery, priceLow, priceHigh)
+	var isGarantVal *bool
+	if isGarant != "" {
+		val, err := strconv.ParseBool(isGarant)
+		if err != nil {
+			log.Error("Invalid isProducer value", slog.String("isGarant", isGarant), sl.Err(err))
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid isProducer value"}, http.StatusInternalServerError)
+			return
+		}
+		isGarantVal = &val
+	}
+
+	var isAquaVal *bool
+	if isAqua != "" {
+		val, err := strconv.ParseBool(isAqua)
+		if err != nil {
+			log.Error("Invalid isProducer value", slog.String("isAqua", isAqua), sl.Err(err))
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid isProducer value"}, http.StatusInternalServerError)
+			return
+		}
+		isAquaVal = &val
+	}
+
+	result, err := s.service.Search(r.Context(), code, isProducerVal, isPaintedVal, isGarantVal, isAquaVal, decodedQuery, priceLow, priceHigh)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusNotFound)
@@ -114,6 +140,8 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 // @Param  lang  query  string  false  "Language code"
 // @Param  is_producer  query  bool  false  "Filter by producer status"
 // @Param  is_painted  query  bool  false  "Filter by painted"
+// @Param  is_garant  query  bool  false  "Filter by garant status"
+// @Param  is_aqua  query  bool  false  "Filter by aqua"
 // @Param min query integer false "min price"
 // @Param max query integer false "max price"
 // @Param  q  query  string  false  "Search query"
@@ -128,6 +156,8 @@ func (s *Server) SearchCollections(w http.ResponseWriter, r *http.Request) {
 
 	isProducer := r.URL.Query().Get("is_producer")
 	isPainted := r.URL.Query().Get("is_painted")
+	isGarant := r.URL.Query().Get("is_garant")
+	isAqua := r.URL.Query().Get("is_aqua")
 	searchQuery := r.URL.Query().Get("q")
 	code := r.URL.Query().Get("lang")
 	priceLowStr := r.URL.Query().Get("min")
@@ -182,7 +212,29 @@ func (s *Server) SearchCollections(w http.ResponseWriter, r *http.Request) {
 		isPaintedVal = &val
 	}
 
-	result, err := s.service.SearchCollection(r.Context(), code, isProducerVal, isPaintedVal, decodedQuery, priceLow, priceHigh)
+	var isGarantVal *bool
+	if isGarant != "" {
+		val, err := strconv.ParseBool(isGarant)
+		if err != nil {
+			log.Error("Invalid isProducer value", slog.String("isGarant", isGarant), sl.Err(err))
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid isProducer value"}, http.StatusInternalServerError)
+			return
+		}
+		isGarantVal = &val
+	}
+
+	var isAquaVal *bool
+	if isAqua != "" {
+		val, err := strconv.ParseBool(isAqua)
+		if err != nil {
+			log.Error("Invalid isProducer value", slog.String("isAqua", isAqua), sl.Err(err))
+			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Invalid isProducer value"}, http.StatusInternalServerError)
+			return
+		}
+		isAquaVal = &val
+	}
+
+	result, err := s.service.SearchCollection(r.Context(), code, isProducerVal, isPaintedVal, isGarantVal, isAquaVal, decodedQuery, priceLow, priceHigh)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			utils.WriteResponseBody(w, models.ErrorMessage{Message: "Not Found"}, http.StatusNotFound)

@@ -35,6 +35,8 @@ type CollectionResponse struct {
 	IsPainted   bool             `json:"isPainted"`
 	IsPopular   bool             `json:"is_popular"`
 	IsNew       bool             `json:"is_new"`
+	IsGarant    bool             `json:"isGarant"`
+	IsAqua      bool             `json:"isAqua"`
 	Photos      []PhotosResponse `json:"photos"`
 	Colors      []ColorResponse  `json:"colors"`
 }
@@ -46,11 +48,13 @@ type PopularResponse struct {
 
 type UpdateCollectionRequest struct {
 	CollectionID int                `json:"collection_id"`
-	Price        float64            `json:"price,omitempty"`
-	IsProducer   bool               `json:"isProducer,omitempty"`
-	IsPainted    bool               `json:"isPainted,omitempty"`
-	IsPopular    bool               `json:"isPopular,omitempty"`
-	IsNew        bool               `json:"isNew,omitempty"`
+	Price        float64            `json:"price"`
+	IsProducer   bool               `json:"isProducer"`
+	IsPainted    bool               `json:"isPainted"`
+	IsPopular    bool               `json:"isPopular"`
+	IsNew        bool               `json:"isNew"`
+	IsGarant     bool               `json:"isGarant"`
+	IsAqua       bool               `json:"isAqua"`
 	Photos       []PhotosResponse   `json:"photos"`
 	Colors       []ColorResponse    `json:"colors"`
 	Collections  []UpdateCollection `json:"collections"`
@@ -66,40 +70,46 @@ type RemoveCollectionRequest struct {
 }
 
 type CreateCollectionRequest struct {
-	Price       float64            `json:"price,omitempty"`
-	IsProducer  bool               `json:"isProducer,omitempty"`
-	IsPainted   bool               `json:"isPainted,omitempty"`
-	IsPopular   bool               `json:"isPopular,omitempty"`
-	IsNew       bool               `json:"isNew,omitempty"`
+	Price       float64            `json:"price"`
+	IsProducer  bool               `json:"isProducer"`
+	IsPainted   bool               `json:"isPainted"`
+	IsPopular   bool               `json:"isPopular"`
+	IsNew       bool               `json:"isNew"`
+	IsGarant    bool               `json:"isGarant"`
+	IsAqua      bool               `json:"isAqua"`
 	Photos      []PhotosResponse   `json:"photos"`
 	Collections []CreateCollection `json:"collections"`
 }
 
 type CreateCollection struct {
-	Name         string `json:"name,omitempty"`
-	Description  string `json:"description,omitempty"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
 	LanguageCode string `json:"language_code"`
 }
 
 type CreateCollectionResponse struct {
 	ID          int                `json:"ID"`
 	Price       float64            `json:"price,omitempty"`
-	IsProducer  bool               `json:"isProducer,omitempty"`
-	IsPainted   bool               `json:"isPainted,omitempty"`
-	IsPopular   bool               `json:"isPopular,omitempty"`
-	IsNew       bool               `json:"isNew,omitempty"`
+	IsProducer  bool               `json:"isProducer"`
+	IsPainted   bool               `json:"isPainted"`
+	IsPopular   bool               `json:"isPopular"`
+	IsNew       bool               `json:"isNew"`
+	IsGarant    bool               `json:"isGarant"`
+	IsAqua      bool               `json:"isAqua"`
 	Photos      []PhotosResponse   `json:"photos"`
 	Collections []CreateCollection `json:"collections"`
 }
 
 type CollectionResponses struct {
 	ID          int                `json:"ID"`
-	Price       float64            `json:"price,omitempty"`
-	IsProducer  bool               `json:"isProducer,omitempty"`
-	IsPainted   bool               `json:"isPainted,omitempty"`
-	IsPopular   bool               `json:"isPopular,omitempty"`
-	IsNew       bool               `json:"isNew,omitempty"`
+	Price       float64            `json:"price"`
+	IsProducer  bool               `json:"isProducer"`
+	IsPainted   bool               `json:"isPainted"`
+	IsPopular   bool               `json:"isPopular"`
+	IsNew       bool               `json:"isNew"`
 	Name        string             `json:"name"`
+	IsGarant    bool               `json:"isGarant"`
+	IsAqua      bool               `json:"isAqua"`
 	Photos      []PhotosResponse   `json:"photos"`
 	Collections []CreateCollection `json:"collections"`
 	Color       []ColorResponse    `json:"color"`
@@ -107,11 +117,13 @@ type CollectionResponses struct {
 
 type CollectionResponseForAdmin struct {
 	ID          int                `json:"ID"`
-	Price       float64            `json:"price,omitempty"`
-	IsProducer  bool               `json:"isProducer,omitempty"`
-	IsPainted   bool               `json:"isPainted,omitempty"`
-	IsPopular   bool               `json:"isPopular,omitempty"`
-	IsNew       bool               `json:"isNew,omitempty"`
+	Price       float64            `json:"price"`
+	IsProducer  bool               `json:"isProducer"`
+	IsPainted   bool               `json:"isPainted"`
+	IsPopular   bool               `json:"isPopular"`
+	IsNew       bool               `json:"isNew"`
+	IsGarant    bool               `json:"isGarant"`
+	IsAqua      bool               `json:"isAqua"`
 	Photos      []PhotosResponse   `json:"photos"`
 	Collections []CreateCollection `json:"collections"`
 }

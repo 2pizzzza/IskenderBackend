@@ -6,13 +6,14 @@ import (
 	"github.com/2pizzzza/plumbing/internal/domain/models"
 	"github.com/2pizzzza/plumbing/internal/storage"
 	"github.com/jackc/pgx/v5"
+	"log"
 )
 
 func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode string) ([]*models.CollectionResponse, error) {
 	const op = "postgres.GetCollectionsByLanguageCode"
 
 	query := `
-    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, 
+    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
            COALESCE(ct.name, ''), COALESCE(ct.description, '')
     FROM Collection c
     LEFT JOIN CollectionTranslation ct 
@@ -28,7 +29,16 @@ func (db *DB) GetCollectionsByLanguageCode(ctx context.Context, languageCode str
 
 	for rows.Next() {
 		var collection models.CollectionResponse
-		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.Name, &collection.Description); err != nil {
+		if err := rows.Scan(&collection.ID,
+			&collection.Price,
+			&collection.IsProducer,
+			&collection.IsPainted,
+			&collection.IsPopular,
+			&collection.IsNew,
+			&collection.IsGarant,
+			&collection.IsAqua,
+			&collection.Name,
+			&collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
@@ -54,7 +64,7 @@ func (db *DB) GetCollectionsByIsProducerSLanguageCode(ctx context.Context, langu
 	const op = "postgres.GetCollectionsByLanguageCode"
 
 	query := `
-    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, 
+    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
            COALESCE(ct.name, ''), COALESCE(ct.description, '')
     FROM Collection c
     LEFT JOIN CollectionTranslation ct 
@@ -71,7 +81,7 @@ func (db *DB) GetCollectionsByIsProducerSLanguageCode(ctx context.Context, langu
 
 	for rows.Next() {
 		var collection models.CollectionResponse
-		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.Name, &collection.Description); err != nil {
+		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.IsGarant, &collection.IsAqua, &collection.Name, &collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
@@ -98,7 +108,7 @@ func (db *DB) GetCollectionsByIsProducerPLanguageCode(ctx context.Context, langu
 	const op = "postgres.GetCollectionsByLanguageCode"
 
 	query := `
-    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, 
+    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
            COALESCE(ct.name, ''), COALESCE(ct.description, '')
     FROM Collection c
     LEFT JOIN CollectionTranslation ct 
@@ -115,7 +125,7 @@ func (db *DB) GetCollectionsByIsProducerPLanguageCode(ctx context.Context, langu
 
 	for rows.Next() {
 		var collection models.CollectionResponse
-		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.Name, &collection.Description); err != nil {
+		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.IsGarant, &collection.IsAqua, &collection.Name, &collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
@@ -142,7 +152,7 @@ func (db *DB) GetPopularCollections(ctx context.Context, languageCode string) ([
 	const op = "postgres.GetPopularCollections"
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew,
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
 		       COALESCE(ct.name, ''), COALESCE(ct.description, '')
 		FROM Collection c
 		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $1
@@ -159,7 +169,7 @@ func (db *DB) GetPopularCollections(ctx context.Context, languageCode string) ([
 	for rows.Next() {
 		var collection models.CollectionResponse
 		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular,
-			&collection.IsNew, &collection.Name, &collection.Description); err != nil {
+			&collection.IsNew, &collection.IsGarant, &collection.IsAqua, &collection.Name, &collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
@@ -186,7 +196,7 @@ func (db *DB) GetNewCollections(ctx context.Context, languageCode string) ([]*mo
 	const op = "postgres.GetNewCollections"
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew,
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
 		       COALESCE(ct.name, ''), COALESCE(ct.description, '')
 		FROM Collection c
 		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $1
@@ -203,7 +213,7 @@ func (db *DB) GetNewCollections(ctx context.Context, languageCode string) ([]*mo
 	for rows.Next() {
 		var collection models.CollectionResponse
 		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular,
-			&collection.IsNew, &collection.Name, &collection.Description); err != nil {
+			&collection.IsNew, &collection.IsGarant, &collection.IsAqua, &collection.Name, &collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
@@ -240,7 +250,7 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 	}
 
 	query := `
-    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, 
+    SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
            COALESCE(ct.name, ''), COALESCE(ct.description, '')
     FROM Collection c
     LEFT JOIN CollectionTranslation ct 
@@ -249,7 +259,7 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 
 	var collection models.CollectionResponse
 	err = db.Pool.QueryRow(ctx, query, collectionID, languageCode).Scan(
-		&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew,
+		&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular, &collection.IsNew, &collection.IsGarant, &collection.IsAqua,
 		&collection.Name, &collection.Description,
 	)
 	if err != nil {
@@ -266,11 +276,11 @@ func (db *DB) GetCollectionByID(ctx context.Context, collectionID int, languageC
 
 	return &collection, nil
 }
-func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error) {
+func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error) {
 	const op = "postgres.SearchCollections"
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew,
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua,
 		COALESCE(ct.name, ''), COALESCE(ct.description, '')
 		FROM Collection c
 		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $1
@@ -287,6 +297,16 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 	if isPainted != nil {
 		query += ` AND c.isPainted = $` + fmt.Sprintf("%d", len(args)+1)
 		args = append(args, *isPainted)
+	}
+
+	if isGarant != nil {
+		query += ` AND c.isGarant = $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *isGarant)
+	}
+
+	if isAqua != nil {
+		query += ` AND c.isAqua = $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *isAqua)
 	}
 
 	if searchQuery != "" {
@@ -313,8 +333,16 @@ func (db *DB) SearchCollections(ctx context.Context, languageCode string, isProd
 	var collections []*models.CollectionResponse
 	for rows.Next() {
 		var collection models.CollectionResponse
-		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted, &collection.IsPopular,
-			&collection.IsNew, &collection.Name, &collection.Description); err != nil {
+		if err := rows.Scan(&collection.ID,
+			&collection.Price,
+			&collection.IsProducer,
+			&collection.IsPainted,
+			&collection.IsPopular,
+			&collection.IsNew,
+			&collection.IsGarant,
+			&collection.IsAqua,
+			&collection.Name,
+			&collection.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
 
@@ -408,7 +436,7 @@ func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCo
 	const op = "postgres.GetRandomCollectionsWithPopularity"
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, ct.name, ct.description
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, ct.name, ct.description, c.isGarant, c.isAqua
 		FROM Collection c
 		LEFT JOIN CollectionTranslation ct ON c.id = ct.collection_id AND ct.language_code = $1
 		ORDER BY RANDOM() 
@@ -433,6 +461,8 @@ func (db *DB) GetRandomCollectionsWithPopularity(ctx context.Context, languageCo
 			&collection.IsNew,
 			&collection.Name,
 			&collection.Description,
+			&collection.IsGarant,
+			&collection.IsAqua,
 		); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
@@ -553,8 +583,8 @@ func (db *DB) CreateCollection(ctx context.Context, req models.CreateCollectionR
 
 	var collectionID int
 	insertCollectionQuery := `
-		INSERT INTO Collection (price, isProducer, isPainted, isPopular, isNew)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO Collection (price, isProducer, isPainted, isPopular, isNew, isGarant, isAqua)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id
 	`
 	err = tx.QueryRow(ctx, insertCollectionQuery,
@@ -563,6 +593,8 @@ func (db *DB) CreateCollection(ctx context.Context, req models.CreateCollectionR
 		req.IsPainted,
 		req.IsPopular,
 		req.IsNew,
+		req.IsGarant,
+		req.IsAqua,
 	).Scan(&collectionID)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to insert collection: %w", op, err)
@@ -617,6 +649,8 @@ func (db *DB) CreateCollection(ctx context.Context, req models.CreateCollectionR
 	response.IsPopular = req.IsPopular
 	response.IsNew = req.IsNew
 	response.Collections = req.Collections
+	response.IsGarant = req.IsGarant
+	response.IsAqua = req.IsAqua
 
 	for _, photo := range req.Photos {
 		response.Photos = append(response.Photos, models.PhotosResponse{
@@ -633,7 +667,7 @@ func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionRespon
 	const op = "postgres.GetAllCollections"
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua
 		FROM Collection c`
 
 	rows, err := db.Pool.Query(ctx, query)
@@ -646,11 +680,18 @@ func (db *DB) GetAllCollections(ctx context.Context) ([]*models.CollectionRespon
 
 	for rows.Next() {
 		var collection models.CollectionResponses
-		if err := rows.Scan(&collection.ID, &collection.Price, &collection.IsProducer, &collection.IsPainted,
-			&collection.IsPopular, &collection.IsNew); err != nil {
+		if err := rows.Scan(
+			&collection.ID,
+			&collection.Price,
+			&collection.IsProducer,
+			&collection.IsPainted,
+			&collection.IsPopular,
+			&collection.IsNew,
+			&collection.IsGarant,
+			&collection.IsAqua); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan collection row: %w", op, err)
 		}
-
+		log.Println(collection)
 		transQuery := `SELECT language_code, name, description FROM CollectionTranslation WHERE collection_id = $1`
 		transRows, err := db.Pool.Query(ctx, transQuery, collection.ID)
 		if err != nil {
@@ -702,7 +743,7 @@ func (db *DB) GetCollection(ctx context.Context, collectionID int) (*models.Coll
 	}
 
 	query := `
-		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew
+		SELECT c.id, c.price, c.isProducer, c.isPainted, c.isPopular, c.isNew, c.isGarant, c.isAqua
 		FROM Collection c WHERE c.id = $1`
 	var collection models.CollectionResponseForAdmin
 	err = db.Pool.QueryRow(ctx, query, collectionID).Scan(
@@ -712,6 +753,8 @@ func (db *DB) GetCollection(ctx context.Context, collectionID int) (*models.Coll
 		&collection.IsPainted,
 		&collection.IsPopular,
 		&collection.IsNew,
+		&collection.IsGarant,
+		&collection.IsAqua,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("%s: failed to get collection details: %w", op, err)
@@ -776,8 +819,8 @@ func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models
 
 	updateCollectionQuery := `
 		UPDATE Collection
-		SET price = $1, isProducer = $2, isPainted = $3, isPopular = $4, isNew = $5
-		WHERE id = $6
+		SET price = $1, isProducer = $2, isPainted = $3, isPopular = $4, isNew = $5, isGarant = $6, c.isAqua = $7
+		WHERE id = $8
 	`
 	_, err = tx.Exec(ctx, updateCollectionQuery,
 		req.Price,
@@ -785,6 +828,8 @@ func (db *DB) UpdateCollection(ctx context.Context, collectionID int, req models
 		req.IsPainted,
 		req.IsPopular,
 		req.IsNew,
+		req.IsGarant,
+		req.IsAqua,
 		collectionID,
 	)
 	if err != nil {

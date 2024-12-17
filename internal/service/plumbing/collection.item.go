@@ -64,7 +64,7 @@ func (pr *Plumping) GetNew(ctx context.Context, code string) (*models.PopularRes
 	return res, nil
 }
 
-func (pr *Plumping) Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error) {
+func (pr *Plumping) Search(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error) {
 	const op = "service.Search"
 
 	log := pr.log.With(
@@ -79,7 +79,7 @@ func (pr *Plumping) Search(ctx context.Context, code string, isProducer *bool, i
 		return nil, fmt.Errorf("%s, %w", op, err)
 	}
 
-	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, isPainted, searchQuery, minPrice, maxPrice)
+	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, isPainted, isGarant, isAqua, searchQuery, minPrice, maxPrice)
 	if errors.Is(err, storage.ErrCollectionNotFound) {
 		count++
 		if count == 2 {
@@ -125,14 +125,14 @@ func (pr *Plumping) SearchItem(ctx context.Context, code string, isProducer *boo
 	return items, nil
 }
 
-func (pr *Plumping) SearchCollection(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error) {
+func (pr *Plumping) SearchCollection(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error) {
 	const op = "service.SearchCollection"
 
 	log := pr.log.With(
 		slog.String("op: ", op),
 	)
 
-	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, isPainted, searchQuery, minPrice, maxPrice)
+	collection, err := pr.plumpingRepository.SearchCollections(ctx, code, isProducer, isPainted, isGarant, isAqua, searchQuery, minPrice, maxPrice)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			return nil, storage.ErrCollectionNotFound

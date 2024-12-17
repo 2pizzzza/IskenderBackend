@@ -46,6 +46,10 @@ definitions:
         type: boolean
       is_popular:
         type: boolean
+      isAqua:
+        type: boolean
+      isGarant:
+        type: boolean
       isPainted:
         type: boolean
       isProducer:
@@ -69,6 +73,10 @@ definitions:
         items:
           $ref: '#/definitions/models.CreateCollection'
         type: array
+      isAqua:
+        type: boolean
+      isGarant:
+        type: boolean
       isNew:
         type: boolean
       isPainted:
@@ -96,6 +104,10 @@ definitions:
         items:
           $ref: '#/definitions/models.ColorResponse'
         type: array
+      isAqua:
+        type: boolean
+      isGarant:
+        type: boolean
       isNew:
         type: boolean
       isPainted:
@@ -149,6 +161,10 @@ definitions:
         items:
           $ref: '#/definitions/models.CreateCollection'
         type: array
+      isAqua:
+        type: boolean
+      isGarant:
+        type: boolean
       isNew:
         type: boolean
       isPainted:
@@ -238,6 +254,8 @@ definitions:
     type: object
   models.Discount:
     properties:
+      collection_id:
+        type: integer
       color:
         items:
           $ref: '#/definitions/models.ColorResponse'
@@ -2050,6 +2068,14 @@ paths:
         in: query
         name: is_painted
         type: boolean
+      - description: Filter by garant status
+        in: query
+        name: is_garant
+        type: boolean
+      - description: Filter by aqua
+        in: query
+        name: is_aqua
+        type: boolean
       - description: min price
         in: query
         name: min
@@ -2095,6 +2121,14 @@ paths:
       - description: Filter by painted
         in: query
         name: is_painted
+        type: boolean
+      - description: Filter by garant status
+        in: query
+        name: is_garant
+        type: boolean
+      - description: Filter by aqua
+        in: query
+        name: is_aqua
         type: boolean
       - description: min price
         in: query

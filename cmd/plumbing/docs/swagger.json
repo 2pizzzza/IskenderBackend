@@ -2217,6 +2217,18 @@
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Filter by garant status",
+                        "name": "is_garant",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by aqua",
+                        "name": "is_aqua",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "min price",
                         "name": "min",
@@ -2281,6 +2293,18 @@
                         "type": "boolean",
                         "description": "Filter by painted",
                         "name": "is_painted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by garant status",
+                        "name": "is_garant",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by aqua",
+                        "name": "is_aqua",
                         "in": "query"
                     },
                     {
@@ -2932,6 +2956,12 @@
                 "id": {
                     "type": "integer"
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isPainted": {
                     "type": "boolean"
                 },
@@ -2973,6 +3003,12 @@
                         "$ref": "#/definitions/models.CreateCollection"
                     }
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isNew": {
                     "type": "boolean"
                 },
@@ -3013,6 +3049,12 @@
                     "items": {
                         "$ref": "#/definitions/models.ColorResponse"
                     }
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isNew": {
                     "type": "boolean"
@@ -3095,6 +3137,12 @@
                     "items": {
                         "$ref": "#/definitions/models.CreateCollection"
                     }
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isNew": {
                     "type": "boolean"
@@ -3232,6 +3280,9 @@
         "models.Discount": {
             "type": "object",
             "properties": {
+                "collection_id": {
+                    "type": "integer"
+                },
                 "color": {
                     "type": "array",
                     "items": {

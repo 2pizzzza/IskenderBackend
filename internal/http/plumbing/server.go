@@ -81,8 +81,8 @@ type Service interface {
 	GetItemWithoutDiscount(ctx context.Context) ([]models.ItemWithoutDiscount, error)
 
 	//Seach
-	Search(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error)
-	SearchCollection(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error)
+	Search(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error)
+	SearchCollection(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error)
 	SearchItem(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error)
 
 	//Photo

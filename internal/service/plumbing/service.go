@@ -75,7 +75,7 @@ type PlumpingRepository interface {
 	GetNewItems(ctx context.Context, languageCode string) ([]*models.ItemResponse, error)
 
 	//Search and filtr
-	SearchCollections(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error)
+	SearchCollections(ctx context.Context, languageCode string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error)
 	SearchItems(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error)
 
 	//Item
