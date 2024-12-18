@@ -83,8 +83,7 @@ type Service interface {
 	//Seach
 	Search(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) (*models.PopularResponse, error)
 	SearchCollection(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.CollectionResponse, error)
-	SearchItem(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error)
-
+	SearchItem(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error)
 	//Photo
 	GetImagePath(ctx context.Context, imageName string) (string, error)
 	UploadPhotos(ctx context.Context, files []*multipart.FileHeader) ([]string, error)

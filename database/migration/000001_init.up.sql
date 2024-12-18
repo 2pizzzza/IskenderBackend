@@ -66,7 +66,9 @@ CREATE TABLE IF NOT EXISTS Item (
     isProducer BOOLEAN DEFAULT false,
     isPainted BOOLEAN DEFAULT false,
     isPopular BOOLEAN DEFAULT false,
-    isNew BOOLEAN DEFAULT false
+    isNew BOOLEAN DEFAULT false,
+    isGarant BOOLEAN DEFAULT false,
+    isAqua BOOLEAN DEFAULT false
     );
 
 

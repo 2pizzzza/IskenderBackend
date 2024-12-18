@@ -38,6 +38,8 @@ type ItemResponse struct {
 	IsPainted    bool             `json:"isPainted"`
 	IsPopular    bool             `json:"is_popular"`
 	IsNew        bool             `json:"is_new"`
+	IsGarant     bool             `json:"isGarant"`
+	IsAqua       bool             `json:"isAqua"`
 	Photos       []PhotosResponse `json:"photos"`
 	Colors       []ColorResponse  `json:"colors"`
 }
@@ -51,6 +53,8 @@ type CreateItem struct {
 	IsPainted    bool                    `json:"isPainted"`
 	IsPopular    bool                    `json:"is_popular"`
 	IsNew        bool                    `json:"is_new"`
+	IsGarant     bool                    `json:"isGarant"`
+	IsAqua       bool                    `json:"isAqua"`
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 }
@@ -71,6 +75,8 @@ type CreateItemResponse struct {
 	IsPainted    bool                    `json:"isPainted"`
 	IsPopular    bool                    `json:"is_popular"`
 	IsNew        bool                    `json:"is_new"`
+	IsGarant     bool                    `json:"isGarant"`
+	IsAqua       bool                    `json:"isAqua"`
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 }
@@ -86,6 +92,8 @@ type ItemResponses struct {
 	IsPopular    bool                    `json:"is_popular"`
 	IsNew        bool                    `json:"is_new"`
 	Name         string                  `json:"name"`
+	IsGarant     bool                    `json:"isGarant"`
+	IsAqua       bool                    `json:"isAqua"`
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 	Color        []ColorResponse         `json:"color"`
@@ -102,6 +110,8 @@ type ItemResponseForAdmin struct {
 	IsPopular    bool                    `json:"is_popular"`
 	IsNew        bool                    `json:"is_new"`
 	Name         string                  `json:"name"`
+	IsGarant     bool                    `json:"isGarant"`
+	IsAqua       bool                    `json:"isAqua"`
 	Photos       []PhotosResponse        `json:"photos"`
 	Items        []CreateItemTranslation `json:"items"`
 }

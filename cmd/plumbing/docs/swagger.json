@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "127.0.0.1:8080",
+    "host": "https://garant-asia.com",
     "basePath": "/",
     "paths": {
         "/api/brand": {
@@ -2375,6 +2375,18 @@
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Filter by garant status",
+                        "name": "is_garant",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by aqua",
+                        "name": "is_aqua",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "min price",
                         "name": "min",
@@ -3179,6 +3191,12 @@
                 "collection_id": {
                     "type": "integer"
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isPainted": {
                     "type": "boolean"
                 },
@@ -3427,6 +3445,12 @@
                 "id": {
                     "type": "integer"
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isPainted": {
                     "type": "boolean"
                 },
@@ -3470,6 +3494,12 @@
                 },
                 "collection_id": {
                     "type": "integer"
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isPainted": {
                     "type": "boolean"
@@ -3523,6 +3553,12 @@
                     "items": {
                         "$ref": "#/definitions/models.ColorResponse"
                     }
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isPainted": {
                     "type": "boolean"

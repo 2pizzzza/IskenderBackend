@@ -192,6 +192,10 @@ definitions:
         type: boolean
       is_popular:
         type: boolean
+      isAqua:
+        type: boolean
+      isGarant:
+        type: boolean
       isPainted:
         type: boolean
       isProducer:
@@ -354,6 +358,10 @@ definitions:
         type: boolean
       is_popular:
         type: boolean
+      isAqua:
+        type: boolean
+      isGarant:
+        type: boolean
       isPainted:
         type: boolean
       isProducer:
@@ -382,6 +390,10 @@ definitions:
       is_new:
         type: boolean
       is_popular:
+        type: boolean
+      isAqua:
+        type: boolean
+      isGarant:
         type: boolean
       isPainted:
         type: boolean
@@ -417,6 +429,10 @@ definitions:
       is_new:
         type: boolean
       is_popular:
+        type: boolean
+      isAqua:
+        type: boolean
+      isGarant:
         type: boolean
       isPainted:
         type: boolean
@@ -588,7 +604,7 @@ definitions:
           $ref: '#/definitions/models.CreateVacancy'
         type: array
     type: object
-host: 127.0.0.1:8080
+host: https://garant-asia.com
 info:
   contact:
     email: support@swagger.io
@@ -2175,6 +2191,14 @@ paths:
       - description: Filter by painted
         in: query
         name: is_painted
+        type: boolean
+      - description: Filter by garant status
+        in: query
+        name: is_garant
+        type: boolean
+      - description: Filter by aqua
+        in: query
+        name: is_aqua
         type: boolean
       - description: min price
         in: query

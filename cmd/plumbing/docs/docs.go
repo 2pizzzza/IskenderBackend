@@ -2382,6 +2382,18 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "description": "Filter by garant status",
+                        "name": "is_garant",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by aqua",
+                        "name": "is_aqua",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "min price",
                         "name": "min",
@@ -3186,6 +3198,12 @@ const docTemplate = `{
                 "collection_id": {
                     "type": "integer"
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isPainted": {
                     "type": "boolean"
                 },
@@ -3434,6 +3452,12 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
+                },
                 "isPainted": {
                     "type": "boolean"
                 },
@@ -3477,6 +3501,12 @@ const docTemplate = `{
                 },
                 "collection_id": {
                     "type": "integer"
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isPainted": {
                     "type": "boolean"
@@ -3530,6 +3560,12 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.ColorResponse"
                     }
+                },
+                "isAqua": {
+                    "type": "boolean"
+                },
+                "isGarant": {
+                    "type": "boolean"
                 },
                 "isPainted": {
                     "type": "boolean"
@@ -3807,7 +3843,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "127.0.0.1:8080",
+	Host:             "https://garant-asia.com",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Swagger Plumbing API",

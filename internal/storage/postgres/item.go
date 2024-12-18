@@ -24,7 +24,7 @@ func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, language
 	}
 
 	query := `
-		SELECT i.id, COALESCE(it.name, ''), COALESCE(it.description, ''), i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted
+		SELECT i.id, COALESCE(it.name, ''), COALESCE(it.description, ''), i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $2
 		WHERE i.category_id = $1`
@@ -39,7 +39,20 @@ func (db *DB) GetItemsByCategoryID(ctx context.Context, categoryID int, language
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer, &item.IsPainted); err != nil {
+		if err := rows.Scan(
+			&item.ID,
+			&item.Name,
+			&item.Description,
+			&item.CategoryID,
+			&item.CollectionID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&item.IsGarant,
+			&item.IsAqua); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 		if item.CollectionID == nil {
@@ -77,7 +90,7 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 	}
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted,
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua,
 		       COALESCE(it.name, ''), COALESCE(it.description, '')
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $2
@@ -85,8 +98,19 @@ func (db *DB) GetItemByID(ctx context.Context, itemID int, languageCode string) 
 
 	var item models.ItemResponse
 	err = db.Pool.QueryRow(ctx, query, itemID, languageCode).Scan(
-		&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-		&item.IsPainted, &item.Name, &item.Description,
+		&item.ID,
+		&item.CategoryID,
+		&item.CollectionID,
+		&item.Size,
+		&item.Price,
+		&item.IsProducer,
+		&item.IsPainted,
+		&item.IsPopular,
+		&item.IsNew,
+		&item.IsGarant,
+		&item.IsAqua,
+		&item.Name,
+		&item.Description,
 	)
 	if item.CollectionID == nil {
 		a := 0
@@ -108,7 +132,7 @@ func (db *DB) GetAllItems(ctx context.Context) ([]*models.ItemResponses, error) 
 	const op = "postgres.GetAllItems"
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua
 		FROM Item i`
 
 	rows, err := db.Pool.Query(ctx, query)
@@ -121,8 +145,18 @@ func (db *DB) GetAllItems(ctx context.Context) ([]*models.ItemResponses, error) 
 
 	for rows.Next() {
 		var item models.ItemResponses
-		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-			&item.IsPainted, &item.IsPopular, &item.IsNew); err != nil {
+		if err := rows.Scan(&item.ID,
+			&item.CategoryID,
+			&item.CollectionID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&item.IsGarant,
+			&item.IsAqua,
+		); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 		if item.CollectionID == nil {
@@ -180,7 +214,7 @@ func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, lang
 	}
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew,
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua,
 		       COALESCE(it.name, ''), COALESCE(it.description, '')
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $2
@@ -196,8 +230,19 @@ func (db *DB) GetItemsByCollectionID(ctx context.Context, collectionID int, lang
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
+		if err := rows.Scan(&item.ID,
+			&item.CategoryID,
+			&item.CollectionID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&item.IsGarant,
+			&item.IsAqua,
+			&item.Name,
+			&item.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 
@@ -234,7 +279,7 @@ func (db *DB) GetItem(ctx context.Context, itemID int) (*models.ItemResponseForA
 
 	query := `
 		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, 
-			i.isProducer, i.isPainted, i.isPopular, i.isNew
+			i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua
 		FROM Item i WHERE i.id = $1`
 	var item models.ItemResponseForAdmin
 	err = db.Pool.QueryRow(ctx, query, itemID).Scan(
@@ -247,6 +292,8 @@ func (db *DB) GetItem(ctx context.Context, itemID int) (*models.ItemResponseForA
 		&item.IsPainted,
 		&item.IsPopular,
 		&item.IsNew,
+		&item.IsGarant,
+		&item.IsAqua,
 	)
 	if item.CollectionID == nil {
 		a := 0
@@ -289,7 +336,7 @@ func (db *DB) GetPopularItems(ctx context.Context, languageCode string) ([]*mode
 	const op = "postgres.GetPopularItems"
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew,
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua,
 		       COALESCE(it.name, ''), COALESCE(it.description, '')
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
@@ -305,8 +352,20 @@ func (db *DB) GetPopularItems(ctx context.Context, languageCode string) ([]*mode
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
+		if err := rows.Scan(&item.ID,
+			&item.CategoryID,
+			&item.CollectionID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&item.IsGarant,
+			&item.IsAqua,
+			&item.Name,
+			&item.Description,
+		); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 
@@ -336,7 +395,7 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 	const op = "postgres.GetNewItems"
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew,
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua,
 		       COALESCE(it.name, ''), COALESCE(it.description, '')
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
@@ -352,8 +411,19 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
+		if err := rows.Scan(&item.ID,
+			&item.CategoryID,
+			&item.CollectionID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&item.IsGarant,
+			&item.IsAqua,
+			&item.Name,
+			&item.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 
@@ -380,11 +450,11 @@ func (db *DB) GetNewItems(ctx context.Context, languageCode string) ([]*models.I
 	return items, nil
 }
 
-func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error) {
+func (db *DB) SearchItem(ctx context.Context, languageCode string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error) {
 	const op = "postgres.SearchItems"
 
 	query := `
-		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew,
+		SELECT i.id, i.category_id, i.collection_id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua,
 		COALESCE(it.name, ''), COALESCE(it.description, '')
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
@@ -401,6 +471,16 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 	if isPainted != nil {
 		query += ` AND i.isPainted = $` + fmt.Sprintf("%d", len(args)+1)
 		args = append(args, *isPainted)
+	}
+
+	if isGarant != nil {
+		query += ` AND i.isGarant = $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *isGarant)
+	}
+
+	if isAqua != nil {
+		query += ` AND i.isAqua = $` + fmt.Sprintf("%d", len(args)+1)
+		args = append(args, *isAqua)
 	}
 
 	if searchQuery != "" {
@@ -428,8 +508,19 @@ func (db *DB) SearchItems(ctx context.Context, languageCode string, isProducer *
 
 	for rows.Next() {
 		var item models.ItemResponse
-		if err := rows.Scan(&item.ID, &item.CategoryID, &item.CollectionID, &item.Size, &item.Price, &item.IsProducer,
-			&item.IsPainted, &item.IsPopular, &item.IsNew, &item.Name, &item.Description); err != nil {
+		if err := rows.Scan(&item.ID,
+			&item.CategoryID,
+			&item.CollectionID,
+			&item.Size,
+			&item.Price,
+			&item.IsProducer,
+			&item.IsPainted,
+			&item.IsPopular,
+			&item.IsNew,
+			&item.IsGarant,
+			&item.IsAqua,
+			&item.Name,
+			&item.Description); err != nil {
 			return nil, fmt.Errorf("%s: failed to scan item row: %w", op, err)
 		}
 		if item.CollectionID == nil {
@@ -473,7 +564,7 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 	}
 
 	query := `
-		SELECT i.id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, it.name, it.description
+		SELECT i.id, i.size, i.price, i.isProducer, i.isPainted, i.isPopular, i.isNew, i.isGarant, i.isAqua, i.category_id, i.collection_id, it.name, it.description
 		FROM Item i
 		LEFT JOIN ItemTranslation it ON i.id = it.item_id AND it.language_code = $1
 		WHERE i.category_id = $2
@@ -501,7 +592,9 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 			&item.IsPainted,
 			&item.IsPopular,
 			&item.IsNew,
-			&item.CollectionID,
+			&item.IsGarant,
+			&item.IsAqua,
+			&item.CategoryID,
 			&item.CollectionID,
 			&name,
 			&description,
@@ -520,7 +613,10 @@ func (db *DB) GetRandomItemsWithPopularity(ctx context.Context, languageCode str
 		} else {
 			item.Description = ""
 		}
-
+		if item.CollectionID == nil {
+			temp := 0
+			item.CollectionID = &temp
+		}
 		photos, colors, err := db.getItemPhotos(ctx, item.ID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to get photos for item %d: %w", op, item.ID, err)
@@ -655,8 +751,8 @@ func (db *DB) CreateItem(ctx context.Context, req models.CreateItem) (*models.Cr
 	var itemID int
 	if req.CollectionID == 0 {
 		err = tx.QueryRow(ctx, `
-        INSERT INTO Item (category_id, size, price, isProducer, isPainted, isPopular, isNew)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO Item (category_id, size, price, isProducer, isPainted, isPopular, isNew, isGarant, isAqua)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id
     `,
 			req.CategoryID,
@@ -666,11 +762,13 @@ func (db *DB) CreateItem(ctx context.Context, req models.CreateItem) (*models.Cr
 			req.IsPainted,
 			req.IsPopular,
 			req.IsNew,
+			req.IsGarant,
+			req.IsAqua,
 		).Scan(&itemID)
 	} else {
 		err = tx.QueryRow(ctx, `
-        INSERT INTO Item (category_id, collection_id, size, price, isProducer, isPainted, isPopular, isNew)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO Item (category_id, collection_id, size, price, isProducer, isPainted, isPopular, isNew, isGarant, isAqua)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING id
     `,
 			req.CategoryID,
@@ -681,6 +779,8 @@ func (db *DB) CreateItem(ctx context.Context, req models.CreateItem) (*models.Cr
 			req.IsPainted,
 			req.IsPopular,
 			req.IsNew,
+			req.IsGarant,
+			req.IsAqua,
 		).Scan(&itemID)
 	}
 	if err != nil {
@@ -738,6 +838,8 @@ func (db *DB) CreateItem(ctx context.Context, req models.CreateItem) (*models.Cr
 	response.IsPainted = req.IsPainted
 	response.IsPopular = req.IsPopular
 	response.IsNew = req.IsNew
+	response.IsGarant = req.IsGarant
+	response.IsAqua = req.IsAqua
 	response.Items = req.Items
 
 	for _, photo := range req.Photos {
@@ -785,8 +887,9 @@ func (db *DB) UpdateItem(ctx context.Context, itemID int, req models.CreateItem)
 	updateItemQuery := `
 		UPDATE Item
 		SET category_id = $1, collection_id = $2, size = $3, price = $4, 
-		    isProducer = $5, isPainted = $6, isPopular = $7, isNew = $8
-		WHERE id = $9
+		    isProducer = $5, isPainted = $6, isPopular = $7, isNew = $8,
+		    isGarant = $9, isAqua = $10
+		WHERE id = $11
 	`
 	_, err = tx.Exec(ctx, updateItemQuery,
 		req.CategoryID,
@@ -797,6 +900,8 @@ func (db *DB) UpdateItem(ctx context.Context, itemID int, req models.CreateItem)
 		req.IsPainted,
 		req.IsPopular,
 		req.IsNew,
+		req.IsGarant,
+		req.IsAqua,
 		itemID,
 	)
 	if err != nil {

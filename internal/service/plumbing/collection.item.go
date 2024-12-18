@@ -71,7 +71,7 @@ func (pr *Plumping) Search(ctx context.Context, code string, isProducer, isPaint
 		slog.String("op: ", op),
 	)
 	count := 0
-	items, err := pr.plumpingRepository.SearchItems(ctx, code, isProducer, isPainted, searchQuery, minPrice, maxPrice)
+	items, err := pr.plumpingRepository.SearchItem(ctx, code, isProducer, isPainted, isGarant, isAqua, searchQuery, minPrice, maxPrice)
 	if errors.Is(err, storage.ErrCollectionNotFound) {
 		count++
 	} else if err != nil {
@@ -103,13 +103,13 @@ func (pr *Plumping) Search(ctx context.Context, code string, isProducer, isPaint
 	return res, nil
 }
 
-func (pr *Plumping) SearchItem(ctx context.Context, code string, isProducer *bool, isPainted *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error) {
+func (pr *Plumping) SearchItem(ctx context.Context, code string, isProducer, isPainted, isGarant, isAqua *bool, searchQuery string, minPrice, maxPrice *float64) ([]*models.ItemResponse, error) {
 	const op = "service.Search"
 
 	log := pr.log.With(
 		slog.String("op: ", op),
 	)
-	items, err := pr.plumpingRepository.SearchItems(ctx, code, isProducer, isPainted, searchQuery, minPrice, maxPrice)
+	items, err := pr.plumpingRepository.SearchItem(ctx, code, isProducer, isPainted, isGarant, isAqua, searchQuery, minPrice, maxPrice)
 	if err != nil {
 		if errors.Is(err, storage.ErrCollectionNotFound) {
 			return nil, storage.ErrCollectionNotFound
